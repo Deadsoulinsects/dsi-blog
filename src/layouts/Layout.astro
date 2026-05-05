@@ -17,6 +17,15 @@ const navItems = [
 	{ href: '/about', label: '关于' },
 ];
 
+const base = import.meta.env.BASE_URL;
+
+const withBase = (path: string) => {
+	const trimmedBase = base.endsWith('/') ? base.slice(0, -1) : base;
+	const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+
+	return `${trimmedBase}${normalizedPath}`;
+};
+
 const normalizePath = (path: string) => {
 	if (path === '/') {
 		return '/';
@@ -33,8 +42,8 @@ const currentPath = normalizePath(Astro.url.pathname);
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
+		<link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
+		<link rel="icon" href={withBase('/favicon.ico')} />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content={description} />
 		<title>{title}</title>
@@ -45,7 +54,7 @@ const currentPath = normalizePath(Astro.url.pathname);
 			<div class="site-glow site-glow-right"></div>
 
 			<header class="site-header">
-				<a class="brand" href="/">
+				<a class="brand" href={base}>
 					<span class="brand-name">Dead Soul Insects</span>
 					<span class="brand-tag">个人博客 / 笔记 / 项目</span>
 				</a>
@@ -53,10 +62,10 @@ const currentPath = normalizePath(Astro.url.pathname);
 				<nav class="site-nav" aria-label="主导航">
 					{
 						navItems.map((item) => {
-							const isActive = currentPath === normalizePath(item.href);
+							const isActive = currentPath === normalizePath(withBase(item.href));
 
 							return (
-								<a class:list={{ active: isActive }} aria-current={isActive ? 'page' : undefined} href={item.href}>
+								<a class:list={{ active: isActive }} aria-current={isActive ? 'page' : undefined} href={withBase(item.href)}>
 									{item.label}
 								</a>
 							);

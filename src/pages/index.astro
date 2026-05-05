@@ -6,31 +6,40 @@ const entryCards = [
 		label: 'Blog',
 		title: '博客',
 		description: '收纳技术笔记、学习记录与阶段性思考，是 Dead Soul Insects 最稳定的写作入口。',
-		href: '/blog',
+		href: 'blog',
 		action: '阅读文章',
 	},
 	{
 		label: 'Projects',
 		title: '项目',
 		description: '整理持续推进的实践、工具与实验，保留它们的用途、边界与阶段。',
-		href: '/projects',
+		href: 'projects',
 		action: '查看项目',
 	},
 	{
 		label: 'Docs',
 		title: '文档',
 		description: '把零散记录收束成可复用的说明，方便查阅，也便于长期整理。',
-		href: '/docs',
+		href: 'docs',
 		action: '打开文档',
 	},
 	{
 		label: 'Origin',
 		title: '起源',
 		description: '说明 Dead Soul Insects 这个名字如何留下来，以及整站气质由何而来。',
-		href: '/origin',
+		href: 'origin',
 		action: '了解起源',
 	},
 ];
+
+const base = import.meta.env.BASE_URL;
+
+const withBase = (path: string) => {
+	const trimmedBase = base.endsWith('/') ? base.slice(0, -1) : base;
+	const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+
+	return `${trimmedBase}${normalizedPath}`;
+};
 ---
 
 <Layout title="Dead Soul Insects" description="在灵魂残光中，记录技术、项目与碎片。">
@@ -47,9 +56,9 @@ const entryCards = [
 			</p>
 
 			<div class="hero-links">
-				<a class="primary-link" href="/blog">进入博客</a>
-				<a class="secondary-link" href="/docs">阅读文档</a>
-				<a class="secondary-link" href="/projects">查看项目</a>
+				<a class="primary-link" href={withBase('/blog')}>进入博客</a>
+				<a class="secondary-link" href={withBase('/docs')}>阅读文档</a>
+				<a class="secondary-link" href={withBase('/projects')}>查看项目</a>
 			</div>
 		</div>
 
@@ -62,10 +71,10 @@ const entryCards = [
 				</div>
 			</div>
 			<ul class="visual-nav" aria-label="主要入口概览">
-				<li><span>01</span><a href="/blog">博客</a></li>
-				<li><span>02</span><a href="/projects">项目</a></li>
-				<li><span>03</span><a href="/docs">文档</a></li>
-				<li><span>04</span><a href="/origin">起源</a></li>
+				<li><span>01</span><a href={withBase('/blog')}>博客</a></li>
+				<li><span>02</span><a href={withBase('/projects')}>项目</a></li>
+				<li><span>03</span><a href={withBase('/docs')}>文档</a></li>
+				<li><span>04</span><a href={withBase('/origin')}>起源</a></li>
 			</ul>
 		</aside>
 	</section>
@@ -79,7 +88,7 @@ const entryCards = [
 		<div class="entry-grid">
 			{
 				entryCards.map((card) => (
-					<a class="entry-card panel" href={card.href}>
+					<a class="entry-card panel" href={withBase(card.href)}>
 						<p class="entry-label">{card.label}</p>
 						<h3>{card.title}</h3>
 						<p>{card.description}</p>

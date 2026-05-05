@@ -16,6 +16,8 @@ const formatDate = (date: Date) =>
 
 const formatDateTime = (date: Date) =>
 	`${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;
+
+const base = import.meta.env.BASE_URL;
 ---
 
 <Layout title="博客 | Dead Soul Insects" description="Dead Soul Insects 的博客列表页。">
@@ -30,7 +32,7 @@ const formatDateTime = (date: Date) =>
 	<section class="post-list" aria-label="文章列表">
 		{
 			posts.map((post) => (
-				<a class="post-card" href={`/blog/${post.id}/`}>
+				<a class="post-card" href={`${base}blog/${post.id}/`}>
 					<div class="post-card-top">
 						<time class="post-date" datetime={formatDateTime(post.data.pubDate)}>{formatDate(post.data.pubDate)}</time>
 						{post.data.tags.length > 0 && (
