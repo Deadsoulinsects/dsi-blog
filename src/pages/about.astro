@@ -1,0 +1,168 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const aboutSections = [
+	{
+		title: '这个站是做什么的',
+		description:
+			'Dead Soul Insects 是一个偏安静的个人站点，用来放博客、项目入口和整理后的说明页。它不追求把一切都展示出来，只保留那些愿意慢慢写清楚的内容。',
+	},
+	{
+		title: '主要内容',
+		description:
+			'内容主要围绕建站记录、学习过程、工具实践与少量仍在成形的想法。以中文为主，也重视长期可回看。',
+	},
+	{
+		title: '不写什么',
+		description:
+			'这里不放过多私人经历、履历细节或需要频繁维护的自我包装信息。与其把个人介绍写满，不如让文章、项目与文档慢慢说明这个站。',
+	},
+];
+---
+
+<Layout title="关于 | Dead Soul Insects" description="Dead Soul Insects 的简要站点介绍与写作方向说明。">
+	<section class="page-card">
+		<header class="page-intro">
+			<p class="kicker">关于</p>
+			<h1>一个保留距离感的个人站。</h1>
+			<p class="lead">
+				这里不是完整履历，也不是社交主页。它更像一个安静的公开出口，把愿意留下的文字、项目与说明整理出来。
+			</p>
+		</header>
+
+		<section class="summary-block" aria-labelledby="about-summary-title">
+			<h2 id="about-summary-title">这一页的边界</h2>
+			<p>
+				这里只保留必要的站点说明，不展开过多私人信息。重心放在内容本身，也让这个页面保持简洁。
+			</p>
+		</section>
+
+		<div class="section-grid" aria-label="关于页面内容分组">
+			{
+				aboutSections.map((section) => (
+					<section class="content-card">
+						<h2>{section.title}</h2>
+						<p>{section.description}</p>
+					</section>
+				))
+			}
+		</div>
+
+		<section class="closing-note" aria-labelledby="about-note-title">
+			<h2 id="about-note-title">说明方式</h2>
+			<p>
+				这一页只说明写作方向、页面用途与内容边界。对这个站来说，克制比扩写更重要。
+			</p>
+		</section>
+	</section>
+</Layout>
+
+<style>
+	.page-card {
+		padding: 32px;
+		border: 1px solid var(--line);
+		border-radius: 28px;
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+			var(--panel);
+		backdrop-filter: blur(18px);
+		box-shadow: var(--shadow);
+	}
+
+	.page-intro,
+	.summary-block,
+	.closing-note {
+		max-width: 46rem;
+	}
+
+	.summary-block,
+	.closing-note,
+	.content-card {
+		padding: 24px;
+		border: 1px solid var(--line);
+		border-radius: 24px;
+	}
+
+	.summary-block,
+	.closing-note {
+		background: var(--panel-strong);
+	}
+
+	.summary-block {
+		margin: 0 0 20px;
+	}
+
+	.closing-note {
+		margin-top: 20px;
+	}
+
+	.kicker {
+		margin: 0 0 12px;
+		font-size: 0.88rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--accent-soft);
+	}
+
+	h1,
+	h2,
+	p {
+		margin-top: 0;
+	}
+
+	h1 {
+		margin-bottom: 18px;
+		font-size: clamp(2rem, 4vw, 3rem);
+		line-height: 1.1;
+	}
+
+	h2 {
+		margin-bottom: 12px;
+		font-size: clamp(1.2rem, 2.4vw, 1.6rem);
+		line-height: 1.25;
+	}
+
+	p {
+		margin-bottom: 0;
+		line-height: 1.8;
+		color: var(--text-soft);
+	}
+
+	.lead {
+		margin-bottom: 28px;
+		font-size: 1.02rem;
+		color: var(--text-soft);
+	}
+
+	.section-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 18px;
+	}
+
+	.content-card {
+		background:
+			radial-gradient(circle at top right, rgba(110, 195, 255, 0.08), transparent 34%),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+			var(--panel);
+	}
+
+	@media (max-width: 900px) {
+		.section-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	@media (max-width: 640px) {
+		.page-card,
+		.summary-block,
+		.content-card,
+		.closing-note {
+			padding: 24px;
+		}
+
+		.lead {
+			margin-bottom: 24px;
+		}
+	}
+</style>

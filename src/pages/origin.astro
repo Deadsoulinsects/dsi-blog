@@ -1,0 +1,161 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const originSections = [
+	{
+		title: 'Dead Soul Insects 名字来源',
+		description:
+			'这个名字保留下来，不是为了显得完整或神秘，而是因为它准确对应了站点的气质。它带一点冷意和距离感，也保留了微弱发光的余地。',
+	},
+	{
+		title: '死魂虫的意象',
+		description:
+			'这里的“死魂虫”更接近一种意象，而不是具体设定。它适合承接夜色、残光、碎片与缓慢整理中的内容，也让文章、项目与文档拥有相近的语气。',
+	},
+	{
+		title: '为什么保持抽象',
+		description:
+			'这一页更想说明站点气质，而不是借用已有形象来替代表达。保留抽象、克制与空白，可以让注意力停在文字本身，也让联想保持适度开放。',
+	},
+];
+---
+
+<Layout title="起源 | Dead Soul Insects" description="解释 Dead Soul Insects 的名字来源、死魂虫意象与站点视觉选择。">
+	<section class="page-card">
+		<header class="page-intro">
+			<p class="kicker">起源</p>
+			<h1>这个名字更像一种语气。</h1>
+			<p class="lead">
+				Dead Soul Insects 不是一套设定，也不是需要被完全解释的符号。它只是为这个站点留下一个稳定的语气：安静、冷调、克制，仍有一点微弱的光。
+			</p>
+		</header>
+
+		<section class="summary-block" aria-labelledby="origin-summary-title">
+			<h2 id="origin-summary-title">这页想说明的重点</h2>
+			<p>
+				这不是考据页，也不是设定说明。这里仅说明三件事：名字为何保留下来，它所对应的意象，以及页面为何保持抽象和留白。
+			</p>
+		</section>
+
+		<div class="section-stack" aria-label="起源说明">
+			{
+				originSections.map((section) => (
+					<section class="content-card">
+						<h2>{section.title}</h2>
+						<p>{section.description}</p>
+					</section>
+				))
+			}
+		</div>
+
+		<section class="closing-note" aria-labelledby="origin-note-title">
+			<h2 id="origin-note-title">保留一点模糊感</h2>
+			<p>
+				这个名字不需要被解释得毫无剩余。只要它仍能让人感到安静、冷调、克制发光，这一页的作用就已经足够。
+			</p>
+		</section>
+	</section>
+</Layout>
+
+<style>
+	.page-card {
+		padding: 32px;
+		border: 1px solid var(--line);
+		border-radius: 28px;
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+			var(--panel);
+		backdrop-filter: blur(18px);
+		box-shadow: var(--shadow);
+	}
+
+	.page-intro,
+	.summary-block,
+	.closing-note {
+		max-width: 48rem;
+	}
+
+	.summary-block,
+	.closing-note,
+	.content-card {
+		padding: 24px;
+		border: 1px solid var(--line);
+		border-radius: 24px;
+	}
+
+	.summary-block,
+	.closing-note {
+		background: var(--panel-strong);
+	}
+
+	.summary-block {
+		margin: 0 0 20px;
+	}
+
+	.closing-note {
+		margin-top: 20px;
+	}
+
+	.kicker {
+		margin: 0 0 12px;
+		font-size: 0.88rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--accent-soft);
+	}
+
+	h1,
+	h2,
+	p {
+		margin-top: 0;
+	}
+
+	h1 {
+		margin-bottom: 18px;
+		font-size: clamp(2rem, 4vw, 3rem);
+		line-height: 1.1;
+	}
+
+	h2 {
+		margin-bottom: 12px;
+		font-size: clamp(1.2rem, 2.4vw, 1.6rem);
+		line-height: 1.25;
+	}
+
+	p {
+		margin-bottom: 0;
+		line-height: 1.8;
+		color: var(--text-soft);
+	}
+
+	.lead {
+		margin-bottom: 28px;
+		font-size: 1.02rem;
+		color: var(--text-soft);
+	}
+
+	.section-stack {
+		display: grid;
+		gap: 18px;
+	}
+
+	.content-card {
+		background:
+			radial-gradient(circle at top right, rgba(110, 195, 255, 0.08), transparent 34%),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+			var(--panel);
+	}
+
+	@media (max-width: 640px) {
+		.page-card,
+		.summary-block,
+		.content-card,
+		.closing-note {
+			padding: 24px;
+		}
+
+		.lead {
+			margin-bottom: 24px;
+		}
+	}
+</style>

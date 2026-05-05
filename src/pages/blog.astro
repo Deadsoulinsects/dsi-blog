@@ -1,0 +1,206 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog')).sort(
+	(a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime(),
+);
+
+const formatDate = (date: Date) =>
+	date.toLocaleDateString('zh-CN', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+		timeZone: 'UTC',
+	});
+
+const formatDateTime = (date: Date) =>
+	`${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;
+---
+
+<Layout title="博客 | Dead Soul Insects" description="Dead Soul Insects 的博客列表页。">
+	<section class="page-card intro-card">
+		<p class="kicker">博客</p>
+		<h1>持续写下来的记录。</h1>
+		<p>
+			这里收纳 Dead Soul Insects 的文章记录。内容以技术、建站、工具实践与阶段性思考为主，按时间安静展开。
+		</p>
+	</section>
+
+	<section class="post-list" aria-label="文章列表">
+		{
+			posts.map((post) => (
+				<a class="post-card" href={`/blog/${post.id}/`}>
+					<div class="post-card-top">
+						<time class="post-date" datetime={formatDateTime(post.data.pubDate)}>{formatDate(post.data.pubDate)}</time>
+						{post.data.tags.length > 0 && (
+							<ul class="tag-list" aria-label="文章标签">
+								{post.data.tags.map((tag) => (
+									<li>{tag}</li>
+								))}
+							</ul>
+						)}
+					</div>
+					<div class="post-card-body">
+						<h2>{post.data.title}</h2>
+						<p class="post-description">{post.data.description}</p>
+					</div>
+					<span class="post-link">阅读全文 →</span>
+				</a>
+			))
+		}
+	</section>
+</Layout>
+
+<style>
+	.page-card {
+		padding: 32px;
+		border: 1px solid var(--line);
+		border-radius: 28px;
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+			var(--panel);
+		backdrop-filter: blur(18px);
+		box-shadow: var(--shadow);
+	}
+
+	.intro-card {
+		margin-bottom: 22px;
+	}
+
+	.kicker {
+		margin: 0 0 12px;
+		font-size: 0.88rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--accent-soft);
+	}
+
+	h1 {
+		margin: 0 0 16px;
+		font-size: clamp(2rem, 4vw, 3rem);
+		line-height: 1.08;
+	}
+
+	h2 {
+		margin: 0;
+		font-size: clamp(1.3rem, 2.4vw, 1.65rem);
+		line-height: 1.25;
+	}
+
+	p {
+		margin: 0;
+		line-height: 1.8;
+		color: var(--text-soft);
+	}
+
+	.post-list {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		gap: 18px;
+	}
+
+	.post-card {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+		min-height: 100%;
+		padding: 24px;
+		border: 1px solid var(--line);
+		border-radius: 24px;
+		background:
+			radial-gradient(circle at top right, rgba(110, 195, 255, 0.1), transparent 34%),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+			var(--panel);
+		backdrop-filter: blur(18px);
+		box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
+		text-decoration: none;
+		transition:
+			transform 0.2s ease,
+			border-color 0.2s ease,
+			background 0.2s ease,
+			box-shadow 0.2s ease;
+	}
+
+	.post-card-top,
+	.tag-list {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 10px;
+	}
+
+	.post-card-body {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.post-card:hover {
+		transform: translateY(-2px);
+		border-color: rgba(157, 140, 255, 0.3);
+		background:
+			radial-gradient(circle at top right, rgba(110, 195, 255, 0.14), transparent 36%),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
+			var(--panel-strong);
+		box-shadow: 0 28px 90px rgba(0, 0, 0, 0.3);
+	}
+
+	.post-card:focus-visible {
+		transform: translateY(-2px);
+		border-color: rgba(157, 140, 255, 0.3);
+		background:
+			radial-gradient(circle at top right, rgba(110, 195, 255, 0.14), transparent 36%),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
+			var(--panel-strong);
+		box-shadow: 0 28px 90px rgba(0, 0, 0, 0.3);
+		outline: 2px solid rgba(110, 195, 255, 0.9);
+		outline-offset: 3px;
+	}
+
+	.post-date {
+		margin: 0;
+		font-size: 0.9rem;
+		color: var(--accent-soft);
+	}
+
+	.post-description {
+		max-width: 34rem;
+	}
+
+	.tag-list {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.tag-list li {
+		padding: 6px 10px;
+		border: 1px solid rgba(110, 195, 255, 0.16);
+		border-radius: 999px;
+		background: rgba(110, 195, 255, 0.08);
+		color: var(--text);
+		font-size: 0.82rem;
+		line-height: 1.2;
+	}
+
+	.post-link {
+		margin-top: auto;
+		color: #a0b5ff;
+		font-size: 0.95rem;
+		font-weight: 600;
+	}
+
+	@media (max-width: 640px) {
+		.page-card,
+		.post-card {
+			padding: 24px;
+		}
+
+		.post-card {
+			gap: 18px;
+		}
+	}
+</style>

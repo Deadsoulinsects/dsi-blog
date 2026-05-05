@@ -1,0 +1,190 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const projectGroups = [
+	{
+		title: 'AI 项目',
+		description:
+			'收纳与 AI 生成、协作流程、提示整理相关的实践。重点不是陈列概念，而是说明它们解决什么问题，现阶段能做到什么。',
+		items: ['用于整理思路、辅助写作或支持工作流的小型实验', '把内容、资料与操作步骤串联起来的半自动流程', '尽量交代背景、目标与使用边界'],
+	},
+	{
+		title: '自动化脚本',
+		description:
+			'这部分偏向更实用的日常脚本。它们未必复杂，但通常解决的是重复、机械、容易出错的事，所以值得留下来整理成可复用的记录。',
+		items: ['文件整理、批量处理和轻量部署脚本', '围绕本地工作流的小范围自动化尝试', '尽量保留能看懂、能改动、能继续维护的写法'],
+	},
+	{
+		title: '个人工具',
+		description:
+			'这里更接近个人工作台：小页面、小命令、小工具。它们未必公开发布，也不追求完整产品感，但都会说明为何存在、如何使用。',
+		items: ['为写作、记录或整理流程服务的小工具', '带一点实验性质但已经能自用的页面或命令', '优先保留用途说明，而不是只放一个名字'],
+	},
+];
+---
+
+<Layout title="项目 | Dead Soul Insects" description="Dead Soul Insects 的项目页，收纳 AI 项目、自动化脚本与个人工具。">
+	<section class="page-card">
+		<header class="page-intro">
+			<p class="kicker">项目</p>
+			<h1>把正在做的东西，安静地整理出来。</h1>
+			<p class="lead">
+				这一页整理 Dead Soul Insects 里与实践相关的内容。AI 项目、自动化脚本与个人工具分别归档，各自保持清楚的边界。
+			</p>
+		</header>
+
+		<section class="summary-block" aria-labelledby="projects-summary-title">
+			<h2 id="projects-summary-title">这一页的取向</h2>
+			<p>
+				这里不是堆叠数量的作品集，而是一个更稳定的项目入口。每个条目尽量说明它在解决什么问题、处于什么状态，以及为何值得留下。
+			</p>
+		</section>
+
+		<div class="section-grid" aria-label="项目分组">
+			{
+				projectGroups.map((group) => (
+					<section class="content-card">
+						<h2>{group.title}</h2>
+						<p>{group.description}</p>
+						<ul class="detail-list">
+							{group.items.map((item) => (
+								<li>{item}</li>
+							))}
+						</ul>
+					</section>
+				))
+			}
+		</div>
+
+		<section class="closing-note" aria-labelledby="projects-note-title">
+			<h2 id="projects-note-title">当前的取向</h2>
+			<p>
+				这一页优先记录真实在用、真实在做、也愿意继续维护的东西。数量不会很多，但每一项都应有来路、有用途，也有清楚的位置。
+			</p>
+		</section>
+	</section>
+</Layout>
+
+<style>
+	.page-card {
+		padding: 32px;
+		border: 1px solid var(--line);
+		border-radius: 28px;
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+			var(--panel);
+		backdrop-filter: blur(18px);
+		box-shadow: var(--shadow);
+	}
+
+	.page-intro,
+	.summary-block,
+	.closing-note {
+		max-width: 46rem;
+	}
+
+	.summary-block,
+	.closing-note {
+		padding: 24px;
+		border: 1px solid var(--line);
+		border-radius: 24px;
+		background: var(--panel-strong);
+	}
+
+	.summary-block {
+		margin: 0 0 20px;
+	}
+
+	.closing-note {
+		margin-top: 20px;
+	}
+
+	.kicker {
+		margin: 0 0 12px;
+		font-size: 0.88rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--accent-soft);
+	}
+
+	h1,
+	h2,
+	p,
+	ul {
+		margin-top: 0;
+	}
+
+	h1 {
+		margin-bottom: 18px;
+		font-size: clamp(2rem, 4vw, 3rem);
+		line-height: 1.1;
+	}
+
+	h2 {
+		margin-bottom: 12px;
+		font-size: clamp(1.2rem, 2.4vw, 1.6rem);
+		line-height: 1.25;
+	}
+
+	p {
+		margin-bottom: 0;
+		line-height: 1.8;
+		color: var(--text-soft);
+	}
+
+	.lead {
+		margin-bottom: 28px;
+		font-size: 1.02rem;
+		color: var(--text-soft);
+	}
+
+	.section-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 18px;
+	}
+
+	.content-card {
+		padding: 24px;
+		border: 1px solid var(--line);
+		border-radius: 24px;
+		background:
+			radial-gradient(circle at top right, rgba(110, 195, 255, 0.08), transparent 34%),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+			var(--panel);
+	}
+
+	.detail-list {
+		margin: 16px 0 0;
+		padding-left: 1.2rem;
+		color: var(--text-soft);
+	}
+
+	.detail-list li {
+		margin-bottom: 10px;
+		line-height: 1.75;
+	}
+
+	.detail-list li:last-child {
+		margin-bottom: 0;
+	}
+
+	@media (max-width: 900px) {
+		.section-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	@media (max-width: 640px) {
+		.page-card,
+		.summary-block,
+		.content-card,
+		.closing-note {
+			padding: 24px;
+		}
+
+		.lead {
+			margin-bottom: 24px;
+		}
+	}
+</style>

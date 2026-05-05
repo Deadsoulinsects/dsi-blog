@@ -1,11 +1,402 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const entryCards = [
+	{
+		label: 'Blog',
+		title: '博客',
+		description: '收纳技术笔记、学习记录与阶段性思考，是 Dead Soul Insects 最稳定的写作入口。',
+		href: '/blog',
+		action: '阅读文章',
+	},
+	{
+		label: 'Projects',
+		title: '项目',
+		description: '整理持续推进的实践、工具与实验，保留它们的用途、边界与阶段。',
+		href: '/projects',
+		action: '查看项目',
+	},
+	{
+		label: 'Docs',
+		title: '文档',
+		description: '把零散记录收束成可复用的说明，方便查阅，也便于长期整理。',
+		href: '/docs',
+		action: '打开文档',
+	},
+	{
+		label: 'Origin',
+		title: '起源',
+		description: '说明 Dead Soul Insects 这个名字如何留下来，以及整站气质由何而来。',
+		href: '/origin',
+		action: '了解起源',
+	},
+];
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="Dead Soul Insects" description="在灵魂残光中，记录技术、项目与碎片。">
+	<section class="hero-grid">
+		<div class="hero-copy panel">
+			<p class="eyebrow">Dead Soul Insects</p>
+			<h1>一个在冷色残光里，缓慢展开的个人站点。</h1>
+			<p class="lead">
+				Dead Soul Insects 以博客、项目、文档与起源四个入口为主，收纳技术记录、实践页面与整理后的说明。
+				这里保留长期写作、项目归档与文档整理的节奏，让零散想法慢慢沉淀成可回看的内容。
+			</p>
+			<p class="hero-note">
+				写作、项目、说明与名字来路，在这里并列展开。各自安静，也彼此照应。
+			</p>
+
+			<div class="hero-links">
+				<a class="primary-link" href="/blog">进入博客</a>
+				<a class="secondary-link" href="/docs">阅读文档</a>
+				<a class="secondary-link" href="/projects">查看项目</a>
+			</div>
+		</div>
+
+		<aside class="visual-card panel" aria-label="首页入口概览">
+			<div class="visual-header">
+				<div class="visual-badge">DSI</div>
+				<div>
+					<p class="visual-title">Where Dead Souls Still Glow</p>
+					<p class="visual-text">安静、冷调、克制发光。四个主要入口在这里并列展开，让阅读、项目与说明有清楚的落点。</p>
+				</div>
+			</div>
+			<ul class="visual-nav" aria-label="主要入口概览">
+				<li><span>01</span><a href="/blog">博客</a></li>
+				<li><span>02</span><a href="/projects">项目</a></li>
+				<li><span>03</span><a href="/docs">文档</a></li>
+				<li><span>04</span><a href="/origin">起源</a></li>
+			</ul>
+		</aside>
+	</section>
+
+	<section class="entry-section">
+		<div class="section-heading">
+			<p class="section-kicker">主要入口</p>
+			<h2>从这里进入 Dead Soul Insects 的四个主要入口。</h2>
+		</div>
+
+		<div class="entry-grid">
+			{
+				entryCards.map((card) => (
+					<a class="entry-card panel" href={card.href}>
+						<p class="entry-label">{card.label}</p>
+						<h3>{card.title}</h3>
+						<p>{card.description}</p>
+						<span>{card.action} →</span>
+					</a>
+				))
+			}
+		</div>
+	</section>
 </Layout>
+
+<style>
+	.panel {
+		border: 1px solid var(--line);
+		border-radius: 28px;
+		background:
+			radial-gradient(circle at top right, rgba(110, 195, 255, 0.08), transparent 34%),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+			var(--panel);
+		backdrop-filter: blur(18px);
+		box-shadow: var(--shadow);
+	}
+
+	.hero-grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+		gap: 24px;
+		align-items: stretch;
+	}
+
+	.hero-copy,
+	.visual-card {
+		padding: 32px;
+	}
+
+	.eyebrow,
+	.section-kicker {
+		margin: 0 0 12px;
+		font-size: 0.88rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--accent-soft);
+	}
+
+	h1,
+	h2,
+	h3,
+	p {
+		margin-top: 0;
+	}
+
+	h1 {
+		margin-bottom: 18px;
+		font-size: clamp(2.2rem, 5vw, 4rem);
+		line-height: 1.1;
+	}
+
+	.lead {
+		max-width: 42rem;
+		margin-bottom: 16px;
+		font-size: 1.02rem;
+		line-height: 1.8;
+		color: var(--text-soft);
+	}
+
+	.hero-note {
+		max-width: 36rem;
+		margin-bottom: 28px;
+		line-height: 1.8;
+		color: var(--text-soft);
+	}
+
+	.hero-links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 14px;
+	}
+
+	.hero-links a {
+		padding: 12px 18px;
+		border-radius: 999px;
+		text-decoration: none;
+		font-weight: 600;
+		color: var(--text);
+		transition:
+			transform 0.2s ease,
+			background 0.2s ease,
+			border-color 0.2s ease;
+	}
+
+	.hero-links a:hover,
+	.hero-links a:focus-visible,
+	.entry-card:hover {
+		transform: translateY(-2px);
+	}
+
+	.hero-links a:focus-visible,
+	.entry-card:focus-visible {
+		outline: 2px solid rgba(110, 195, 255, 0.9);
+		outline-offset: 3px;
+	}
+
+	.primary-link {
+		background: linear-gradient(135deg, rgba(122, 101, 255, 0.9), rgba(70, 176, 255, 0.9));
+		color: #f8fbff;
+	}
+
+	.secondary-link {
+		border: 1px solid rgba(153, 176, 255, 0.24);
+		background: rgba(153, 176, 255, 0.08);
+	}
+
+	.visual-card {
+		position: relative;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		gap: 18px;
+		min-height: 320px;
+	}
+
+	.visual-header {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		gap: 18px;
+		align-items: start;
+	}
+
+	.visual-card::after {
+		content: '';
+		position: absolute;
+		inset: auto -20% -30% auto;
+		width: 220px;
+		height: 220px;
+		border-radius: 50%;
+		background: radial-gradient(circle, rgba(103, 189, 255, 0.28), transparent 70%);
+		filter: blur(14px);
+	}
+
+	.visual-badge {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 80px;
+		height: 80px;
+		border-radius: 24px;
+		background: linear-gradient(160deg, rgba(123, 103, 255, 0.28), rgba(93, 190, 255, 0.1));
+		border: 1px solid rgba(153, 176, 255, 0.22);
+		font-size: 1.4rem;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+	}
+
+	.visual-title {
+		margin-top: 0;
+		margin-bottom: 0;
+		font-size: 1.2rem;
+		font-weight: 600;
+	}
+
+	.visual-text {
+		margin-top: 10px;
+		margin-bottom: 0;
+		line-height: 1.8;
+		color: var(--text-soft);
+	}
+
+	.visual-nav {
+		position: relative;
+		z-index: 1;
+		display: grid;
+		gap: 12px;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.visual-nav li {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		gap: 12px;
+		align-items: center;
+		padding: 14px 16px;
+		border: 1px solid rgba(153, 176, 255, 0.14);
+		border-radius: 18px;
+		background: rgba(255, 255, 255, 0.03);
+	}
+
+	.visual-nav span {
+		color: var(--accent-soft);
+		font-size: 0.82rem;
+		letter-spacing: 0.12em;
+	}
+
+	.visual-nav a {
+		text-decoration: none;
+		font-weight: 600;
+	}
+
+	.visual-nav a:hover,
+	.visual-nav a:focus-visible {
+		color: var(--accent-soft);
+	}
+
+	.visual-nav a:focus-visible {
+		outline: 2px solid rgba(110, 195, 255, 0.9);
+		outline-offset: 3px;
+		border-radius: 4px;
+	}
+
+	.visual-nav li:focus-within {
+		border-color: rgba(157, 140, 255, 0.28);
+		background: rgba(255, 255, 255, 0.05);
+	}
+
+	.entry-section {
+		margin-top: 26px;
+	}
+
+	.section-heading {
+		margin-bottom: 18px;
+	}
+
+	h2 {
+		margin-bottom: 0;
+		font-size: clamp(1.5rem, 3vw, 2.2rem);
+	}
+
+	.entry-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 18px;
+	}
+
+	.entry-card {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+		padding: 24px;
+		text-decoration: none;
+		transition:
+			transform 0.2s ease,
+			border-color 0.2s ease,
+			background 0.2s ease,
+			box-shadow 0.2s ease;
+	}
+
+	.entry-card:hover {
+		border-color: rgba(153, 176, 255, 0.3);
+		background:
+			radial-gradient(circle at top right, rgba(110, 195, 255, 0.14), transparent 36%),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
+			var(--panel-strong);
+		box-shadow: 0 28px 90px rgba(0, 0, 0, 0.3);
+	}
+
+	.entry-card:focus-visible {
+		border-color: rgba(153, 176, 255, 0.3);
+		background:
+			radial-gradient(circle at top right, rgba(110, 195, 255, 0.14), transparent 36%),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
+			var(--panel-strong);
+		box-shadow: 0 28px 90px rgba(0, 0, 0, 0.3);
+	}
+
+	.entry-label {
+		margin-bottom: 0;
+		font-size: 0.82rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--accent-soft);
+	}
+
+	.entry-card h3 {
+		margin-bottom: 0;
+		font-size: 1.12rem;
+	}
+
+	.entry-card p {
+		margin-bottom: 0;
+		line-height: 1.7;
+		color: var(--text-soft);
+	}
+
+	.entry-card span {
+		margin-top: auto;
+		color: #a0b5ff;
+		font-size: 0.95rem;
+		font-weight: 600;
+	}
+
+	@media (max-width: 900px) {
+		.hero-grid,
+		.entry-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.visual-card {
+			min-height: auto;
+		}
+	}
+
+	@media (max-width: 640px) {
+		.hero-copy,
+		.visual-card,
+		.entry-card {
+			padding: 24px;
+		}
+
+		.visual-header {
+			grid-template-columns: 1fr;
+		}
+
+		h1 {
+			font-size: 2rem;
+		}
+	}
+</style>

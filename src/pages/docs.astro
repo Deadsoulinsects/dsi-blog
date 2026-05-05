@@ -1,0 +1,190 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const docGroups = [
+	{
+		title: '分享文档',
+		description:
+			'整理适合直接给读者或协作者查看的说明页。重点是把流程、项目入口或使用方式写清楚，方便引用，也方便回看。',
+		items: ['面向读者或协作者的简洁说明', '围绕项目、页面或工具的入口型文档', '尽量减少跳跃式表达，先把核心信息说完整'],
+	},
+	{
+		title: '学习资料',
+		description:
+			'这部分更接近整理后的学习记录。不堆链接，而是把概念、路径和可复用的片段收束起来，让它比原始笔记更适合阅读。',
+		items: ['值得长期保留的教程、资料与线索', '阶段性的理解、摘录与再整理', '便于查找与延展的主题索引'],
+	},
+	{
+		title: '配置说明',
+		description:
+			'当某个环境、工具或站点结构需要重复处理时，这里保留可复查的说明。它不追求铺开太大，只求下一次打开时仍然清楚。',
+		items: ['本地环境、建站流程和工具配置记录', '关键目录、文件作用与改动边界说明', '优先保留能照着复现的最小信息'],
+	},
+];
+---
+
+<Layout title="文档 | Dead Soul Insects" description="Dead Soul Insects 的文档页，整理分享文档、学习资料与配置说明。">
+	<section class="page-card">
+		<header class="page-intro">
+			<p class="kicker">文档</p>
+			<h1>把零散记录收紧成可复用的说明。</h1>
+			<p class="lead">
+				博客偏向持续写下来的过程，文档页更偏向整理后的结果。分享文档、学习资料与配置说明在这里分开陈列，方便查阅，也方便复用。
+			</p>
+		</header>
+
+		<section class="summary-block" aria-labelledby="docs-summary-title">
+			<h2 id="docs-summary-title">这一页和博客的区别</h2>
+			<p>
+				这里不会追求文章感，而更重视说明感。能不能快速找到入口、能不能顺着读完、能不能在一段时间之后还帮到自己，是这页更在意的事。
+			</p>
+		</section>
+
+		<div class="section-grid" aria-label="文档分组">
+			{
+				docGroups.map((group) => (
+					<section class="content-card">
+						<h2>{group.title}</h2>
+						<p>{group.description}</p>
+						<ul class="detail-list">
+							{group.items.map((item) => (
+								<li>{item}</li>
+							))}
+						</ul>
+					</section>
+				))
+			}
+		</div>
+
+		<section class="closing-note" aria-labelledby="docs-note-title">
+			<h2 id="docs-note-title">整理方式</h2>
+			<p>
+				这里优先保留清楚的入口和完整的最小说明。内容不求铺陈，只求在需要时能够迅速找到、顺着读完、重新用上。
+			</p>
+		</section>
+	</section>
+</Layout>
+
+<style>
+	.page-card {
+		padding: 32px;
+		border: 1px solid var(--line);
+		border-radius: 28px;
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+			var(--panel);
+		backdrop-filter: blur(18px);
+		box-shadow: var(--shadow);
+	}
+
+	.page-intro,
+	.summary-block,
+	.closing-note {
+		max-width: 46rem;
+	}
+
+	.summary-block,
+	.closing-note {
+		padding: 24px;
+		border: 1px solid var(--line);
+		border-radius: 24px;
+		background: var(--panel-strong);
+	}
+
+	.summary-block {
+		margin: 0 0 20px;
+	}
+
+	.closing-note {
+		margin-top: 20px;
+	}
+
+	.kicker {
+		margin: 0 0 12px;
+		font-size: 0.88rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--accent-soft);
+	}
+
+	h1,
+	h2,
+	p,
+	ul {
+		margin-top: 0;
+	}
+
+	h1 {
+		margin-bottom: 18px;
+		font-size: clamp(2rem, 4vw, 3rem);
+		line-height: 1.1;
+	}
+
+	h2 {
+		margin-bottom: 12px;
+		font-size: clamp(1.2rem, 2.4vw, 1.6rem);
+		line-height: 1.25;
+	}
+
+	p {
+		margin-bottom: 0;
+		line-height: 1.8;
+		color: var(--text-soft);
+	}
+
+	.lead {
+		margin-bottom: 28px;
+		font-size: 1.02rem;
+		color: var(--text-soft);
+	}
+
+	.section-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 18px;
+	}
+
+	.content-card {
+		padding: 24px;
+		border: 1px solid var(--line);
+		border-radius: 24px;
+		background:
+			radial-gradient(circle at top right, rgba(110, 195, 255, 0.08), transparent 34%),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+			var(--panel);
+	}
+
+	.detail-list {
+		margin: 16px 0 0;
+		padding-left: 1.2rem;
+		color: var(--text-soft);
+	}
+
+	.detail-list li {
+		margin-bottom: 10px;
+		line-height: 1.75;
+	}
+
+	.detail-list li:last-child {
+		margin-bottom: 0;
+	}
+
+	@media (max-width: 900px) {
+		.section-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	@media (max-width: 640px) {
+		.page-card,
+		.summary-block,
+		.content-card,
+		.closing-note {
+			padding: 24px;
+		}
+
+		.lead {
+			margin-bottom: 24px;
+		}
+	}
+</style>
