@@ -1,35 +1,39 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
 
-const docGroups = [
-	{
-		title: '分享文档',
-		description:
-			'整理适合直接给读者或协作者查看的说明页。重点是把流程、项目入口或使用方式写清楚，方便引用，也方便回看。',
-		items: ['面向读者或协作者的简洁说明', '围绕项目、页面或工具的入口型文档', '尽量减少跳跃式表达，先把核心信息说完整'],
-	},
-	{
-		title: '学习资料',
-		description:
-			'这部分更接近整理后的学习记录。不堆链接，而是把概念、路径和可复用的片段收束起来，让它比原始笔记更适合阅读。',
-		items: ['值得长期保留的教程、资料与线索', '阶段性的理解、摘录与再整理', '便于查找与延展的主题索引'],
-	},
-	{
-		title: '配置说明',
-		description:
-			'当某个环境、工具或站点结构需要重复处理时，这里保留可复查的说明。它不追求铺开太大，只求下一次打开时仍然清楚。',
-		items: ['本地环境、建站流程和工具配置记录', '关键目录、文件作用与改动边界说明', '优先保留能照着复现的最小信息'],
-	},
-];
+const docs = (await getCollection('docs')).sort(
+	(a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime(),
+);
+
+const formatDate = (date: Date) =>
+	date.toLocaleDateString('zh-CN', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+		timeZone: 'UTC',
+	});
+
+const formatDateTime = (date: Date) =>
+	`${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;
+
+const base = import.meta.env.BASE_URL;
+
+const withBase = (path: string) => {
+	const trimmedBase = base.endsWith('/') ? base.slice(0, -1) : base;
+	const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+
+	return `${trimmedBase}${normalizedPath}`;
+};
 ---
 
-<Layout title="文档 | Dead Soul Insects" description="Dead Soul Insects 的文档页，整理分享文档、学习资料与配置说明。">
-	<section class="page-card">
+<Layout title="文档 | Dead Soul Insects" description="Dead Soul Insects 的文档列表页，整理分享文档、学习资料与配置说明。">
+	<section class="page-card intro-card">
 		<header class="page-intro">
 			<p class="kicker">文档</p>
 			<h1>把零散记录收紧成可复用的说明。</h1>
 			<p class="lead">
-				博客偏向持续写下来的过程，文档页更偏向整理后的结果。分享文档、学习资料与配置说明在这里分开陈列，方便查阅，也方便复用。
+				博客偏向持续写下来的过程，文档页更偏向整理后的结果。这里直接列出当前可读的说明页，方便查阅，也方便在需要时重新打开。
 			</p>
 		</header>
 
@@ -39,42 +43,53 @@ const docGroups = [
 				这里不会追求文章感，而更重视说明感。能不能快速找到入口、能不能顺着读完、能不能在一段时间之后还帮到自己，是这页更在意的事。
 			</p>
 		</section>
+	</section>
 
-		<div class="section-grid" aria-label="文档分组">
-			{
-				docGroups.map((group) => (
-					<section class="content-card">
-						<h2>{group.title}</h2>
-						<p>{group.description}</p>
-						<ul class="detail-list">
-							{group.items.map((item) => (
-								<li>{item}</li>
-							))}
-						</ul>
-					</section>
-				))
-			}
-		</div>
+	<section class="doc-list" aria-label="文档列表">
+		{
+			docs.map((doc) => (
+				<a class="doc-card" href={withBase(`/docs/${doc.id}/`)}>
+					<div class="doc-card-top">
+						<time class="doc-date" datetime={formatDateTime(doc.data.pubDate)}>{formatDate(doc.data.pubDate)}</time>
+					</div>
+					<div class="doc-card-body">
+						<h2>{doc.data.title}</h2>
+						<p class="doc-description">{doc.data.description}</p>
+					</div>
+					<span class="doc-link">打开文档 →</span>
+				</a>
+			))
+		}
+	</section>
 
-		<section class="closing-note" aria-labelledby="docs-note-title">
-			<h2 id="docs-note-title">整理方式</h2>
-			<p>
-				这里优先保留清楚的入口和完整的最小说明。内容不求铺陈，只求在需要时能够迅速找到、顺着读完、重新用上。
-			</p>
-		</section>
+	<section class="closing-note" aria-labelledby="docs-note-title">
+		<h2 id="docs-note-title">整理方式</h2>
+		<p>
+			这里优先保留清楚的入口和完整的最小说明。内容不求铺陈，只求在需要时能够迅速找到、顺着读完、重新用上。
+		</p>
 	</section>
 </Layout>
 
 <style>
-	.page-card {
-		padding: 32px;
+	.page-card,
+	.closing-note,
+	.doc-card {
 		border: 1px solid var(--line);
 		border-radius: 28px;
+		backdrop-filter: blur(18px);
+		box-shadow: var(--shadow);
+	}
+
+	.page-card,
+	.closing-note {
+		padding: 32px;
 		background:
 			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
 			var(--panel);
-		backdrop-filter: blur(18px);
-		box-shadow: var(--shadow);
+	}
+
+	.intro-card {
+		margin-bottom: 22px;
 	}
 
 	.page-intro,
@@ -83,20 +98,15 @@ const docGroups = [
 		max-width: 46rem;
 	}
 
-	.summary-block,
-	.closing-note {
+	.summary-block {
 		padding: 24px;
 		border: 1px solid var(--line);
 		border-radius: 24px;
 		background: var(--panel-strong);
 	}
 
-	.summary-block {
-		margin: 0 0 20px;
-	}
-
 	.closing-note {
-		margin-top: 20px;
+		margin-top: 22px;
 	}
 
 	.kicker {
@@ -109,8 +119,7 @@ const docGroups = [
 
 	h1,
 	h2,
-	p,
-	ul {
+	p {
 		margin-top: 0;
 	}
 
@@ -121,15 +130,9 @@ const docGroups = [
 	}
 
 	h2 {
-		margin-bottom: 12px;
-		font-size: clamp(1.2rem, 2.4vw, 1.6rem);
+		margin: 0;
+		font-size: clamp(1.3rem, 2.4vw, 1.65rem);
 		line-height: 1.25;
-	}
-
-	h1,
-	h2,
-	p,
-	li {
 		overflow-wrap: anywhere;
 	}
 
@@ -137,57 +140,114 @@ const docGroups = [
 		margin-bottom: 0;
 		line-height: 1.8;
 		color: var(--text-soft);
+		overflow-wrap: anywhere;
 	}
 
 	.lead {
 		margin-bottom: 28px;
 		font-size: 1.02rem;
-		color: var(--text-soft);
 	}
 
-	.section-grid {
+	.doc-list {
 		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: 18px;
+		align-items: stretch;
 	}
 
-	.content-card {
+	.doc-card {
+		position: relative;
+		display: grid;
+		grid-template-rows: auto 1fr auto;
+		gap: 20px;
+		height: 100%;
 		padding: 24px;
-		border: 1px solid var(--line);
-		border-radius: 24px;
 		background:
-			radial-gradient(circle at top right, rgba(110, 195, 255, 0.08), transparent 34%),
+			radial-gradient(circle at top right, rgba(110, 195, 255, 0.1), transparent 34%),
 			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
 			var(--panel);
+		box-sizing: border-box;
+		text-decoration: none;
+		transition:
+			transform 0.2s ease,
+			border-color 0.2s ease,
+			background 0.2s ease,
+			box-shadow 0.2s ease;
 	}
 
-	.detail-list {
-		margin: 16px 0 0;
-		padding-left: 1.2rem;
-		color: var(--text-soft);
+	.doc-card-body {
+		display: grid;
+		align-content: start;
+		gap: 12px;
 	}
 
-	.detail-list li {
-		margin-bottom: 10px;
-		line-height: 1.75;
+	.doc-card:hover,
+	.doc-card:focus-visible {
+		transform: translateY(-2px);
+		border-color: rgba(157, 140, 255, 0.3);
+		background:
+			radial-gradient(circle at top right, rgba(110, 195, 255, 0.14), transparent 36%),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
+			var(--panel-strong);
+		box-shadow: 0 28px 90px rgba(0, 0, 0, 0.3);
 	}
 
-	.detail-list li:last-child {
-		margin-bottom: 0;
+	.doc-card:focus-visible {
+		outline: 2px solid rgba(110, 195, 255, 0.9);
+		outline-offset: 3px;
+	}
+
+	.doc-date {
+		margin: 0;
+		font-size: 0.9rem;
+		color: var(--accent-soft);
+	}
+
+	.doc-description {
+		max-width: 34rem;
+	}
+
+	.doc-link {
+		display: inline-flex;
+		align-items: center;
+		align-self: flex-start;
+		padding: 8px 12px;
+		border: 1px solid rgba(153, 176, 255, 0.18);
+		border-radius: 999px;
+		background: rgba(153, 176, 255, 0.08);
+		color: var(--text);
+		font-size: 0.95rem;
+		font-weight: 600;
+		line-height: 1.2;
+		transition:
+			border-color 0.2s ease,
+			background 0.2s ease,
+			color 0.2s ease;
+	}
+
+	.doc-card:hover .doc-link,
+	.doc-card:focus-visible .doc-link {
+		border-color: rgba(157, 140, 255, 0.28);
+		background: rgba(157, 140, 255, 0.14);
+		color: #f3f6ff;
 	}
 
 	@media (max-width: 900px) {
-		.section-grid {
+		.doc-list {
 			grid-template-columns: 1fr;
 		}
 	}
 
 	@media (max-width: 640px) {
 		.page-card,
-		.summary-block,
-		.content-card,
-		.closing-note {
+		.doc-card,
+		.closing-note,
+		.summary-block {
 			padding: 24px;
+		}
+
+		.doc-card {
+			gap: 18px;
 		}
 
 		.lead {

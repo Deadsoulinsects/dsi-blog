@@ -1,0 +1,246 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+	const docs = await getCollection('docs');
+
+	return docs.map((doc) => ({
+		params: { slug: doc.id },
+		props: { doc },
+	}));
+}
+
+const { doc } = Astro.props;
+const { Content } = await render(doc);
+
+const formatDate = doc.data.pubDate.toLocaleDateString('zh-CN', {
+	year: 'numeric',
+	month: 'long',
+	day: 'numeric',
+	timeZone: 'UTC',
+});
+
+const dateTime = `${doc.data.pubDate.getUTCFullYear()}-${String(doc.data.pubDate.getUTCMonth() + 1).padStart(2, '0')}-${String(doc.data.pubDate.getUTCDate()).padStart(2, '0')}`;
+
+const base = import.meta.env.BASE_URL;
+
+const withBase = (path: string) => {
+	const trimmedBase = base.endsWith('/') ? base.slice(0, -1) : base;
+	const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+
+	return `${trimmedBase}${normalizedPath}`;
+};
+---
+
+<Layout title={`${doc.data.title} | Dead Soul Insects`} description={doc.data.description}>
+	<article class="doc-article">
+		<header class="doc-header">
+			<a class="back-link" href={withBase('/docs')}>← 返回文档列表</a>
+			<p class="kicker">文档</p>
+			<h1>{doc.data.title}</h1>
+			<p class="doc-description">{doc.data.description}</p>
+			<div class="doc-meta" aria-label="文档信息">
+				<time class="doc-date" datetime={dateTime}>{formatDate}</time>
+			</div>
+		</header>
+
+		<div class="doc-body">
+			<Content />
+		</div>
+	</article>
+</Layout>
+
+<style>
+	.doc-article {
+		padding: 36px;
+		border: 1px solid var(--line);
+		border-radius: 28px;
+		background:
+			radial-gradient(circle at top right, rgba(110, 195, 255, 0.08), transparent 26%),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+			var(--panel);
+		backdrop-filter: blur(18px);
+		box-shadow: var(--shadow);
+	}
+
+	.doc-header {
+		margin-bottom: 32px;
+	}
+
+	.back-link {
+		display: inline-flex;
+		align-items: center;
+		margin-bottom: 20px;
+		padding: 8px 12px;
+		border: 1px solid rgba(153, 176, 255, 0.18);
+		border-radius: 999px;
+		background: rgba(153, 176, 255, 0.08);
+		color: var(--text);
+		font-size: 0.95rem;
+		font-weight: 600;
+		line-height: 1.2;
+		text-decoration: none;
+		transition:
+			transform 0.2s ease,
+			border-color 0.2s ease,
+			background 0.2s ease,
+			color 0.2s ease;
+	}
+
+	.back-link:hover,
+	.back-link:focus-visible {
+		transform: translateY(-2px);
+		border-color: rgba(157, 140, 255, 0.28);
+		background: rgba(157, 140, 255, 0.14);
+		color: #f3f6ff;
+	}
+
+	.back-link:focus-visible {
+		outline: 2px solid rgba(110, 195, 255, 0.9);
+		outline-offset: 3px;
+	}
+
+	.kicker {
+		margin: 0 0 12px;
+		font-size: 0.88rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--accent-soft);
+	}
+
+	.doc-date {
+		margin: 0;
+		font-size: 0.9rem;
+		color: var(--accent-soft);
+	}
+
+	h1 {
+		margin: 0 0 18px;
+		font-size: clamp(2rem, 4vw, 3.2rem);
+		line-height: 1.08;
+		overflow-wrap: anywhere;
+	}
+
+	.doc-description {
+		margin: 0 0 28px;
+		max-width: 44rem;
+		line-height: 1.8;
+		color: var(--text-soft);
+		overflow-wrap: anywhere;
+	}
+
+	.doc-body {
+		font-size: 1.03rem;
+		line-height: 1.95;
+		color: #d8e0f8;
+	}
+
+	.doc-body :global(h2),
+	.doc-body :global(h3) {
+		margin: 40px 0 16px;
+		line-height: 1.24;
+	}
+
+	.doc-body :global(h2) {
+		font-size: clamp(1.5rem, 3vw, 2rem);
+	}
+
+	.doc-body :global(h3) {
+		font-size: clamp(1.2rem, 2.2vw, 1.45rem);
+	}
+
+	.doc-body :global(p),
+	.doc-body :global(ul),
+	.doc-body :global(ol),
+	.doc-body :global(pre),
+	.doc-body :global(blockquote) {
+		margin: 0 0 20px;
+	}
+
+	.doc-body :global(ul),
+	.doc-body :global(ol) {
+		padding-left: 1.4rem;
+	}
+
+	.doc-body :global(li) {
+		margin-bottom: 10px;
+		color: var(--text-soft);
+	}
+
+	.doc-body :global(strong) {
+		color: var(--text);
+	}
+
+	.doc-body :global(a) {
+		color: var(--accent-soft);
+		text-decoration-color: rgba(110, 195, 255, 0.5);
+		text-underline-offset: 0.18em;
+	}
+
+	.doc-body :global(a:hover) {
+		text-decoration-color: rgba(110, 195, 255, 0.9);
+	}
+
+	.doc-body :global(a:focus-visible) {
+		outline: 2px solid rgba(110, 195, 255, 0.9);
+		outline-offset: 3px;
+		border-radius: 4px;
+	}
+
+	.doc-body :global(blockquote) {
+		padding: 18px 20px;
+		border-left: 3px solid rgba(157, 140, 255, 0.7);
+		border-radius: 18px;
+		background: rgba(157, 140, 255, 0.08);
+		color: var(--text);
+	}
+
+	.doc-body :global(blockquote p:last-child) {
+		margin-bottom: 0;
+	}
+
+	.doc-body :global(code) {
+		padding: 2px 7px;
+		border-radius: 8px;
+		background: rgba(153, 176, 255, 0.12);
+		color: #f3f6ff;
+		font-size: 0.94em;
+	}
+
+	.doc-body :global(pre) {
+		padding: 20px;
+		border: 1px solid rgba(153, 176, 255, 0.14);
+		border-radius: 20px;
+		background: rgba(8, 10, 18, 0.88);
+		overflow-x: auto;
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+	}
+
+	.doc-body :global(pre code) {
+		padding: 0;
+		border-radius: 0;
+		background: transparent;
+		font-size: 0.95rem;
+		line-height: 1.8;
+	}
+
+	@media (max-width: 720px) {
+		.doc-article {
+			padding: 24px;
+		}
+
+		.doc-header {
+			margin-bottom: 28px;
+		}
+
+		.doc-body {
+			font-size: 1rem;
+		}
+
+		.doc-body :global(pre),
+		.doc-body :global(blockquote) {
+			padding: 16px;
+		}
+	}
+</style>
