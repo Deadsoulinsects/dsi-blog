@@ -1,0 +1,200 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const base = import.meta.env.BASE_URL;
+
+const withBase = (path: string) => {
+	const trimmedBase = base.endsWith('/') ? base.slice(0, -1) : base;
+	const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+
+	return `${trimmedBase}${normalizedPath}`;
+};
+
+const links = [
+	{ href: withBase('/'), label: '返回首页', variant: 'primary-link' },
+	{ href: withBase('/blog'), label: '返回博客', variant: 'secondary-link' },
+];
+---
+
+<Layout title="404 | Dead Soul Insects" description="Dead Soul Insects 的 404 页面，引导返回首页或博客。">
+	<section class="not-found-shell" aria-labelledby="not-found-title">
+		<div class="not-found-card">
+			<p class="kicker">404</p>
+			<p class="status-code" aria-hidden="true">404</p>
+			<h1 id="not-found-title">页面未找到</h1>
+			<p class="lead">
+				你访问的页面可能已经移动、暂时失效，或还没有留下稳定入口。可以先回到首页，或者直接进入博客继续阅读。
+			</p>
+
+			<nav class="actions" aria-label="404 页面返回操作">
+				{
+					links.map((link) => (
+						<a class={link.variant} href={link.href}>
+							{link.label}
+						</a>
+					))
+				}
+			</nav>
+		</div>
+	</section>
+</Layout>
+
+<style>
+	.not-found-shell {
+		display: grid;
+		place-items: center;
+		min-height: calc(100vh - 15rem);
+	}
+
+	.not-found-card {
+		position: relative;
+		isolation: isolate;
+		overflow: hidden;
+		width: min(100%, 42rem);
+		padding: 32px;
+		border: 1px solid var(--line);
+		border-radius: 28px;
+		background:
+			radial-gradient(circle at top, rgba(157, 140, 255, 0.18), transparent 34%),
+			radial-gradient(circle at bottom right, rgba(110, 195, 255, 0.12), transparent 36%),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
+			var(--panel);
+		backdrop-filter: blur(18px);
+		box-shadow: var(--shadow);
+		text-align: center;
+	}
+
+	.not-found-card::before,
+	.not-found-card::after {
+		content: '';
+		position: absolute;
+		border-radius: 999px;
+		pointer-events: none;
+		z-index: -1;
+		filter: blur(18px);
+	}
+
+	.not-found-card::before {
+		top: -3rem;
+		left: -2rem;
+		width: 10rem;
+		height: 10rem;
+		background: rgba(122, 101, 255, 0.22);
+	}
+
+	.not-found-card::after {
+		right: -3rem;
+		bottom: -4rem;
+		width: 12rem;
+		height: 12rem;
+		background: rgba(70, 176, 255, 0.16);
+	}
+
+	.kicker {
+		margin: 0 0 14px;
+		font-size: 0.88rem;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--accent-soft);
+	}
+
+	.status-code,
+		h1,
+		.lead {
+		margin-top: 0;
+		overflow-wrap: anywhere;
+	}
+
+	.status-code {
+		margin-bottom: 12px;
+		font-size: clamp(4rem, 16vw, 7rem);
+		font-weight: 700;
+		line-height: 0.95;
+		letter-spacing: 0.08em;
+		color: rgba(237, 242, 255, 0.95);
+		text-shadow: 0 0 28px rgba(110, 195, 255, 0.18);
+	}
+
+	h1 {
+		margin-bottom: 16px;
+		font-size: clamp(1.8rem, 4vw, 3rem);
+		line-height: 1.08;
+	}
+
+	.lead {
+		max-width: 34rem;
+		margin: 0 auto;
+		line-height: 1.8;
+		color: var(--text-soft);
+	}
+
+	.actions {
+		display: flex;
+		justify-content: center;
+		flex-wrap: wrap;
+		gap: 14px;
+		margin-top: 28px;
+	}
+
+	.actions a {
+		padding: 12px 18px;
+		border-radius: 999px;
+		text-decoration: none;
+		font-weight: 600;
+		color: var(--text);
+		transition:
+			transform 0.2s ease,
+			background 0.2s ease,
+			border-color 0.2s ease,
+			box-shadow 0.2s ease;
+	}
+
+	.actions a:hover,
+		.actions a:focus-visible {
+		transform: translateY(-2px);
+	}
+
+	.actions a:focus-visible {
+		outline: 2px solid rgba(110, 195, 255, 0.9);
+		outline-offset: 3px;
+	}
+
+	.primary-link {
+		background: linear-gradient(135deg, rgba(122, 101, 255, 0.92), rgba(70, 176, 255, 0.92));
+		box-shadow: 0 16px 42px rgba(37, 53, 109, 0.34);
+	}
+
+	.primary-link:hover,
+		.primary-link:focus-visible {
+		box-shadow: 0 20px 52px rgba(37, 53, 109, 0.42);
+	}
+
+	.secondary-link {
+		border: 1px solid rgba(153, 176, 255, 0.24);
+		background: rgba(153, 176, 255, 0.08);
+	}
+
+	.secondary-link:hover,
+		.secondary-link:focus-visible {
+		border-color: rgba(157, 140, 255, 0.3);
+		background: rgba(157, 140, 255, 0.14);
+	}
+
+	@media (max-width: 640px) {
+		.not-found-shell {
+			min-height: auto;
+		}
+
+		.not-found-card {
+			padding: 24px;
+		}
+
+		.actions {
+			flex-direction: column;
+		}
+
+		.actions a {
+			justify-content: center;
+		}
+	}
+</style>
