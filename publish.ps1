@@ -5,6 +5,9 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $env:GIT_MASTER = '1'
+$utf8Encoding = New-Object System.Text.UTF8Encoding($false)
+[Console]::OutputEncoding = $utf8Encoding
+$OutputEncoding = $utf8Encoding
 
 function Exit-WithMessage {
     param(
@@ -42,19 +45,59 @@ function Get-GitPathList {
     return @($output | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
 }
 
-function Get-ChangedBlogFiles {
-    $worktreeChanges = Get-GitPathList -Command { git diff --name-only --diff-filter=ACMR -- src/content/blog } -ErrorMessage 'Failed to inspect unstaged blog changes.'
-    $stagedChanges = Get-GitPathList -Command { git diff --cached --name-only --diff-filter=ACMR -- src/content/blog } -ErrorMessage 'Failed to inspect staged blog changes.'
-    $untrackedChanges = Get-GitPathList -Command { git ls-files --others --exclude-standard -- src/content/blog } -ErrorMessage 'Failed to inspect untracked blog changes.'
+function Get-Text {
+    param(
+        [int[]]$CodePoints
+    )
 
-    return @($worktreeChanges + $stagedChanges + $untrackedChanges | Where-Object { $_ -match '^src/content/blog/.+\.md$' } | Sort-Object -Unique)
+    return (-join ($CodePoints | ForEach-Object { [char]$_ }))
 }
 
-function Get-DeletedBlogFiles {
-    $deletedWorktree = Get-GitPathList -Command { git diff --name-only --diff-filter=D -- src/content/blog } -ErrorMessage 'Failed to inspect deleted unstaged blog files.'
-    $deletedStaged = Get-GitPathList -Command { git diff --cached --name-only --diff-filter=D -- src/content/blog } -ErrorMessage 'Failed to inspect deleted staged blog files.'
+function Get-PublishableMarkdownPattern {
+    return '^(src/content/blog|src/content/docs)/.+\.md$'
+}
 
-    return @($deletedWorktree + $deletedStaged | Where-Object { $_ -match '^src/content/blog/.+\.md$' } | Sort-Object -Unique)
+function Get-ChangedMarkdownFiles {
+    $worktreeChanges = Get-GitPathList -Command { git diff --name-only --diff-filter=ACMR -- src/content/blog src/content/docs } -ErrorMessage 'Failed to inspect unstaged markdown changes.'
+    $stagedChanges = Get-GitPathList -Command { git diff --cached --name-only --diff-filter=ACMR -- src/content/blog src/content/docs } -ErrorMessage 'Failed to inspect staged markdown changes.'
+    $untrackedChanges = Get-GitPathList -Command { git ls-files --others --exclude-standard -- src/content/blog src/content/docs } -ErrorMessage 'Failed to inspect untracked markdown changes.'
+
+    $markdownPattern = Get-PublishableMarkdownPattern
+
+    return @($worktreeChanges + $stagedChanges + $untrackedChanges | Where-Object { $_ -match $markdownPattern } | Sort-Object -Unique)
+}
+
+function Get-DeletedMarkdownFiles {
+    $deletedWorktree = Get-GitPathList -Command { git diff --name-only --diff-filter=D -- src/content/blog src/content/docs } -ErrorMessage 'Failed to inspect deleted unstaged markdown files.'
+    $deletedStaged = Get-GitPathList -Command { git diff --cached --name-only --diff-filter=D -- src/content/blog src/content/docs } -ErrorMessage 'Failed to inspect deleted staged markdown files.'
+
+    $markdownPattern = Get-PublishableMarkdownPattern
+
+    return @($deletedWorktree + $deletedStaged | Where-Object { $_ -match $markdownPattern } | Sort-Object -Unique)
+}
+
+function Get-AllChangedFiles {
+    $worktreeChanges = Get-GitPathList -Command { git diff --name-only --diff-filter=ACMRD } -ErrorMessage 'Failed to inspect unstaged repository changes.'
+    $stagedChanges = Get-GitPathList -Command { git diff --cached --name-only --diff-filter=ACMRD } -ErrorMessage 'Failed to inspect staged repository changes.'
+    $untrackedChanges = Get-GitPathList -Command { git ls-files --others --exclude-standard } -ErrorMessage 'Failed to inspect untracked repository changes.'
+
+    return @($worktreeChanges + $stagedChanges + $untrackedChanges | Sort-Object -Unique)
+}
+
+function Get-ContentCommitPrefix {
+    param(
+        [string]$FilePath
+    )
+
+    if ($FilePath -match '^src/content/blog/.+\.md$') {
+        return (Get-Text @(26032, 22686, 25991, 31456))
+    }
+
+    if ($FilePath -match '^src/content/docs/.+\.md$') {
+        return (Get-Text @(26032, 22686, 25991, 26723))
+    }
+
+    Exit-WithMessage "Unsupported publishable file type: $FilePath"
 }
 
 function Get-FrontmatterTitle {
@@ -107,58 +150,53 @@ function Get-FrontmatterTitle {
     Exit-WithMessage "Unable to read article title: $FilePath"
 }
 
-function Get-StagedFiles {
-    $stagedOutput = git diff --cached --name-only --diff-filter=ACMRD
-    if ($LASTEXITCODE -ne 0) {
-        Exit-WithMessage 'Failed to inspect staged files.'
-    }
-
-    return @($stagedOutput | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
-}
-
 $customCommitMessage = ($CommitMessageParts -join ' ').Trim()
+$noAutoPublishMessage = Get-Text @(27809, 26377, 21487, 33258, 21160, 21457, 24067, 30340, 20869, 23481, 65292, 35831, 25163, 21160, 25552, 20132, 12290)
+$multipleMarkdownMessage = Get-Text @(26816, 27979, 21040, 22810, 20010, 32, 77, 97, 114, 107, 100, 111, 119, 110, 32, 25991, 20214, 21464, 21270, 65292, 35831, 36816, 34892, 65306, 110, 112, 109, 32, 114, 117, 110, 32, 112, 117, 98, 108, 105, 115, 104, 32, 45, 45, 32)
+$multipleContentExample = Get-Text @(26356, 26032, 22810, 31687, 20869, 23481)
+$fullWidthColon = [char]65306
 
 Write-Host 'Running build...'
 Invoke-Step { & npm.cmd run build } 'Build failed. Publish stopped.'
 
-$changedBlogFiles = @(Get-ChangedBlogFiles)
-$deletedBlogFiles = @(Get-DeletedBlogFiles)
+$changedMarkdownFiles = @(Get-ChangedMarkdownFiles)
+$deletedMarkdownFiles = @(Get-DeletedMarkdownFiles)
 
-if ($deletedBlogFiles.Count -gt 0) {
-    Exit-WithMessage "Detected deleted blog markdown files. Please handle deletions manually before publishing:`n$($deletedBlogFiles -join "`n")"
+if ($deletedMarkdownFiles.Count -gt 0) {
+    Exit-WithMessage ('Detected deleted markdown files. Please handle deletions manually before publishing:' + [Environment]::NewLine + ($deletedMarkdownFiles -join [Environment]::NewLine))
 }
 
-if ($changedBlogFiles.Count -eq 0) {
-    Exit-WithMessage 'No publishable blog article changes found.' 0
+if ($changedMarkdownFiles.Count -eq 0) {
+    Exit-WithMessage $noAutoPublishMessage 0
 }
 
-if ($changedBlogFiles.Count -gt 1 -and [string]::IsNullOrWhiteSpace($customCommitMessage)) {
-    Exit-WithMessage 'Multiple blog article changes detected. Please run: npm run publish -- "commit message"'
+if ($changedMarkdownFiles.Count -gt 1 -and [string]::IsNullOrWhiteSpace($customCommitMessage)) {
+    Exit-WithMessage ($multipleMarkdownMessage + [char]34 + $multipleContentExample + [char]34)
 }
 
-$commitMessage = if ($changedBlogFiles.Count -eq 1) { '' } else { $customCommitMessage }
+$allChangedFiles = @(Get-AllChangedFiles)
+$unexpectedChangedFiles = @($allChangedFiles | Where-Object { $_ -notin $changedMarkdownFiles -and $_ -notin $deletedMarkdownFiles })
+
+if ($unexpectedChangedFiles.Count -gt 0) {
+    Exit-WithMessage ('Detected non-content changes. Please commit manually instead:' + [Environment]::NewLine + ($unexpectedChangedFiles -join [Environment]::NewLine))
+}
+
+$commitMessage = $customCommitMessage
 
 if ([string]::IsNullOrWhiteSpace($commitMessage)) {
-    $title = Get-FrontmatterTitle -FilePath $changedBlogFiles[0]
+    $targetFile = $changedMarkdownFiles[0]
+    $title = Get-FrontmatterTitle -FilePath $targetFile
     if ([string]::IsNullOrWhiteSpace($title)) {
-        Exit-WithMessage "Article title is empty: $($changedBlogFiles[0])"
+        Exit-WithMessage ('Content title is empty: ' + $targetFile)
     }
 
-    $commitMessage = "新增文章：$title"
+    $commitPrefix = Get-ContentCommitPrefix -FilePath $targetFile
+    $commitMessage = $commitPrefix + $fullWidthColon + $title
 }
 
-Write-Host "Commit message: $commitMessage"
+Write-Host ('Commit message: ' + $commitMessage)
 
-$stagedFiles = @(Get-StagedFiles)
-$unexpectedStagedFiles = @($stagedFiles | Where-Object { $_ -notin $changedBlogFiles })
-
-if ($unexpectedStagedFiles.Count -gt 0) {
-    Exit-WithMessage "Unexpected staged files detected. Please clean the index first:`n$($unexpectedStagedFiles -join "`n")"
-}
-
-foreach ($file in $changedBlogFiles) {
-    Invoke-Step { git add -- $file } "git add failed for file: $file"
-}
+Invoke-Step { git add . } 'git add failed. Publish stopped.'
 Invoke-Step { git commit -m $commitMessage } 'git commit failed. Publish stopped.'
 Invoke-Step { git push origin master } 'git push failed. Publish stopped.'
 
