@@ -10,6 +10,7 @@
     "prepare:content": "node scripts/prepare-content.mjs",
     "prebuild": "npm run prepare:content",
     "build": "astro build",
+    "publish": "powershell -NoProfile -ExecutionPolicy Bypass -File ./publish.ps1",
     "preview": "astro preview",
     "astro": "astro"
   },
