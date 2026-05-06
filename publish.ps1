@@ -31,20 +31,6 @@ function Invoke-Step {
     }
 }
 
-function Get-GitPathList {
-    param(
-        [scriptblock]$Command,
-        [string]$ErrorMessage
-    )
-
-    $output = & $Command
-    if ($LASTEXITCODE -ne 0) {
-        Exit-WithMessage $ErrorMessage
-    }
-
-    return @($output | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
-}
-
 function Get-Text {
     param(
         [int[]]$CodePoints
@@ -57,31 +43,74 @@ function Get-PublishableMarkdownPattern {
     return '^(src/content/blog|src/content/docs)/.+\.md$'
 }
 
-function Get-ChangedMarkdownFiles {
-    $worktreeChanges = Get-GitPathList -Command { git diff --name-only --diff-filter=ACMR -- src/content/blog src/content/docs } -ErrorMessage 'Failed to inspect unstaged markdown changes.'
-    $stagedChanges = Get-GitPathList -Command { git diff --cached --name-only --diff-filter=ACMR -- src/content/blog src/content/docs } -ErrorMessage 'Failed to inspect staged markdown changes.'
-    $untrackedChanges = Get-GitPathList -Command { git ls-files --others --exclude-standard -- src/content/blog src/content/docs } -ErrorMessage 'Failed to inspect untracked markdown changes.'
+function Get-GitStatusEntries {
+    $statusOutput = & git -c core.quotepath=false status --porcelain --untracked-files=all
+    if ($LASTEXITCODE -ne 0) {
+        Exit-WithMessage 'Failed to inspect repository changes via git status --porcelain.'
+    }
+
+    $entries = foreach ($line in @($statusOutput | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })) {
+        if ($line.Length -lt 4) {
+            continue
+        }
+
+        $status = $line.Substring(0, 2)
+        $path = $line.Substring(3)
+
+        if ($path.Contains(' -> ')) {
+            $path = ($path -split ' -> ', 2)[1]
+        }
+
+        [pscustomobject]@{
+            Status = $status
+            Path = $path
+        }
+    }
+
+    return @($entries)
+}
+
+function Test-PublishableMarkdownPath {
+    param(
+        [string]$FilePath
+    )
 
     $markdownPattern = Get-PublishableMarkdownPattern
+    return $FilePath -match $markdownPattern
+}
 
-    return @($worktreeChanges + $stagedChanges + $untrackedChanges | Where-Object { $_ -match $markdownPattern } | Sort-Object -Unique)
+function Get-ChangedMarkdownFiles {
+    param(
+        [object[]]$StatusEntries
+    )
+
+    return @(
+        $StatusEntries |
+            Where-Object { (Test-PublishableMarkdownPath $_.Path) -and ($_.Status -notmatch 'D') } |
+            ForEach-Object { $_.Path } |
+            Sort-Object -Unique
+    )
 }
 
 function Get-DeletedMarkdownFiles {
-    $deletedWorktree = Get-GitPathList -Command { git diff --name-only --diff-filter=D -- src/content/blog src/content/docs } -ErrorMessage 'Failed to inspect deleted unstaged markdown files.'
-    $deletedStaged = Get-GitPathList -Command { git diff --cached --name-only --diff-filter=D -- src/content/blog src/content/docs } -ErrorMessage 'Failed to inspect deleted staged markdown files.'
+    param(
+        [object[]]$StatusEntries
+    )
 
-    $markdownPattern = Get-PublishableMarkdownPattern
-
-    return @($deletedWorktree + $deletedStaged | Where-Object { $_ -match $markdownPattern } | Sort-Object -Unique)
+    return @(
+        $StatusEntries |
+            Where-Object { (Test-PublishableMarkdownPath $_.Path) -and ($_.Status -match 'D') } |
+            ForEach-Object { $_.Path } |
+            Sort-Object -Unique
+    )
 }
 
 function Get-AllChangedFiles {
-    $worktreeChanges = Get-GitPathList -Command { git diff --name-only --diff-filter=ACMRD } -ErrorMessage 'Failed to inspect unstaged repository changes.'
-    $stagedChanges = Get-GitPathList -Command { git diff --cached --name-only --diff-filter=ACMRD } -ErrorMessage 'Failed to inspect staged repository changes.'
-    $untrackedChanges = Get-GitPathList -Command { git ls-files --others --exclude-standard } -ErrorMessage 'Failed to inspect untracked repository changes.'
+    param(
+        [object[]]$StatusEntries
+    )
 
-    return @($worktreeChanges + $stagedChanges + $untrackedChanges | Sort-Object -Unique)
+    return @($StatusEntries | ForEach-Object { $_.Path } | Sort-Object -Unique)
 }
 
 function Get-ContentCommitPrefix {
@@ -159,8 +188,9 @@ $fullWidthColon = [char]65306
 Write-Host 'Running build...'
 Invoke-Step { & npm.cmd run build } 'Build failed. Publish stopped.'
 
-$changedMarkdownFiles = @(Get-ChangedMarkdownFiles)
-$deletedMarkdownFiles = @(Get-DeletedMarkdownFiles)
+$statusEntries = @(Get-GitStatusEntries)
+$changedMarkdownFiles = @(Get-ChangedMarkdownFiles -StatusEntries $statusEntries)
+$deletedMarkdownFiles = @(Get-DeletedMarkdownFiles -StatusEntries $statusEntries)
 
 if ($deletedMarkdownFiles.Count -gt 0) {
     Exit-WithMessage ('Detected deleted markdown files. Please handle deletions manually before publishing:' + [Environment]::NewLine + ($deletedMarkdownFiles -join [Environment]::NewLine))
@@ -174,7 +204,7 @@ if ($changedMarkdownFiles.Count -gt 1 -and [string]::IsNullOrWhiteSpace($customC
     Exit-WithMessage ($multipleMarkdownMessage + [char]34 + $multipleContentExample + [char]34)
 }
 
-$allChangedFiles = @(Get-AllChangedFiles)
+$allChangedFiles = @(Get-AllChangedFiles -StatusEntries $statusEntries)
 $unexpectedChangedFiles = @($allChangedFiles | Where-Object { $_ -notin $changedMarkdownFiles -and $_ -notin $deletedMarkdownFiles })
 
 if ($unexpectedChangedFiles.Count -gt 0) {
