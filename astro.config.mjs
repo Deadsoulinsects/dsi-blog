@@ -3,6 +3,5 @@ import { defineConfig } from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://Deadsoulinsects.github.io',
-	base: '/dsi-blog',
+	site: 'https://blog.deadsoulinsects.cn',
 });
