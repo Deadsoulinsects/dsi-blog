@@ -1,8 +1,8 @@
 ---
-title: "SBTI2.0的设计思路"
-description: "描述借助AI完成人格测试SBTI2.0项目的设计思路"
-pubDate: 2026-05-05
-tags: ["SBTI2.0","AI项目","思路"]
+title: ""
+description: ""
+pubDate: 2026-05-07
+tags: []
 ---
 
 # 奠定缘分
@@ -31,15 +31,15 @@ AI最初的版本题目是一题一题显示的，不像原版那样一次性展
 我打算在测试首页和答题页共用一首BGM，然后结果页单独设计BGM。
 **首页和答题页（算作默认BGM）**
 首先要不难听，然后要有点压迫感，所以我选取的是：
-【**哈基米音乐】格哈罗基の小曲**（原曲：Witch Parade Assassin）
+【**哈基米音乐】[格哈罗基の小曲](https://www.bilibili.com/video/BV19emXBdEiP/?spm_id_from=333.337.search-card.all.click)**（原曲：Witch Parade Assassin）
 **结果页**
 我原本想得是每个人格都有一首对应的哈基米音乐呢，但是我发现很难细分每个人格的风格，不好设计对应的BGM，而且我没找到这么多豪听的哈基米音乐。所以我就根据最高值五维来进行BGM的选择。但是我多次测试发现，这个五维最高值的数量并不均衡，所以我就借助AI进行五维数值的算法优化以此来平衡各维度达到最高值的数量。
 最终BGM版本：
-1. **内耗——my soul**（哈基米版）（比较悲伤的音乐，内耗嘛，焦虑和忧伤是主基调）
-2. **躺平——蓝莲哈**（原曲：蓝莲花。公路神曲，听了之后谁不想来场说走就走的旅行，在我看来这是比较符合躺平的内核，不骄不躁，自由的感觉）
-3. **社交——不再曼波**（原曲：Normal No More。祝你在社交方面不再平庸）
-4. **幽默——约德尔曼波**（原曲：Auf und auf voll Lebenslust--大家在热情的生活（约德尔调）欢快的节奏）
-5. **社畜——夜曲**（哈基米版）（这个我在夜曲·哈基米版和跳楼基之间犹豫了下，因为两首歌都挺不错的，而且歌词合适，这里我是将歌词的描述对象看作是钱来理解的。但我细细品味之后感觉跳楼基虽然符合意思，但是格局小了，更适合情情爱爱。但是夜曲更加深沉点，不仅可以描述对钱的情感，也可以用来说创业艰辛和事业碰壁这些复杂的情感，所以我最终选了夜曲·哈基米版）
+1. **内耗——[my soul（哈基米版）](https://www.bilibili.com/video/BV1Ch9YYuET9/?spm_id_from=333.337.search-card.all.click&vd_source=7f068c7de9b2b8adfa3e39f161b1fc7a)**（比较悲伤的音乐，内耗嘛，焦虑和忧伤是主基调）
+2. **躺平——[蓝莲哈](https://www.bilibili.com/video/BV18M83zrECY/?spm_id_from=333.337.search-card.all.click&vd_source=7f068c7de9b2b8adfa3e39f161b1fc7a)**（原曲：蓝莲花。公路神曲，听了之后谁不想来场说走就走的旅行，在我看来这是比较符合躺平的内核，不骄不躁，自由的感觉）
+3. **社交——[不再曼波](https://www.bilibili.com/video/BV1fJSEY1E7h/?spm_id_from=333.337.search-card.all.click&vd_source=7f068c7de9b2b8adfa3e39f161b1fc7a)**（原曲：Normal No More。祝你在社交方面不再平庸）
+4. **幽默——[约德尔曼波](https://www.bilibili.com/video/BV1KUMAzdEaZ/?spm_id_from=333.337.search-card.all.click)**（原曲：Auf und auf voll Lebenslust--大家在热情的生活（约德尔调）欢快的节奏）
+5. **社畜——[夜曲（哈基米版）](https://www.bilibili.com/video/BV1pXnizLECc/?spm_id_from=333.337.search-card.all.click&vd_source=7f068c7de9b2b8adfa3e39f161b1fc7a)**（这个我在夜曲·哈基米版和跳楼基之间犹豫了下，因为两首歌都挺不错的，而且歌词合适，这里我是将歌词的描述对象看作是钱来理解的。但我细细品味之后感觉跳楼基虽然符合意思，但是格局小了，更适合情情爱爱。但是夜曲更加深沉点，不仅可以描述对钱的情感，也可以用来说创业艰辛和事业碰壁这些复杂的情感，所以我最终选了夜曲·哈基米版）
 
 最后就是最这一大改动进行优化：
 1. 在右上角增加**BGM开关**
