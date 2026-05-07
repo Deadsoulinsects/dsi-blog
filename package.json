@@ -8,7 +8,9 @@
   "scripts": {
     "dev": "astro dev",
     "prepare:content": "node scripts/prepare-content.mjs",
-    "prebuild": "npm run prepare:content",
+    "links:check": "node scripts/convert-markdown-links.mjs --check",
+    "links:apply": "node scripts/convert-markdown-links.mjs --apply",
+    "prebuild": "npm run prepare:content && npm run links:apply",
     "build": "astro build",
     "publish": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/publish.ps1",
     "preview": "astro preview",
