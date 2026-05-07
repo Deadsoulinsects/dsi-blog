@@ -1,8 +1,8 @@
 ---
-title: ""
+title: "SBTI2.0的设计思路"
 description: ""
 pubDate: 2026-05-07
-tags: []
+tags: ["","",""]
 ---
 
 # 奠定缘分

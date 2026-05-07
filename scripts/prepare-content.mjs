@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { basename, extname, join, relative } from 'node:path';
 
 const root = process.cwd();
 
@@ -14,14 +14,35 @@ const getToday = () => {
 
 const today = getToday();
 
+const getTitleFromFile = (file) => basename(file, extname(file));
+
+const escapeYamlString = (value) => value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+
 const targets = [
 	{
 		directory: join(root, 'src', 'content', 'blog'),
-		createFrontmatter: () => ['---', 'title: ""', 'description: ""', `pubDate: ${today}`, 'tags: []', '---', ''].join('\n'),
+		createFrontmatter: (file) => [
+			'---',
+			`title: "${escapeYamlString(getTitleFromFile(file))}"`,
+			'description: ""',
+			`pubDate: ${today}`,
+			'tags: ["","",""]',
+			'---',
+			'',
+		].join('\n'),
 	},
 	{
 		directory: join(root, 'src', 'content', 'docs'),
-		createFrontmatter: () => ['---', 'title: ""', 'description: ""', `pubDate: ${today}`, 'category: ""', 'tags: []', '---', ''].join('\n'),
+		createFrontmatter: (file) => [
+			'---',
+			`title: "${escapeYamlString(getTitleFromFile(file))}"`,
+			'description: ""',
+			`pubDate: ${today}`,
+			'category: "未分类"',
+			'tags: ["","",""]',
+			'---',
+			'',
+		].join('\n'),
 	},
 ];
 
@@ -71,7 +92,7 @@ for (const target of targets) {
 			continue;
 		}
 
-		const frontmatter = target.createFrontmatter();
+		const frontmatter = target.createFrontmatter(file);
 		const nextContent = normalized.length > 0 ? `${frontmatter}\n${normalized}` : frontmatter;
 
 		writeFileSync(file, nextContent, 'utf8');
