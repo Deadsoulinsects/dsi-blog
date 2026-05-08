@@ -47,13 +47,6 @@ const aboutSections = [
 				))
 			}
 		</div>
-
-		<section class="closing-note" aria-labelledby="about-note-title">
-			<h2 id="about-note-title">说明方式</h2>
-			<p>
-				这一页只说明写作方向、页面用途与内容边界。对这个站来说，克制比扩写更重要。
-			</p>
-		</section>
 	</section>
 </Layout>
 
@@ -70,21 +63,18 @@ const aboutSections = [
 	}
 
 	.page-intro,
-	.summary-block,
-	.closing-note {
+	.summary-block {
 		max-width: 46rem;
 	}
 
 	.summary-block,
-	.closing-note,
 	.content-card {
 		padding: 24px;
 		border: 1px solid var(--line);
 		border-radius: 24px;
 	}
 
-	.summary-block,
-	.closing-note {
+	.summary-block{ 
 		background: var(--panel-strong);
 	}
 
@@ -92,7 +82,7 @@ const aboutSections = [
 		margin: 0 0 20px;
 	}
 
-	.closing-note {
+	/ {
 		margin-top: 20px;
 	}
 
@@ -163,7 +153,7 @@ const aboutSections = [
 		.page-card,
 		.summary-block,
 		.content-card,
-		.closing-note {
+		/ {
 			padding: 24px;
 		}
 
