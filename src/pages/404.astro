@@ -11,8 +11,7 @@ const withBase = (path: string) => {
 };
 
 const links = [
-	{ href: withBase('/'), label: '返回首页', variant: 'primary-link' },
-	{ href: withBase('/blog'), label: '返回博客', variant: 'secondary-link' },
+	{ href: withBase('/'), label: '返回首页', variant: 'secondary-link' },
 ];
 ---
 
@@ -27,6 +26,7 @@ const links = [
 			</p>
 
 			<nav class="actions" aria-label="404 页面返回操作">
+				<button class="primary-link" type="button" id="back-button">返回</button>
 				{
 					links.map((link) => (
 						<a class={link.variant} href={link.href}>
@@ -38,6 +38,19 @@ const links = [
 		</div>
 	</section>
 </Layout>
+
+<script>
+	const backButton = document.querySelector<HTMLButtonElement>('#back-button');
+
+	backButton?.addEventListener('click', () => {
+		if (window.history.length > 1) {
+			window.history.back();
+			return;
+		}
+
+		window.location.href = '/';
+	});
+</script>
 
 <style>
 	.not-found-shell {
@@ -136,12 +149,16 @@ const links = [
 		margin-top: 28px;
 	}
 
-	.actions a {
+	.actions a,
+	.actions button {
 		padding: 12px 18px;
+		border: 0;
 		border-radius: 999px;
 		text-decoration: none;
+		font: inherit;
 		font-weight: 600;
 		color: var(--text);
+		cursor: pointer;
 		transition:
 			transform 0.2s ease,
 			background 0.2s ease,
@@ -150,11 +167,14 @@ const links = [
 	}
 
 	.actions a:hover,
-		.actions a:focus-visible {
+	.actions a:focus-visible,
+	.actions button:hover,
+	.actions button:focus-visible {
 		transform: translateY(-2px);
 	}
 
-	.actions a:focus-visible {
+	.actions a:focus-visible,
+	.actions button:focus-visible {
 		outline: 2px solid rgba(110, 195, 255, 0.9);
 		outline-offset: 3px;
 	}
@@ -193,7 +213,8 @@ const links = [
 			flex-direction: column;
 		}
 
-		.actions a {
+		.actions a,
+		.actions button {
 			justify-content: center;
 		}
 	}

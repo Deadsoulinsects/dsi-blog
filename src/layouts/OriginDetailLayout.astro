@@ -1,0 +1,180 @@
+---
+import Layout from './Layout.astro';
+
+interface Props {
+	title?: string;
+	description?: string;
+}
+
+const {
+	title = '起源详情 | Dead Soul Insects',
+	description = 'Dead Soul Insects 的起源详情文章。',
+} = Astro.props;
+---
+
+<Layout title={`${title} | Dead Soul Insects`} description={description}>
+	<article class="origin-detail-card">
+		<button class="back-button" type="button" id="origin-detail-back-button" aria-label="返回">
+			<svg viewBox="0 0 80 24" fill="none" aria-hidden="true">
+  				<path
+    				d="M80 12H0"
+			    	stroke="currentColor"
+    				stroke-width="6"
+    				stroke-linecap="round"
+  				/>
+  				<path
+    				d="M20 0L0 12L20 24"
+    				stroke="currentColor"
+    				stroke-width="6"
+    				stroke-linecap="round"
+    				stroke-linejoin="round"
+  				/>
+			</svg>
+		</button>
+		<div class="origin-detail-body">
+			<slot />
+		</div>
+	</article>
+</Layout>
+
+<script>
+	const backButton = document.querySelector<HTMLButtonElement>('#origin-detail-back-button');
+
+	backButton?.addEventListener('click', () => {
+		if (window.history.length > 1) {
+			window.history.back();
+			return;
+		}
+
+		window.location.href = '/origin/';
+	});
+</script>
+
+<style>
+	.origin-detail-card {
+		padding: 32px;
+		border: 1px solid var(--line);
+		border-radius: 28px;
+		background:
+			radial-gradient(circle at top right, rgba(110, 195, 255, 0.08), transparent 32%),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+			var(--panel);
+		backdrop-filter: blur(18px);
+		box-shadow: var(--shadow);
+	}
+
+	.back-button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 60px;
+		height: 25px;
+		margin: 0 0 20px;
+		padding: 0;
+		border: 1px solid rgba(153, 210, 255, 0.32);
+		border-radius: 18px;
+		background:
+			radial-gradient(circle at 32% 18%, rgba(178, 225, 255, 0.28), transparent 58%),
+			linear-gradient(135deg, rgba(110, 195, 255, 0.16), rgba(157, 140, 255, 0.14)),
+			rgba(14, 27, 48, 0.78);
+		box-shadow:
+			0 0 18px rgba(110, 195, 255, 0.1),
+			0 10px 24px rgba(0, 0, 0, 0.16),
+			inset 0 1px 0 rgba(255, 255, 255, 0.12);
+		color: var(--text);
+		font: inherit;
+		font-weight: 700;
+		line-height: 1;
+		cursor: pointer;
+		transition:
+			transform 0.2s ease,
+			border-color 0.2s ease,
+			background 0.2s ease,
+			box-shadow 0.2s ease,
+			color 0.2s ease;
+	}
+
+	.back-button svg {
+		display: block;
+		width: 35px;
+		height: 30px;
+	}
+
+	.back-button:hover,
+	.back-button:focus-visible {
+		transform: translateY(-1px);
+		border-color: rgba(178, 225, 255, 0.48);
+		background:
+			radial-gradient(circle at 32% 18%, rgba(178, 225, 255, 0.34), transparent 58%),
+			linear-gradient(135deg, rgba(110, 195, 255, 0.22), rgba(157, 140, 255, 0.18)),
+			rgba(14, 27, 48, 0.88);
+		box-shadow:
+			0 0 22px rgba(110, 195, 255, 0.14),
+			0 12px 26px rgba(0, 0, 0, 0.18),
+			inset 0 1px 0 rgba(255, 255, 255, 0.16);
+		color: #f3f6ff;
+	}
+
+	.back-button:focus-visible {
+		outline: 2px solid rgba(110, 195, 255, 0.9);
+		outline-offset: 3px;
+	}
+
+	.origin-detail-body {
+		font-size: 1.03rem;
+		line-height: 1.95;
+		color: #d8e0f8;
+	}
+
+	.origin-detail-body :global(h1),
+	.origin-detail-body :global(h2),
+	.origin-detail-body :global(h3),
+	.origin-detail-body :global(p),
+	.origin-detail-body :global(ul),
+	.origin-detail-body :global(ol),
+	.origin-detail-body :global(pre),
+	.origin-detail-body :global(blockquote) {
+		margin-top: 0;
+	}
+
+	.origin-detail-body :global(h1) {
+		margin-bottom: 24px;
+		font-size: clamp(2rem, 4vw, 3rem);
+		line-height: 1.1;
+	}
+
+	.origin-detail-body :global(h2),
+	.origin-detail-body :global(h3) {
+		margin: 36px 0 16px;
+		line-height: 1.24;
+	}
+
+	.origin-detail-body :global(p),
+	.origin-detail-body :global(ul),
+	.origin-detail-body :global(ol),
+	.origin-detail-body :global(pre),
+	.origin-detail-body :global(blockquote) {
+		margin-bottom: 20px;
+	}
+
+	.origin-detail-body :global(a) {
+		color: var(--accent-soft);
+		text-decoration-color: rgba(110, 195, 255, 0.5);
+		text-underline-offset: 0.18em;
+	}
+
+	.origin-detail-body :global(a:hover),
+	.origin-detail-body :global(a:focus-visible) {
+		text-decoration-color: rgba(110, 195, 255, 0.9);
+	}
+
+	@media (max-width: 640px) {
+		.origin-detail-card {
+			padding: 24px;
+		}
+
+		.back-button {
+			margin-bottom: 20px;
+		}
+	}
+</style>

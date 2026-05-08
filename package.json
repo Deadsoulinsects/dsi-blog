@@ -8,10 +8,12 @@
   "scripts": {
     "dev": "astro dev",
     "sync:blog": "node scripts/sync-obsidian-blog.mjs",
+    "sync:origin": "node scripts/sync-obsidian-origin.mjs",
     "prepare:content": "node scripts/prepare-content.mjs",
+    "prepare:origin": "node scripts/prepare-origin-pages.mjs",
     "links:check": "node scripts/convert-markdown-links.mjs --check",
     "links:apply": "node scripts/convert-markdown-links.mjs --apply",
-    "prebuild": "npm run sync:blog && npm run prepare:content && npm run links:apply",
+    "prebuild": "npm run sync:blog && npm run sync:origin && npm run prepare:content && npm run prepare:origin && npm run links:apply",
     "build": "astro build",
     "publish": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/publish.ps1",
     "preview": "astro preview",

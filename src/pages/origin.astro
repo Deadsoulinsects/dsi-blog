@@ -6,16 +6,15 @@ const originSections = [
 		title: 'Dead Soul Insects 名字来源',
 		description:
 			'这个名字保留下来，不是为了显得完整或神秘，而是因为它准确对应了站点的气质。它带一点冷意和距离感，也保留了微弱发光的余地。',
+		link: {
+			href: '/origin/详情文章/名字来源/',
+			label: '查看详情',
+		},
 	},
 	{
-		title: '死魂虫的意象',
+		title: 'Dead Soul Insects的意象',
 		description:
-			'这里的“死魂虫”更接近一种意象，而不是具体设定。它适合承接夜色、残光、碎片与缓慢整理中的内容，也让文章、项目与文档拥有相近的语气。',
-	},
-	{
-		title: '为什么保持抽象',
-		description:
-			'这一页更想说明站点气质，而不是借用已有形象来替代表达。保留抽象、克制与空白，可以让注意力停在文字本身，也让联想保持适度开放。',
+			'这里的“Dead Soul Insects”更接近一种意象，而不是具体设定。它适合承接夜色、残光、碎片与缓慢整理中的内容，也让文章、项目与文档拥有相近的语气。',
 	},
 ];
 ---
@@ -24,25 +23,26 @@ const originSections = [
 	<section class="page-card">
 		<header class="page-intro">
 			<p class="kicker">起源</p>
-			<h1>这个名字更像一种语气。</h1>
+			<h1>这个名字更像一种语气</h1>
 			<p class="lead">
-				Dead Soul Insects 不是一套设定，也不是需要被完全解释的符号。它只是为这个站点留下一个稳定的语气：安静、冷调、克制，仍有一点微弱的光。
+				Dead Soul Insects 不是一套设定，也不是需要被完全解释的符号。它只是为这个站点留下一个稳定的语气：安静、冷调，还有一点微弱的光。
 			</p>
 		</header>
-
-		<section class="summary-block" aria-labelledby="origin-summary-title">
-			<h2 id="origin-summary-title">这页想说明的重点</h2>
-			<p>
-				这不是考据页，也不是设定说明。这里仅说明三件事：名字为何保留下来，它所对应的意象，以及页面为何保持抽象和留白。
-			</p>
-		</section>
 
 		<div class="section-stack" aria-label="起源说明">
 			{
 				originSections.map((section) => (
 					<section class="content-card">
 						<h2>{section.title}</h2>
-						<p>{section.description}</p>
+						<div class="origin-description-row">
+							<p>{section.description}</p>
+							{section.link && (
+								<a class="origin-arrow-link" href={section.link.href}>
+									{section.link.label}
+									<span aria-hidden="true">→</span>
+								</a>
+							)}
+						</div>
 					</section>
 				))
 			}
@@ -51,7 +51,7 @@ const originSections = [
 		<section class="closing-note" aria-labelledby="origin-note-title">
 			<h2 id="origin-note-title">保留一点模糊感</h2>
 			<p>
-				这个名字不需要被解释得毫无剩余。只要它仍能让人感到安静、冷调、克制发光，这一页的作用就已经足够。
+				这个名字不需要被解释得毫无剩余。只要它仍能让人感到安静、冷调，这一页的作用就已经足够。
 			</p>
 		</section>
 	</section>
@@ -69,14 +69,17 @@ const originSections = [
 		box-shadow: var(--shadow);
 	}
 
-	.page-intro,
-	.summary-block,
-	.closing-note,
-	.section-stack {
+	.page-intro {
 		max-width: 46rem;
 	}
 
-	.summary-block,
+	.closing-note,
+	.section-stack {
+		box-sizing: border-box;
+		width: 100%;
+		max-width: none;
+	}
+
 	.closing-note,
 	.content-card {
 		padding: 24px;
@@ -84,13 +87,8 @@ const originSections = [
 		border-radius: 24px;
 	}
 
-	.summary-block,
 	.closing-note {
 		background: var(--panel-strong);
-	}
-
-	.summary-block {
-		margin: 0 0 20px;
 	}
 
 	.closing-note {
@@ -147,15 +145,58 @@ const originSections = [
 	}
 
 	.content-card {
+		box-sizing: border-box;
+		width: 100%;
 		background:
 			radial-gradient(circle at top right, rgba(110, 195, 255, 0.08), transparent 34%),
 			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
 			var(--panel);
 	}
 
+	.origin-description-row {
+		display: flex;
+		flex-direction: column;
+		gap: 24px;
+		align-items: stretch;
+		width: 100%;
+	}
+
+	.origin-description-row p {
+		margin: 0;
+	}
+
+	.origin-arrow-link {
+		display: inline-flex;
+		flex-shrink: 0;
+		gap: 8px;
+		align-items: center;
+		align-self: flex-end;
+		padding: 8px 12px;
+		border: 1px solid rgba(153, 176, 255, 0.18);
+		border-radius: 999px;
+		background: rgba(153, 176, 255, 0.08);
+		color: var(--text);
+		font-size: 0.95rem;
+		font-weight: 600;
+		line-height: 1.2;
+		text-decoration: none;
+		transition:
+			border-color 0.2s ease,
+			background 0.2s ease,
+			color 0.2s ease,
+			opacity 0.2s ease;
+	}
+
+	.origin-arrow-link:hover,
+	.origin-arrow-link:focus-visible {
+		border-color: rgba(157, 140, 255, 0.28);
+		background: rgba(157, 140, 255, 0.14);
+		color: #f3f6ff;
+		opacity: 0.82;
+	}
+
 	@media (max-width: 640px) {
 		.page-card,
-		.summary-block,
 		.content-card,
 		.closing-note {
 			padding: 24px;
@@ -163,6 +204,10 @@ const originSections = [
 
 		.lead {
 			margin-bottom: 24px;
+		}
+
+		.origin-arrow-link {
+			align-self: flex-start;
 		}
 	}
 </style>
