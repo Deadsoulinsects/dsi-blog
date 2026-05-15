@@ -70,7 +70,7 @@ const originSections = [
 	}
 
 	.page-intro {
-		max-width: 46rem;
+		max-width: 460rem;
 	}
 
 	.closing-note,
@@ -87,6 +87,9 @@ const originSections = [
 		border-radius: 24px;
 	}
 
+	.content-card:has(.origin-arrow-link) {
+		padding-bottom: 12px;
+	}
 	.closing-note {
 		background: var(--panel-strong);
 	}
@@ -156,7 +159,7 @@ const originSections = [
 	.origin-description-row {
 		display: flex;
 		flex-direction: column;
-		gap: 24px;
+		gap: 5px;
 		align-items: stretch;
 		width: 100%;
 	}
@@ -171,7 +174,7 @@ const originSections = [
 		gap: 8px;
 		align-items: center;
 		align-self: flex-end;
-		padding: 8px 12px;
+		padding: 5px 12px;
 		border: 1px solid rgba(153, 176, 255, 0.18);
 		border-radius: 999px;
 		background: rgba(153, 176, 255, 0.08);

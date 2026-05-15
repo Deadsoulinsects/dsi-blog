@@ -31,18 +31,11 @@ const withBase = (path: string) => {
 	<section class="page-card intro-card">
 		<header class="page-intro">
 			<p class="kicker">文档</p>
-			<h1>把零散记录收紧成可复用的说明。</h1>
+			<h1>把零散记录收紧成可复用的说明</h1>
 			<p class="lead">
 				博客偏向持续写下来的过程，文档页更偏向整理后的结果。这里直接列出当前可读的说明页，方便查阅，也方便在需要时重新打开。
 			</p>
 		</header>
-
-		<section class="summary-block" aria-labelledby="docs-summary-title">
-			<h2 id="docs-summary-title">这一页和博客的区别</h2>
-			<p>
-				这里不会追求文章感，而更重视说明感。能不能快速找到入口、能不能顺着读完、能不能在一段时间之后还帮到自己，是这页更在意的事。
-			</p>
-		</section>
 	</section>
 
 	<section class="doc-list" aria-label="文档列表">
@@ -61,18 +54,10 @@ const withBase = (path: string) => {
 			))
 		}
 	</section>
-
-	<section class="closing-note" aria-labelledby="docs-note-title">
-		<h2 id="docs-note-title">整理方式</h2>
-		<p>
-			这里优先保留清楚的入口和完整的最小说明。内容不求铺陈，只求在需要时能够迅速找到、顺着读完、重新用上。
-		</p>
-	</section>
 </Layout>
 
 <style>
 	.page-card,
-	.closing-note,
 	.doc-card {
 		border: 1px solid var(--line);
 		border-radius: 28px;
@@ -80,8 +65,7 @@ const withBase = (path: string) => {
 		box-shadow: var(--shadow);
 	}
 
-	.page-card,
-	.closing-note {
+	.page-card {
 		padding: 32px;
 		background:
 			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
@@ -92,21 +76,8 @@ const withBase = (path: string) => {
 		margin-bottom: 22px;
 	}
 
-	.page-intro,
-	.summary-block,
-	.closing-note {
-		max-width: 46rem;
-	}
-
-	.summary-block {
-		padding: 24px;
-		border: 1px solid var(--line);
-		border-radius: 24px;
-		background: var(--panel-strong);
-	}
-
-	.closing-note {
-		margin-top: 22px;
+	.page-intro {
+		max-width: none;
 	}
 
 	.kicker {
@@ -118,7 +89,6 @@ const withBase = (path: string) => {
 	}
 
 	h1,
-	h2,
 	p {
 		margin-top: 0;
 	}
@@ -129,13 +99,6 @@ const withBase = (path: string) => {
 		line-height: 1.1;
 	}
 
-	h2 {
-		margin: 0;
-		font-size: clamp(1.3rem, 2.4vw, 1.65rem);
-		line-height: 1.25;
-		overflow-wrap: anywhere;
-	}
-
 	p {
 		margin-bottom: 0;
 		line-height: 1.8;
@@ -144,7 +107,7 @@ const withBase = (path: string) => {
 	}
 
 	.lead {
-		margin-bottom: 28px;
+		margin-bottom: 0;
 		font-size: 1.02rem;
 	}
 
@@ -240,9 +203,7 @@ const withBase = (path: string) => {
 
 	@media (max-width: 640px) {
 		.page-card,
-		.doc-card,
-		.closing-note,
-		.summary-block {
+		.doc-card {
 			padding: 24px;
 		}
 
