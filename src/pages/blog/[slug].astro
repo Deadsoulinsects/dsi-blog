@@ -21,11 +21,21 @@ const formatDate = post.data.pubDate.toLocaleDateString('zh-CN', {
 });
 
 const dateTime = `${post.data.pubDate.getUTCFullYear()}-${String(post.data.pubDate.getUTCMonth() + 1).padStart(2, '0')}-${String(post.data.pubDate.getUTCDate()).padStart(2, '0')}`;
+
+const base = import.meta.env.BASE_URL;
+
+const withBase = (path: string) => {
+	const trimmedBase = base.endsWith('/') ? base.slice(0, -1) : base;
+	const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+
+	return `${trimmedBase}${normalizedPath}`;
+};
 ---
 
 <Layout title={`${post.data.title} | Dead Soul Insects`} description={post.data.description}>
 	<article class="post-article">
 		<header class="post-header">
+			<a class="back-link" href={withBase('/blog')}>← 返回博客列表</a>
 			<p class="kicker">文章</p>
 			<h1>{post.data.title}</h1>
 			<p class="post-description">{post.data.description}</p>
@@ -62,6 +72,39 @@ const dateTime = `${post.data.pubDate.getUTCFullYear()}-${String(post.data.pubDa
 
 	.post-header {
 		margin-bottom: 32px;
+	}
+
+	.back-link {
+		display: inline-flex;
+		align-items: center;
+		margin-bottom: 20px;
+		padding: 8px 12px;
+		border: 1px solid rgba(153, 176, 255, 0.18);
+		border-radius: 999px;
+		background: rgba(153, 176, 255, 0.08);
+		color: var(--text);
+		font-size: 0.95rem;
+		font-weight: 600;
+		line-height: 1.2;
+		text-decoration: none;
+		transition:
+			transform 0.2s ease,
+			border-color 0.2s ease,
+			background 0.2s ease,
+			color 0.2s ease;
+	}
+
+	.back-link:hover,
+	.back-link:focus-visible {
+		transform: translateY(-2px);
+		border-color: rgba(157, 140, 255, 0.28);
+		background: rgba(157, 140, 255, 0.14);
+		color: #f3f6ff;
+	}
+
+	.back-link:focus-visible {
+		outline: 2px solid rgba(110, 195, 255, 0.9);
+		outline-offset: 3px;
 	}
 
 	.kicker {
