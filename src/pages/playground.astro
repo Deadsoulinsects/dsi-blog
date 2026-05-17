@@ -16,26 +16,10 @@ type Star = {
 };
 
 const navItems = [
-	{
-		title: '博客',
-		href: '/blog',
-		icon: 'book',
-	},
-	{
-		title: '项目',
-		href: '/projects',
-		icon: 'folder',
-	},
-	{
-		title: '文档',
-		href: '/docs',
-		icon: 'file',
-	},
-	{
-		title: '起源',
-		href: '/origin',
-		icon: 'info',
-	},
+	{ title: '博客', href: '/blog', icon: 'book' },
+	{ title: '项目', href: '/projects', icon: 'folder' },
+	{ title: '文档', href: '/docs', icon: 'file' },
+	{ title: '起源', href: '/origin', icon: 'info' },
 ];
 
 const base = import.meta.env.BASE_URL;
@@ -76,7 +60,7 @@ const buildStars = (): Star[] => {
 		const size = 1.4 + sizeSeed * 3.4;
 		const opacity = 0.32 + opacitySeed * 0.58;
 		const duration = 2.6 + durationSeed * 4.2;
-		const delay = delaySeed * -8;
+		const delay = delaySeed * 8;
 		const blur = size > 3 ? 0.8 + blurSeed * 1.8 : blurSeed * 0.8;
 		const color = colorPalette[Math.floor(colorSeed * colorPalette.length)];
 
@@ -99,8 +83,75 @@ const buildStars = (): Star[] => {
 const stars = buildStars();
 ---
 
-<Layout title="Dead Soul Insects" description="冷色残光中的技术记录、项目与文档整理" hideChrome={true} fullBleed={true}>
-	<section class="cover-frame" aria-labelledby="cover-title">
+<Layout title="Playground | Dead Soul Insects" description="Dead Soul Insects 首页星光背景实验页" hideChrome={true} fullBleed={true}>
+	<section class="playground-cover" aria-labelledby="playground-title">
+		<details class="control-panel" open>
+			<summary>背景参数</summary>
+			<div class="control-grid">
+				<label>
+					<span>中心冷雾</span>
+					<input type="range" min="0" max="0.32" step="0.01" value="0.18" data-var="--fog-core" />
+					<output>0.18</output>
+				</label>
+				<label>
+					<span>蓝色雾光</span>
+					<input type="range" min="0" max="0.22" step="0.01" value="0.11" data-var="--fog-cyan" />
+					<output>0.11</output>
+				</label>
+				<label>
+					<span>左侧紫光</span>
+					<input type="range" min="0" max="0.42" step="0.01" value="0.27" data-var="--left-violet" />
+					<output>0.27</output>
+				</label>
+				<label>
+					<span>右侧蓝光</span>
+					<input type="range" min="0" max="0.34" step="0.01" value="0.17" data-var="--right-blue" />
+					<output>0.17</output>
+				</label>
+				<label>
+					<span>星光强度</span>
+					<input type="range" min="0.3" max="1" step="0.01" value="0.84" data-var="--starfield-opacity" />
+					<output>0.84</output>
+				</label>
+				<label>
+					<span>星光数量</span>
+					<input type="range" min="40" max="160" step="1" value="160" data-stars />
+					<output>160</output>
+				</label>
+				<label>
+					<span>星点大小</span>
+					<input type="range" min="0.6" max="1.8" step="0.05" value="1" data-var="--star-size-scale" />
+					<output>1</output>
+				</label>
+				<label>
+					<span>闪烁峰值</span>
+					<input type="range" min="0.6" max="1.5" step="0.05" value="1" data-var="--twinkle-peak" />
+					<output>1</output>
+				</label>
+				<label>
+					<span>漂浮幅度</span>
+					<input type="range" min="0" max="2" step="0.05" value="1" data-var="--drift-scale" />
+					<output>1</output>
+				</label>
+				<label>
+					<span>暗角强度</span>
+					<input type="range" min="0" max="0.6" step="0.01" value="0.34" data-var="--vignette" />
+					<output>0.34</output>
+				</label>
+				<label>
+					<span>内容高度</span>
+					<input type="range" min="-8" max="6" step="0.1" value="-2.6" data-var="--content-y" data-unit="vh" />
+					<output>-2.6vh</output>
+				</label>
+				<label>
+					<span>标题大小</span>
+					<input type="range" min="7" max="13" step="0.1" value="10" data-var="--title-vw" data-unit="vw" />
+					<output>10vw</output>
+				</label>
+			</div>
+			<button class="control-reset" type="button" data-reset>重置参数</button>
+		</details>
+
 		<div class="cover-ambient" aria-hidden="true"></div>
 
 		<div class="starfield" aria-hidden="true">
@@ -129,14 +180,9 @@ const stars = buildStars();
 
 		<div class="cover-content">
 			<p class="cover-kicker">DEAD SOUL INSECTS</p>
-
-			<h1 id="cover-title" class="cover-title">Dead Soul Insects</h1>
-
+			<h1 id="playground-title" class="cover-title">Dead Soul Insects</h1>
 			<p class="cover-subtitle">一个在冷色残光里，缓慢展开的个人站点</p>
-
-			<p class="cover-description">
-				收纳技术记录、实践项目与长期整理，让零散想法在暗处缓慢成形
-			</p>
+			<p class="cover-description">收纳技术记录、实践项目与长期整理，让零散想法在暗处缓慢成形</p>
 
 			<nav class="cover-nav" aria-label="首页主要入口">
 				{
@@ -185,6 +231,51 @@ const stars = buildStars();
 	</section>
 </Layout>
 
+<script>
+	const cover = document.querySelector<HTMLElement>('.playground-cover');
+	const stars = Array.from(document.querySelectorAll<HTMLElement>('.star'));
+	const controls = Array.from(document.querySelectorAll<HTMLInputElement>('.control-panel input'));
+	const resetButton = document.querySelector<HTMLButtonElement>('[data-reset]');
+
+	const formatValue = (input: HTMLInputElement) => `${input.value}${input.dataset.unit ?? ''}`;
+
+	const updateOutput = (input: HTMLInputElement) => {
+		const output = input.parentElement?.querySelector('output');
+
+		if (output) {
+			output.textContent = formatValue(input);
+		}
+	};
+
+	const updateVisibleStars = (count: number) => {
+		stars.forEach((star, index) => {
+			star.style.display = index < count ? '' : 'none';
+		});
+	};
+
+	const applyControl = (input: HTMLInputElement) => {
+		if (input.dataset.stars !== undefined) {
+			updateVisibleStars(Number(input.value));
+		} else if (cover && input.dataset.var) {
+			cover.style.setProperty(input.dataset.var, formatValue(input));
+		}
+
+		updateOutput(input);
+	};
+
+	controls.forEach((input) => {
+		applyControl(input);
+		input.addEventListener('input', () => applyControl(input));
+	});
+
+	resetButton?.addEventListener('click', () => {
+		controls.forEach((input) => {
+			input.value = input.defaultValue;
+			applyControl(input);
+		});
+	});
+</script>
+
 <style>
 	:global(html),
 	:global(body) {
@@ -194,19 +285,19 @@ const stars = buildStars();
 		background: #02040c;
 	}
 
-	.cover-frame {
-		--fog-core: 0.16;
-		--fog-cyan: 0.09;
+	.playground-cover {
+		--fog-core: 0.18;
+		--fog-cyan: 0.11;
 		--left-violet: 0.27;
-		--right-blue: 0.24;
-		--starfield-opacity: 1;
-		--star-size-scale: 1.8;
+		--right-blue: 0.17;
+		--starfield-opacity: 0.84;
+		--star-size-scale: 1;
 		--twinkle-low: 0.35;
 		--twinkle-mid: 0.78;
-		--twinkle-peak: 1.5;
-		--drift-scale: 2;
+		--twinkle-peak: 1;
+		--drift-scale: 1;
 		--vignette: 0.34;
-		--content-y: -8vh;
+		--content-y: -2.6vh;
 		--title-vw: 10vw;
 		--title-size: clamp(4.25rem, var(--title-vw), 9.4rem);
 		position: relative;
@@ -227,7 +318,73 @@ const stars = buildStars();
 			#02040c;
 	}
 
-	.cover-frame::after {
+	.control-panel {
+		position: fixed;
+		top: 14px;
+		left: 14px;
+		z-index: 20;
+		width: min(360px, calc(100vw - 28px));
+		max-height: calc(100svh - 28px);
+		padding: 12px;
+		border: 1px solid rgba(148, 163, 184, 0.2);
+		border-radius: 20px;
+		background: rgba(6, 10, 24, 0.78);
+		box-shadow: 0 22px 70px rgba(0, 0, 0, 0.32);
+		backdrop-filter: blur(18px);
+		overflow: auto;
+		color: #dbeafe;
+		font-size: 0.82rem;
+		text-align: left;
+	}
+
+	.control-panel summary {
+		color: rgba(125, 211, 252, 0.94);
+		font-weight: 800;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		cursor: pointer;
+		user-select: none;
+	}
+
+	.control-grid {
+		display: grid;
+		gap: 10px;
+		margin-top: 12px;
+	}
+
+	.control-grid label {
+		display: grid;
+		grid-template-columns: 5.2rem 1fr 3.4rem;
+		gap: 10px;
+		align-items: center;
+		color: rgba(203, 213, 225, 0.88);
+	}
+
+	.control-grid input {
+		width: 100%;
+		accent-color: #7dd3fc;
+	}
+
+	.control-grid output {
+		color: rgba(186, 230, 253, 0.9);
+		font-variant-numeric: tabular-nums;
+		text-align: right;
+	}
+
+	.control-reset {
+		width: 100%;
+		margin-top: 12px;
+		padding: 9px 12px;
+		border: 1px solid rgba(125, 211, 252, 0.22);
+		border-radius: 999px;
+		background: rgba(15, 23, 42, 0.56);
+		color: #e0f2fe;
+		font: inherit;
+		font-weight: 700;
+		cursor: pointer;
+	}
+
+	.playground-cover::after {
 		content: '';
 		position: absolute;
 		inset: 0;
@@ -317,42 +474,6 @@ const stars = buildStars();
 	.cover-motto {
 		position: relative;
 		z-index: 2;
-	}
-
-	@keyframes twinkleStar {
-		0% {
-			transform: scale(0.85);
-			opacity: calc(var(--star-opacity) * var(--twinkle-low));
-		}
-
-		100% {
-			transform: scale(0.85);
-			opacity: calc(var(--star-opacity) * var(--twinkle-low));
-		}
-
-		35% {
-			transform: scale(1);
-			opacity: calc(var(--star-opacity) * var(--twinkle-mid));
-		}
-
-		62% {
-			transform: scale(1.25);
-			opacity: calc(var(--star-opacity) * var(--twinkle-peak));
-		}
-	}
-
-	@keyframes floatStar {
-		0% {
-			transform: translate3d(0, 0, 0);
-		}
-
-		100% {
-			transform: translate3d(0, 0, 0);
-		}
-
-		50% {
-			transform: translate3d(calc(var(--star-drift-x) * var(--drift-scale)), calc(var(--star-drift-y) * var(--drift-scale)), 0);
-		}
 	}
 
 	.cover-content {
@@ -496,8 +617,37 @@ const stars = buildStars();
 		color: rgba(71, 85, 105, 0.78);
 	}
 
+	@keyframes twinkleStar {
+		0%,
+		100% {
+			transform: scale(0.85);
+			opacity: calc(var(--star-opacity) * var(--twinkle-low));
+		}
+
+		35% {
+			transform: scale(1);
+			opacity: calc(var(--star-opacity) * var(--twinkle-mid));
+		}
+
+		62% {
+			transform: scale(1.25);
+			opacity: calc(var(--star-opacity) * var(--twinkle-peak));
+		}
+	}
+
+	@keyframes floatStar {
+		0%,
+		100% {
+			transform: translate3d(0, 0, 0);
+		}
+
+		50% {
+			transform: translate3d(calc(var(--star-drift-x) * var(--drift-scale)), calc(var(--star-drift-y) * var(--drift-scale)), 0);
+		}
+	}
+
 	@media (max-height: 760px) and (min-width: 821px) {
-		.cover-frame {
+		.playground-cover {
 			--content-y: -2vh;
 			padding: 34px clamp(22px, 5vw, 72px) 78px;
 		}
@@ -526,7 +676,6 @@ const stars = buildStars();
 		.cover-nav {
 			margin-top: 20px;
 		}
-
 	}
 
 	@media (max-height: 600px) and (min-width: 821px) {
@@ -536,7 +685,11 @@ const stars = buildStars();
 	}
 
 	@media (max-width: 820px) {
-		.cover-frame {
+		.control-panel {
+			max-height: 42svh;
+		}
+
+		.playground-cover {
 			--content-y: -2.4vh;
 			--starfield-opacity: 0.72;
 			padding: 42px 18px 96px;
@@ -567,15 +720,19 @@ const stars = buildStars();
 			font-size: 0.98rem;
 			line-height: 1.7;
 		}
-
 	}
 
 	@media (max-width: 430px) {
+		.control-grid label {
+			grid-template-columns: 4.8rem 1fr 3.1rem;
+			gap: 8px;
+		}
+
 		.star:nth-child(n + 81) {
 			display: none;
 		}
 
-		.cover-frame {
+		.playground-cover {
 			--starfield-opacity: 0.66;
 			padding-top: 34px;
 		}
