@@ -1,34 +1,26 @@
 ---
 import Layout from '../layouts/Layout.astro';
 
-const entryCards = [
+const navItems = [
 	{
-		label: 'Blog',
 		title: '博客',
-		description: '收纳技术笔记、学习记录与阶段性思考，是 Dead Soul Insects 最稳定的写作入口。',
-		href: 'blog',
-		action: '阅读文章',
+		href: '/blog',
+		icon: 'book',
 	},
 	{
-		label: 'Projects',
 		title: '项目',
-		description: '整理持续推进的实践、工具与实验，保留它们的用途、边界与阶段。',
-		href: 'projects',
-		action: '查看项目',
+		href: '/projects',
+		icon: 'folder',
 	},
 	{
-		label: 'Docs',
 		title: '文档',
-		description: '把零散记录收束成可复用的说明，方便查阅，也便于长期整理。',
-		href: 'docs',
-		action: '打开文档',
+		href: '/docs',
+		icon: 'file',
 	},
 	{
-		label: 'Origin',
 		title: '起源',
-		description: '说明 Dead Soul Insects 这个名字如何留下来，以及整站气质由何而来。',
-		href: 'origin',
-		action: '了解起源',
+		href: '/origin',
+		icon: 'info',
 	},
 ];
 
@@ -42,382 +34,498 @@ const withBase = (path: string) => {
 };
 ---
 
-<Layout title="Dead Soul Insects" description="在灵魂残光中，记录技术、项目与碎片。">
-	<section class="hero-grid">
-		<div class="hero-copy panel">
-			<p class="eyebrow">Dead Soul Insects</p>
-			<h1>一个在冷色残光里，缓慢展开的个人站点。</h1>
-			<p class="lead">
-				Dead Soul Insects 以博客、项目、文档与起源四个入口为主，收纳技术记录、实践页面与整理后的说明。
-				这里保留长期写作、项目归档与文档整理的节奏，让零散想法慢慢沉淀成可回看的内容。
-			</p>
-			<p class="hero-note">
-				写作、项目、说明与名字来路，在这里并列展开。各自安静，也彼此照应。
-			</p>
-
-			<div class="hero-links">
-				<a class="primary-link" href={withBase('/blog')}>进入博客</a>
-				<a class="secondary-link" href={withBase('/docs')}>阅读文档</a>
-				<a class="secondary-link" href={withBase('/projects')}>查看项目</a>
-			</div>
+<Layout title="Dead Soul Insects" description="冷色残光中的技术记录、项目与文档整理" hideChrome={true} fullBleed={true}>
+	<section class="cover-frame" aria-labelledby="cover-title">
+		<div class="cover-light" aria-hidden="true">
+			<span class="glow glow-left"></span>
+			<span class="glow glow-right"></span>
+			<span class="glow glow-bottom"></span>
 		</div>
 
-		<aside class="visual-card panel" aria-label="首页入口概览">
-			<div class="visual-header">
-				<div class="visual-badge">DSI</div>
-				<div>
-					<p class="visual-title">Where Dead Souls Still Glow</p>
-					<p class="visual-text">安静、冷调、克制发光。四个主要入口在这里并列展开，让阅读、项目与说明有清楚的落点。</p>
-				</div>
-			</div>
-			<ul class="visual-nav" aria-label="主要入口概览">
-				<li><span>01</span><a href={withBase('/blog')}>博客</a></li>
-				<li><span>02</span><a href={withBase('/projects')}>项目</a></li>
-				<li><span>03</span><a href={withBase('/docs')}>文档</a></li>
-				<li><span>04</span><a href={withBase('/origin')}>起源</a></li>
-			</ul>
-		</aside>
-	</section>
+		<div class="cover-grid" aria-hidden="true"></div>
 
-	<section class="entry-section">
-		<div class="section-heading">
-			<p class="section-kicker">主要入口</p>
-			<h2>从这里进入 Dead Soul Insects 的四个主要入口。</h2>
+		<div class="cover-content">
+			<p class="cover-kicker">DEAD SOUL INSECTS</p>
+
+			<h1 id="cover-title" class="cover-title">Dead Soul Insects</h1>
+
+			<p class="cover-subtitle">一个在冷色残光里，缓慢展开的个人站点</p>
+
+			<p class="cover-description">
+				收纳技术记录、实践项目与长期整理，让零散想法在暗处缓慢成形
+			</p>
+
+			<nav class="cover-nav" aria-label="首页主要入口">
+				{
+					navItems.map((item) => (
+						<a class="cover-link" href={withBase(item.href)}>
+							<span class="cover-icon" aria-hidden="true">
+								{item.icon === 'book' && (
+									<svg viewBox="0 0 24 24" focusable="false">
+										<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v16H6.5A2.5 2.5 0 0 0 4 21.5v-16Z" />
+										<path d="M13 3h4.5A2.5 2.5 0 0 1 20 5.5v16a2.5 2.5 0 0 0-2.5-2.5H13V3Z" />
+									</svg>
+								)}
+								{item.icon === 'folder' && (
+									<svg viewBox="0 0 24 24" focusable="false">
+										<path d="M3.5 6.5A2.5 2.5 0 0 1 6 4h4.2l1.8 2.2h6A2.5 2.5 0 0 1 20.5 8.7v8.8A2.5 2.5 0 0 1 18 20H6a2.5 2.5 0 0 1-2.5-2.5v-11Z" />
+										<path d="M7.5 10h9" />
+									</svg>
+								)}
+								{item.icon === 'file' && (
+									<svg viewBox="0 0 24 24" focusable="false">
+										<path d="M6 3.5h7l5 5V20a.5.5 0 0 1-.5.5h-11A.5.5 0 0 1 6 20V3.5Z" />
+										<path d="M13 3.5V9h5" />
+										<path d="M9 13h6" />
+										<path d="M9 16.5h5" />
+									</svg>
+								)}
+								{item.icon === 'info' && (
+									<svg viewBox="0 0 24 24" focusable="false">
+										<circle cx="12" cy="12" r="8.5" />
+										<path d="M12 11.5v5" />
+										<path d="M12 7.5h.01" />
+									</svg>
+								)}
+							</span>
+							<span>{item.title}</span>
+						</a>
+					))
+				}
+			</nav>
 		</div>
 
-		<div class="entry-grid">
-			{
-				entryCards.map((card) => (
-					<a class="entry-card panel" href={withBase(card.href)}>
-						<p class="entry-label">{card.label}</p>
-						<h3>{card.title}</h3>
-						<p>{card.description}</p>
-						<span>{card.action} →</span>
-					</a>
-				))
-			}
+		<div class="cover-motto" aria-label="站点标语">
+			<p>WHERE DEAD SOULS STILL GLOW</p>
+			<p>逝魂未灭，幽光犹存</p>
 		</div>
 	</section>
 </Layout>
 
 <style>
-	.panel {
-		border: 1px solid var(--line);
-		border-radius: 28px;
+	:global(html) {
+		margin: 0;
+		min-height: 100%;
+		overflow-x: hidden;
+		background: #02040c;
+	}
+
+	:global(body) {
+		margin: 0;
+		min-height: 100%;
+		overflow-x: hidden;
 		background:
-			radial-gradient(circle at top right, rgba(110, 195, 255, 0.08), transparent 34%),
-			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
-			var(--panel);
-		backdrop-filter: blur(18px);
-		box-shadow: var(--shadow);
+			radial-gradient(circle at 16% 8%, rgba(92, 73, 220, 0.16), transparent 35%),
+			radial-gradient(circle at 85% 18%, rgba(76, 166, 214, 0.08), transparent 40%),
+			linear-gradient(180deg, #050817 0%, #02040c 62%, #01030a 100%);
 	}
 
-	.hero-grid {
+	.cover-frame {
+		position: relative;
+		isolation: isolate;
 		display: grid;
-		grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
-		gap: 24px;
-		align-items: stretch;
+		place-items: center;
+		box-sizing: border-box;
+		width: 100vw;
+		max-width: none;
+		height: 100svh;
+		min-height: 100svh;
+
+		margin: 0;
+		padding: clamp(42px, 5vw, 78px) clamp(22px, 5vw, 72px)
+			clamp(88px, 8vw, 118px);
+
+		overflow: hidden;
+		text-align: center;
+
+		border: none;
+		border-radius: 0;
+
+		background:
+			radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.055), transparent 32%),
+			linear-gradient(180deg, rgba(13, 18, 35, 0.72), rgba(2, 4, 12, 0.82)),
+			rgba(3, 6, 18, 0.72);
+		backdrop-filter: none;
+		box-shadow: none;
 	}
 
-	.hero-copy,
-	.visual-card {
-		padding: 32px;
+	.cover-light {
+		position: absolute;
+		inset: 0;
+		z-index: -20;
+		pointer-events: none;
+		opacity: 0.48;
 	}
 
-	.eyebrow,
-	.section-kicker {
-		margin: 0 0 12px;
-		font-size: 0.88rem;
-		letter-spacing: 0.12em;
+	.glow {
+		position: absolute;
+		display: block;
+		border-radius: 999px;
+		filter: blur(68px);
+	}
+
+	.glow-left {
+		top: -220px;
+		left: -170px;
+		width: 540px;
+		height: 540px;
+		background: rgba(111, 78, 218, 0.2);
+	}
+
+	.glow-right {
+		top: 26px;
+		right: -170px;
+		width: 500px;
+		height: 500px;
+		background: rgba(76, 168, 214, 0.12);
+	}
+
+	.glow-bottom {
+		bottom: -280px;
+		left: 50%;
+		width: 720px;
+		height: 560px;
+		background: rgba(70, 72, 176, 0.1);
+		transform: translateX(-50%);
+	}
+
+	.cover-grid {
+		position: absolute;
+		inset: 0;
+		z-index: -10;
+		pointer-events: none;
+		opacity: 0.055;
+		background-image:
+			linear-gradient(rgba(255, 255, 255, 0.7) 1px, transparent 1px),
+			linear-gradient(90deg, rgba(255, 255, 255, 0.7) 1px, transparent 1px);
+		background-size: 72px 72px;
+		mask-image: radial-gradient(circle at center, black 0%, transparent 72%);
+	}
+
+	.cover-content {
+		width: min(100%, 1200px);
+		min-width: 0;
+	}
+
+	.cover-kicker {
+		margin: 0;
+		font-size: clamp(0.78rem, 1.2vw, 0.95rem);
+		font-weight: 700;
+		letter-spacing: 0.34em;
 		text-transform: uppercase;
-		color: var(--accent-soft);
+		color: rgba(125, 211, 252, 0.88);
 	}
 
-	h1,
-	h2,
-	h3,
-	p {
-		margin-top: 0;
+	.cover-title {
+		max-width: min(1200px, 100%);
+		margin: 26px auto 0;
+		font-size: clamp(3.9rem, 9.6vw, 9rem);
+		font-weight: 900;
+		line-height: 0.88;
+		letter-spacing: -0.08em;
+		color: #f8fafc;
+		overflow-wrap: normal;
+		text-wrap: balance;
+		text-shadow: 0 0 34px rgba(186, 230, 253, 0.1);
 	}
 
-	h1 {
-		margin-bottom: 18px;
-		font-size: clamp(2.2rem, 5vw, 4rem);
-		line-height: 1.1;
+	.cover-subtitle {
+		max-width: 900px;
+		margin: clamp(24px, 3.8vw, 38px) auto 0;
+		font-size: clamp(1.35rem, 2.65vw, 2.55rem);
+		font-weight: 900;
+		line-height: 1.08;
+		letter-spacing: -0.045em;
+		color: #edf2ff;
+		text-wrap: balance;
 	}
 
-	h1,
-	h2,
-	h3,
-	.lead,
-	.hero-note,
-	.visual-text,
-	.visual-nav a,
-	.entry-card p,
-	.entry-card span {
-		overflow-wrap: anywhere;
+	.cover-description {
+		max-width: 680px;
+		margin: 20px auto 0;
+		font-size: clamp(0.95rem, 1.2vw, 1.05rem);
+		line-height: 1.75;
+		color: #93a2be;
+		text-wrap: balance;
 	}
 
-	.lead {
-		max-width: 42rem;
-		margin-bottom: 16px;
-		font-size: 1.02rem;
-		line-height: 1.8;
-		color: var(--text-soft);
-	}
-
-	.hero-note {
-		max-width: 36rem;
-		margin-bottom: 28px;
-		line-height: 1.8;
-		color: var(--text-soft);
-	}
-
-	.hero-links {
+	.cover-nav {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 14px;
+		justify-content: center;
+		gap: 10px;
+		margin-top: 28px;
 	}
 
-	.hero-links a {
-		padding: 12px 18px;
+	.cover-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		padding: 10px 17px;
+		border: 1px solid rgba(148, 163, 184, 0.18);
 		border-radius: 999px;
+		background: rgba(15, 23, 42, 0.46);
+		color: #e2e8f0;
 		text-decoration: none;
-		font-weight: 600;
-		color: var(--text);
+		backdrop-filter: blur(14px);
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 		transition:
-			transform 0.2s ease,
-			background 0.2s ease,
-			border-color 0.2s ease;
+			transform 0.22s ease,
+			border-color 0.22s ease,
+			background 0.22s ease,
+			color 0.22s ease;
 	}
 
-	.hero-links a:hover,
-	.hero-links a:focus-visible,
-	.entry-card:hover {
+	.cover-icon {
+		display: inline-flex;
+		flex: 0 0 auto;
+		align-items: center;
+		justify-content: center;
+		width: 18px;
+		height: 18px;
+		color: rgba(125, 211, 252, 0.88);
+	}
+
+	.cover-icon svg {
+		width: 100%;
+		height: 100%;
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 1.9;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		filter: drop-shadow(0 0 5px rgba(125, 211, 252, 0.12));
+	}
+
+	.cover-link span {
+		font-size: 0.9rem;
+		font-weight: 700;
+	}
+
+	.cover-link:hover,
+	.cover-link:focus-visible {
+		color: #e0f2fe;
+		border-color: rgba(125, 211, 252, 0.4);
+		background: rgba(45, 63, 99, 0.5);
 		transform: translateY(-2px);
 	}
 
-	.hero-links a:focus-visible,
-	.entry-card:focus-visible {
-		outline: 2px solid rgba(110, 195, 255, 0.9);
-		outline-offset: 3px;
+	.cover-link:hover .cover-icon,
+	.cover-link:focus-visible .cover-icon {
+		color: rgba(125, 211, 252, 0.96);
 	}
 
-	.primary-link {
-		background: linear-gradient(135deg, rgba(122, 101, 255, 0.9), rgba(70, 176, 255, 0.9));
-		color: #f8fbff;
+	.cover-link:focus-visible {
+		outline: 2px solid rgba(125, 211, 252, 0.86);
+		outline-offset: 4px;
 	}
 
-	.secondary-link {
-		border: 1px solid rgba(153, 176, 255, 0.24);
-		background: rgba(153, 176, 255, 0.08);
-	}
-
-	.visual-card {
-		position: relative;
-		overflow: hidden;
-		display: flex;
-		flex-direction: column;
-		justify-content: space-between;
-		gap: 18px;
-		min-height: 320px;
-	}
-
-	.visual-header {
-		display: grid;
-		grid-template-columns: auto 1fr;
-		gap: 18px;
-		align-items: start;
-	}
-
-	.visual-card::after {
-		content: '';
+	.cover-motto {
 		position: absolute;
-		inset: auto -20% -30% auto;
-		width: 220px;
-		height: 220px;
-		border-radius: 50%;
-		background: radial-gradient(circle, rgba(103, 189, 255, 0.28), transparent 70%);
-		filter: blur(14px);
-	}
-
-	.visual-badge {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 80px;
-		height: 80px;
-		border-radius: 24px;
-		background: linear-gradient(160deg, rgba(123, 103, 255, 0.28), rgba(93, 190, 255, 0.1));
-		border: 1px solid rgba(153, 176, 255, 0.22);
-		font-size: 1.4rem;
-		font-weight: 700;
-		letter-spacing: 0.12em;
-		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-	}
-
-	.visual-title {
-		margin-top: 0;
-		margin-bottom: 0;
-		font-size: 1.2rem;
-		font-weight: 600;
-	}
-
-	.visual-text {
-		margin-top: 10px;
-		margin-bottom: 0;
-		line-height: 1.8;
-		color: var(--text-soft);
-	}
-
-	.visual-nav {
-		position: relative;
-		z-index: 1;
-		display: grid;
-		gap: 12px;
-		margin: 0;
-		padding: 0;
-		list-style: none;
-	}
-
-	.visual-nav li {
-		display: grid;
-		grid-template-columns: auto 1fr;
-		gap: 12px;
-		align-items: center;
-		padding: 14px 16px;
-		border: 1px solid rgba(153, 176, 255, 0.14);
-		border-radius: 18px;
-		background: rgba(255, 255, 255, 0.03);
-	}
-
-	.visual-nav span {
-		color: var(--accent-soft);
-		font-size: 0.82rem;
-		letter-spacing: 0.12em;
-	}
-
-	.visual-nav a {
-		text-decoration: none;
-		font-weight: 600;
-	}
-
-	.visual-nav a:hover,
-	.visual-nav a:focus-visible {
-		color: var(--accent-soft);
-	}
-
-	.visual-nav a:focus-visible {
-		outline: 2px solid rgba(110, 195, 255, 0.9);
-		outline-offset: 3px;
-		border-radius: 4px;
-	}
-
-	.visual-nav li:focus-within {
-		border-color: rgba(157, 140, 255, 0.28);
-		background: rgba(255, 255, 255, 0.05);
-	}
-
-	.entry-section {
-		margin-top: 26px;
-	}
-
-	.section-heading {
-		margin-bottom: 18px;
-	}
-
-	h2 {
-		margin-bottom: 0;
-		font-size: clamp(1.5rem, 3vw, 2.2rem);
-	}
-
-	.entry-grid {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 18px;
-	}
-
-	.entry-card {
+		right: 24px;
+		bottom: 88px;
+		left: 24px;
 		display: flex;
 		flex-direction: column;
-		gap: 12px;
-		padding: 24px;
-		text-decoration: none;
-		transition:
-			transform 0.2s ease,
-			border-color 0.2s ease,
-			background 0.2s ease,
-			box-shadow 0.2s ease;
+		align-items: center;
+		gap: 7px;
+		color: rgba(100, 116, 139, 0.82);
+		pointer-events: none;
 	}
 
-	.entry-card:hover {
-		border-color: rgba(153, 176, 255, 0.3);
-		background:
-			radial-gradient(circle at top right, rgba(110, 195, 255, 0.14), transparent 36%),
-			linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
-			var(--panel-strong);
-		box-shadow: 0 28px 90px rgba(0, 0, 0, 0.3);
-	}
-
-	.entry-card:focus-visible {
-		border-color: rgba(153, 176, 255, 0.3);
-		background:
-			radial-gradient(circle at top right, rgba(110, 195, 255, 0.14), transparent 36%),
-			linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
-			var(--panel-strong);
-		box-shadow: 0 28px 90px rgba(0, 0, 0, 0.3);
-	}
-
-	.entry-label {
-		margin-bottom: 0;
-		font-size: 0.82rem;
-		letter-spacing: 0.12em;
+	.cover-motto p {
+		margin: 0;
+		font-size: clamp(0.64rem, 0.9vw, 0.74rem);
+		line-height: 1.3;
+		letter-spacing: 0.32em;
 		text-transform: uppercase;
-		color: var(--accent-soft);
 	}
 
-	.entry-card h3 {
-		margin-bottom: 0;
-		font-size: 1.12rem;
+	.cover-motto p:last-child {
+		font-size: clamp(0.62rem, 0.85vw, 0.72rem);
+		letter-spacing: 0.2em;
+		text-transform: none;
+		color: rgba(71, 85, 105, 0.78);
 	}
 
-	.entry-card p {
-		margin-bottom: 0;
-		line-height: 1.7;
-		color: var(--text-soft);
-	}
-
-	.entry-card span {
-		margin-top: auto;
-		color: #a0b5ff;
-		font-size: 0.95rem;
-		font-weight: 600;
-	}
-
-	@media (max-width: 900px) {
-		.hero-grid,
-		.entry-grid {
-			grid-template-columns: 1fr;
+	@media (max-height: 760px) and (min-width: 821px) {
+		.cover-frame {
+			padding: 34px clamp(22px, 5vw, 72px) 78px;
 		}
 
-		.visual-card {
-			min-height: auto;
+		.cover-kicker {
+			font-size: 0.72rem;
+			letter-spacing: 0.28em;
+		}
+
+		.cover-title {
+			margin-top: 18px;
+			font-size: clamp(3.4rem, 8.6vw, 7.2rem);
+			line-height: 0.9;
+		}
+
+		.cover-subtitle {
+			margin-top: 22px;
+			font-size: clamp(1.15rem, 2.3vw, 2rem);
+		}
+
+		.cover-description {
+			margin-top: 14px;
+			font-size: 0.92rem;
+			line-height: 1.6;
+		}
+
+		.cover-nav {
+			margin-top: 20px;
+		}
+
+		.cover-link {
+			padding: 8px 14px;
+		}
+
+		.cover-motto {
+			bottom: 88px;
+			gap: 5px;
 		}
 	}
 
-	@media (max-width: 640px) {
-		.hero-copy,
-		.visual-card,
-		.entry-card {
-			padding: 24px;
+	@media (max-height: 600px) and (min-width: 821px) {
+		.cover-frame {
+			padding-top: 26px;
+			padding-bottom: 62px;
 		}
 
-		.visual-header {
-			grid-template-columns: 1fr;
+		.cover-title {
+			margin-top: 14px;
+			font-size: clamp(3rem, 7.4vw, 5.9rem);
 		}
 
-		h1 {
-			font-size: 2rem;
+		.cover-subtitle {
+			margin-top: 18px;
+			font-size: clamp(1.05rem, 2vw, 1.58rem);
+		}
+
+		.cover-description {
+			display: none;
+		}
+
+		.cover-nav {
+			margin-top: 18px;
+		}
+
+		.cover-motto p {
+			font-size: 0.6rem;
+		}
+	}
+
+	@media (max-width: 820px) {
+		.cover-frame {
+			width: 100vw;
+			height: 100svh;
+			min-height: 100svh;
+			margin: 0;
+			padding: 42px 18px 96px;
+			border-radius: 0;
+		}
+
+		.cover-kicker {
+			letter-spacing: 0.26em;
+		}
+
+		.cover-title {
+			margin-top: 24px;
+			font-size: clamp(3.25rem, 15.4vw, 5.6rem);
+			line-height: 0.9;
+			letter-spacing: -0.075em;
+		}
+
+		.cover-subtitle {
+			margin-top: 26px;
+			font-size: clamp(1.24rem, 6.2vw, 2.05rem);
+			line-height: 1.12;
+		}
+
+		.cover-description {
+			margin-top: 18px;
+			font-size: 0.98rem;
+			line-height: 1.7;
+		}
+
+		.cover-nav {
+			gap: 10px;
+			margin-top: 24px;
+		}
+
+		.cover-link {
+			padding: 11px 16px;
+		}
+
+		.cover-motto {
+			bottom: 88px;
+		}
+	}
+
+	@media (max-width: 820px) and (max-height: 720px) {
+		.cover-frame {
+			padding-top: 30px;
+			padding-bottom: 72px;
+		}
+
+		.cover-kicker {
+			font-size: 0.68rem;
+			letter-spacing: 0.22em;
+		}
+
+		.cover-title {
+			margin-top: 18px;
+			font-size: clamp(2.85rem, 13.8vw, 4.7rem);
+		}
+
+		.cover-subtitle {
+			margin-top: 18px;
+			font-size: clamp(1.08rem, 5vw, 1.55rem);
+		}
+
+		.cover-description {
+			display: none;
+		}
+
+		.cover-nav {
+			margin-top: 18px;
+		}
+
+		.cover-link {
+			padding: 8px 14px;
+		}
+	}
+
+	@media (max-width: 430px) {
+		.cover-frame {
+			padding-top: 34px;
+		}
+
+		.cover-title {
+			font-size: clamp(2.9rem, 14.8vw, 4.1rem);
+			letter-spacing: -0.06em;
+		}
+
+		.cover-nav {
+			max-width: 260px;
+			margin-right: auto;
+			margin-left: auto;
+		}
+
+		.cover-link {
+			justify-content: center;
+			min-width: 92px;
+		}
+
+		.cover-motto p {
+			letter-spacing: 0.16em;
+		}
+
+		.cover-motto p:last-child {
+			letter-spacing: 0.12em;
 		}
 	}
 </style>

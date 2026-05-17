@@ -2,11 +2,15 @@
 interface Props {
 	title?: string;
 	description?: string;
+	hideChrome?: boolean;
+	fullBleed?: boolean;
 }
 
 const {
 	title = 'Dead Soul Insects',
 	description = '在灵魂残光中，记录技术、项目与碎片。',
+	hideChrome = false,
+	fullBleed = false,
 } = Astro.props;
 
 const navItems = [
@@ -49,38 +53,42 @@ const currentPath = normalizePath(Astro.url.pathname);
 		<title>{title}</title>
 	</head>
 	<body>
-		<div class="site-shell">
-			<div class="site-glow site-glow-left"></div>
-			<div class="site-glow site-glow-right"></div>
+		<div class:list={['site-shell', { 'full-bleed': fullBleed }]}>
+			{!hideChrome && <div class="site-glow site-glow-left"></div>}
+			{!hideChrome && <div class="site-glow site-glow-right"></div>}
 
-			<header class="site-header">
-				<a class="brand" href={base}>
-					<span class="brand-name">Dead Soul Insects</span>
-					<span class="brand-tag">个人博客 / 笔记 / 项目</span>
-				</a>
+			{!hideChrome && (
+				<header class="site-header">
+					<a class="brand" href={base}>
+						<span class="brand-name">Dead Soul Insects</span>
+						<span class="brand-tag">个人博客 / 笔记 / 项目</span>
+					</a>
 
-				<nav class="site-nav" aria-label="主导航">
-					{
-						navItems.map((item) => {
-							const isActive = currentPath === normalizePath(withBase(item.href));
+					<nav class="site-nav" aria-label="主导航">
+						{
+							navItems.map((item) => {
+								const isActive = currentPath === normalizePath(withBase(item.href));
 
-							return (
-								<a class:list={{ active: isActive }} aria-current={isActive ? 'page' : undefined} href={withBase(item.href)}>
-									{item.label}
-								</a>
-							);
-						})
-					}
-				</nav>
-			</header>
+								return (
+									<a class:list={{ active: isActive }} aria-current={isActive ? 'page' : undefined} href={withBase(item.href)}>
+										{item.label}
+									</a>
+								);
+							})
+						}
+					</nav>
+				</header>
+			)}
 
-			<main class="page-content">
+			<main class:list={['page-content', { 'full-bleed': fullBleed }]}>
 				<slot />
 			</main>
 
-			<footer class="site-footer">
-				<p>Where Dead Souls Still Glow</p>
-			</footer>
+			{!hideChrome && (
+				<footer class="site-footer">
+					<p>Where Dead Souls Still Glow</p>
+				</footer>
+			)}
 		</div>
 	</body>
 </html>
@@ -130,6 +138,12 @@ const currentPath = normalizePath(Astro.url.pathname);
 		margin: 0 auto;
 		padding: 24px 20px 40px;
 		box-sizing: border-box;
+	}
+
+	.site-shell.full-bleed {
+		min-height: 0;
+		max-width: none;
+		padding: 0;
 	}
 
 	.site-glow {
@@ -232,6 +246,11 @@ const currentPath = normalizePath(Astro.url.pathname);
 		padding: 28px 0 20px;
 	}
 
+	.page-content.full-bleed {
+		min-height: 0;
+		padding: 0;
+	}
+
 	.site-footer {
 		padding-top: 8px;
 		color: var(--text-soft);
@@ -242,6 +261,10 @@ const currentPath = normalizePath(Astro.url.pathname);
 	@media (max-width: 720px) {
 		.site-shell {
 			padding: 16px 14px 32px;
+		}
+
+		.site-shell.full-bleed {
+			padding: 0;
 		}
 
 		.site-header {
