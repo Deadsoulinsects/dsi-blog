@@ -116,6 +116,8 @@ For new dependencies, new frameworks, complex features, deployment changes, dire
 
 \* `.github/workflows/`: deployment config; do not edit by default.
 
+\* Temporary outputs from Playwright MCP, browser screenshots, sandbox experiments, or other automation tools should not be left in the repository root. Put temporary outputs under `D:\ai-output` when possible, and delete unneeded verification artifacts before finishing the task.
+
 
 
 Never edit generated, dependency, or Git internal directories:

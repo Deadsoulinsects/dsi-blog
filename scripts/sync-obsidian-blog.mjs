@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSy
 import { join, relative } from 'node:path';
 
 const root = process.cwd();
+const isDryRun = process.argv.includes('--dry-run');
 
 const sources = [
 	'D:\\GitHub\\cloud-storage\\obsidian\\AI项目\\博客发布',
@@ -29,7 +30,9 @@ const syncMarkdownFile = (sourceFile, destinationFile) => {
 	const sourceParts = splitFrontmatter(sourceContent);
 
 	if (!existsSync(destinationFile)) {
-		writeFileSync(destinationFile, sourceContent, 'utf8');
+		if (!isDryRun) {
+			writeFileSync(destinationFile, sourceContent, 'utf8');
+		}
 		return;
 	}
 
@@ -37,11 +40,16 @@ const syncMarkdownFile = (sourceFile, destinationFile) => {
 	const destinationParts = splitFrontmatter(destinationContent);
 
 	if (!destinationParts.frontmatter) {
-		writeFileSync(destinationFile, sourceContent, 'utf8');
+		if (!isDryRun) {
+			writeFileSync(destinationFile, sourceContent, 'utf8');
+		}
 		return;
 	}
 
-	writeFileSync(destinationFile, `${destinationParts.frontmatter}\n\n${sourceParts.body.replace(/^(?:\r?\n)+/, '')}`, 'utf8');
+	// Keep the site's frontmatter while refreshing the article body from Obsidian.
+	if (!isDryRun) {
+		writeFileSync(destinationFile, `${destinationParts.frontmatter}\n\n${sourceParts.body.replace(/^(?:\r?\n)+/, '')}`, 'utf8');
+	}
 };
 
 mkdirSync(destination, { recursive: true });
@@ -80,11 +88,11 @@ for (const source of sources) {
 }
 
 if (copiedFiles.length === 0) {
-	console.log('No Obsidian blog markdown files synced.');
+	console.log(isDryRun ? 'No Obsidian blog markdown files would be synced.' : 'No Obsidian blog markdown files synced.');
 	process.exit(0);
 }
 
-console.log('Synced Obsidian blog markdown files:');
+console.log(isDryRun ? 'Obsidian blog markdown files that would be synced:' : 'Synced Obsidian blog markdown files:');
 for (const file of copiedFiles) {
 	console.log(`- ${file}`);
 }

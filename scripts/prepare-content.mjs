@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSy
 import { basename, extname, join, relative } from 'node:path';
 
 const root = process.cwd();
+const isDryRun = process.argv.includes('--dry-run');
 
 const getToday = () => {
 	const now = new Date();
@@ -26,7 +27,7 @@ const targets = [
 			`title: "${escapeYamlString(getTitleFromFile(file))}"`,
 			'description: ""',
 			`pubDate: ${today}`,
-			'tags: ["","",""]',
+			'tags: []',
 			'---',
 			'',
 		].join('\n'),
@@ -39,7 +40,7 @@ const targets = [
 			'description: ""',
 			`pubDate: ${today}`,
 			'category: "未分类"',
-			'tags: ["","",""]',
+			'tags: []',
 			'---',
 			'',
 		].join('\n'),
@@ -94,6 +95,11 @@ for (const target of targets) {
 
 		const frontmatter = target.createFrontmatter(file);
 		const nextContent = normalized.length > 0 ? `${frontmatter}\n${normalized}` : frontmatter;
+
+		if (isDryRun) {
+			console.log(`[dry-run] Would add frontmatter: ${relative(root, file)}`);
+			continue;
+		}
 
 		writeFileSync(file, nextContent, 'utf8');
 		console.log(`Added frontmatter: ${relative(root, file)}`);

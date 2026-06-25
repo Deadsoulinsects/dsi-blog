@@ -1,45 +1,38 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getCollection } from 'astro:content';
+import { formatDate, formatDateTime, getAllBlogTags, getSortedPosts } from '../utils/content';
+import { withBase } from '../utils/paths';
 
-const posts = (await getCollection('blog')).sort(
-	(a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime(),
-);
-
-const formatDate = (date: Date) =>
-	date.toLocaleDateString('zh-CN', {
-		year: 'numeric',
-		month: 'long',
-		day: 'numeric',
-		timeZone: 'UTC',
-	});
-
-const formatDateTime = (date: Date) =>
-	`${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;
-
+const posts = await getSortedPosts();
+const tags = await getAllBlogTags();
 const base = import.meta.env.BASE_URL;
-
-const withBase = (path: string) => {
-	const trimmedBase = base.endsWith('/') ? base.slice(0, -1) : base;
-	const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-
-	return `${trimmedBase}${normalizedPath}`;
-};
 ---
 
-<Layout title="博客 | Dead Soul Insects" description="Dead Soul Insects 的博客列表页。">
+<Layout title="博客 | Dead Soul Insects" description="Dead Soul Insects 的博客列表页。" canonicalPath="/blog/">
 	<section class="page-card intro-card">
 		<p class="kicker">博客</p>
 		<h1>持续写下来的记录。</h1>
 		<p>
 			这里收纳 Dead Soul Insects 的文章记录。内容以技术、建站、工具实践与阶段性思考为主，按时间安静展开。
 		</p>
+		{tags.length > 0 && (
+			<ul class="tag-entry-list" aria-label="博客标签入口">
+				{tags.map((tag) => (
+					<li>
+						<a href={withBase(base, `/tags/${tag.slug}/`)}>
+							<span>{tag.name}</span>
+							<span>{tag.count}</span>
+						</a>
+					</li>
+				))}
+			</ul>
+		)}
 	</section>
 
 	<section class="post-list" aria-label="文章列表">
 		{
 			posts.map((post) => (
-				<a class="post-card" href={withBase(`/blog/${post.id}/`)}>
+				<a class="post-card" href={withBase(base, `/blog/${post.id}/`)}>
 					<div class="post-card-top">
 						<time class="post-date" datetime={formatDateTime(post.data.pubDate)}>{formatDate(post.data.pubDate)}</time>
 						{post.data.tags.length > 0 && (
@@ -102,6 +95,38 @@ const withBase = (path: string) => {
 		margin: 0;
 		line-height: 1.8;
 		color: var(--text-soft);
+	}
+
+	.tag-entry-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+		margin: 18px 0 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.tag-entry-list a {
+		display: inline-flex;
+		gap: 8px;
+		align-items: center;
+		padding: 7px 12px;
+		border: 1px solid rgba(110, 195, 255, 0.18);
+		border-radius: 999px;
+		background: rgba(110, 195, 255, 0.08);
+		color: var(--text);
+		text-decoration: none;
+		transition:
+			border-color 0.2s ease,
+			background 0.2s ease,
+			transform 0.2s ease;
+	}
+
+	.tag-entry-list a:hover,
+	.tag-entry-list a:focus-visible {
+		transform: translateY(-1px);
+		border-color: rgba(157, 140, 255, 0.28);
+		background: rgba(157, 140, 255, 0.14);
 	}
 
 	.post-list {

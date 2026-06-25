@@ -3,6 +3,7 @@ import { basename, extname, join, relative } from 'node:path';
 
 const root = process.cwd();
 const originPagesDirectory = join(root, 'src', 'pages', 'origin', '详情文章');
+const isDryRun = process.argv.includes('--dry-run');
 
 const hasFrontmatter = (content) => /^\uFEFF?---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$)/.test(content);
 
@@ -58,6 +59,11 @@ for (const entry of markdownEntries) {
 
 	const frontmatter = createFrontmatter(entry.name);
 	const nextContent = original.length > 0 ? `${frontmatter}\n\n${original}` : frontmatter;
+
+	if (isDryRun) {
+		console.log(`[dry-run] Would add frontmatter: ${relative(root, file)}`);
+		continue;
+	}
 
 	writeFileSync(file, nextContent, 'utf8');
 	console.log(`Added frontmatter: ${relative(root, file)}`);

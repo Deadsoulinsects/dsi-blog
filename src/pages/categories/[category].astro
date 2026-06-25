@@ -1,0 +1,103 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { formatDate, formatDateTime, getAllDocCategories, getSortedDocs } from '../../utils/content';
+import { toParamSlug, withBase } from '../../utils/paths';
+
+export async function getStaticPaths() {
+	const categories = await getAllDocCategories();
+
+	return categories.map((category) => ({
+		params: { category: category.slug },
+		props: { categoryName: category.name },
+	}));
+}
+
+const { categoryName } = Astro.props;
+const docs = (await getSortedDocs()).filter((doc) => toParamSlug(doc.data.category) === toParamSlug(categoryName));
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout title={`${categoryName} | 分类 | Dead Soul Insects`} description={`按分类查看 ${categoryName} 文档。`} canonicalPath={`/categories/${toParamSlug(categoryName)}/`}>
+	<section class="page-card intro-card">
+		<p class="kicker">分类</p>
+		<h1>{categoryName}</h1>
+		<p>这里收纳属于该分类的文档页面。</p>
+	</section>
+
+	<section class="item-list" aria-label="分类文档列表">
+		{docs.map((doc) => (
+			<a class="item-card" href={withBase(base, `/docs/${doc.id}/`)}>
+				<time datetime={formatDateTime(doc.data.pubDate)}>{formatDate(doc.data.pubDate)}</time>
+				<h2>{doc.data.title}</h2>
+				<p>{doc.data.description}</p>
+			</a>
+		))}
+	</section>
+</Layout>
+
+<style>
+	.page-card,
+	.item-card {
+		border: 1px solid var(--line);
+		border-radius: 28px;
+		backdrop-filter: blur(18px);
+		box-shadow: var(--shadow);
+	}
+
+	.page-card {
+		padding: 32px;
+		margin-bottom: 22px;
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+			var(--panel);
+	}
+
+	.kicker {
+		margin: 0 0 12px;
+		font-size: 0.88rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--accent-soft);
+	}
+
+	h1,
+	h2,
+	p,
+	time {
+		margin-top: 0;
+		overflow-wrap: anywhere;
+	}
+
+	h1 {
+		margin-bottom: 16px;
+		font-size: clamp(2rem, 4vw, 3rem);
+	}
+
+	h2 {
+		margin: 0;
+		font-size: clamp(1.3rem, 2.4vw, 1.65rem);
+	}
+
+	p,
+	time {
+		color: var(--text-soft);
+		line-height: 1.8;
+	}
+
+	.item-list {
+		display: grid;
+		gap: 18px;
+	}
+
+	.item-card {
+		display: grid;
+		gap: 12px;
+		padding: 24px;
+		background:
+			radial-gradient(circle at top right, rgba(110, 195, 255, 0.1), transparent 34%),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+			var(--panel);
+		color: inherit;
+		text-decoration: none;
+	}
+</style>

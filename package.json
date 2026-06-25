@@ -8,12 +8,19 @@
   "scripts": {
     "dev": "astro dev",
     "sync:blog": "node scripts/sync-obsidian-blog.mjs",
+    "sync:blog:dry": "node scripts/sync-obsidian-blog.mjs --dry-run",
     "sync:origin": "node scripts/sync-obsidian-origin.mjs",
+    "sync:origin:dry": "node scripts/sync-obsidian-origin.mjs --dry-run",
     "prepare:content": "node scripts/prepare-content.mjs",
+    "prepare:content:dry": "node scripts/prepare-content.mjs --dry-run",
     "prepare:origin": "node scripts/prepare-origin-pages.mjs",
+    "prepare:origin:dry": "node scripts/prepare-origin-pages.mjs --dry-run",
     "links:check": "node scripts/convert-markdown-links.mjs --check",
     "links:apply": "node scripts/convert-markdown-links.mjs --apply",
+    "content:prepare": "npm run prepare:content && npm run prepare:origin && npm run links:apply",
+    "content:prepare:dry": "npm run prepare:content:dry && npm run prepare:origin:dry && npm run links:check",
     "prebuild": "npm run sync:blog && npm run sync:origin && npm run prepare:content && npm run prepare:origin && npm run links:apply",
+    "build:astro": "astro build",
     "build": "astro build",
     "publish": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/publish.ps1",
     "preview": "astro preview",
@@ -21,6 +28,8 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.9.9",
+    "@astrojs/rss": "^4.0.18",
+    "@astrojs/sitemap": "^3.7.3",
     "astro": "^6.2.2",
     "typescript": "^6.0.3"
   }

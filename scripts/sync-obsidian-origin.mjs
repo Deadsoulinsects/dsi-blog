@@ -4,7 +4,9 @@ import { join, relative } from 'node:path';
 const root = process.cwd();
 const sourceDirectory = 'D:\\GitHub\\cloud-storage\\obsidian\\AI项目\\创建Dead Soul Insects博客\\起源';
 const destinationDirectory = join(root, 'src', 'pages', 'origin', '详情文章');
+const isDryRun = process.argv.includes('--dry-run');
 
+// Origin detail pages keep site-managed frontmatter; Obsidian only provides the body.
 const splitFrontmatter = (content) => {
 	const normalized = content.replace(/^\uFEFF/, '');
 	const match = normalized.match(/^(---\r?\n[\s\S]*?\r?\n---)(?:\r?\n)?([\s\S]*)$/);
@@ -69,9 +71,11 @@ for (const entry of markdownEntries) {
 		action = 'created new target without frontmatter; waiting for prepare:origin';
 	}
 
-	writeFileSync(destinationFile, nextContent, 'utf8');
+	if (!isDryRun) {
+		writeFileSync(destinationFile, nextContent, 'utf8');
+	}
 
-	console.log(`Synced: ${relative(root, destinationFile)}`);
+	console.log(`${isDryRun ? '[dry-run] Would sync' : 'Synced'}: ${relative(root, destinationFile)}`);
 	console.log(`  - ${action}`);
 
 	if (sourceParts.frontmatter) {

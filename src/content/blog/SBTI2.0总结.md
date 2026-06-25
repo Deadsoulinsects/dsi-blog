@@ -5,15 +5,15 @@ pubDate: 2026-05-06
 tags: ["SBTI2.0","AI项目","分享"]
 ---
 
-相关链接：[SBTI2.0的设计思路](/blog/sbti20的设计思路/)
+相关链接：[[SBTI2.0/SBTI2.0的设计思路]]
 
-# 介绍
+## 介绍
 受前一段时间比较火的SBTI人格测试启发，借助AI搭建了SBTI2.0网站
 **网站地址**：[sbti2.deadsoulinsects.cn](https://sbti2.deadsoulinsects.cn)
 各位大佬感兴趣的话也可以测试测试
 可以算是AI时代的小玩具，挺有意思的，这里记录一下从零到有的过程
 
-# 开发工具
+## 开发工具
 opencode 终端:
 **下载网址**：[https://opencode.ai/](https://opencode.ai/)
 **下载方式**：通过[node.js](https://nodejs.org/en/download)安装，安装完成后cmd输入 npm i -g opencode-ai
@@ -21,7 +21,7 @@ opencode 终端:
 **AI**模型:
 **MiniMax M2.5 Free**（opencode初始免费模型之一）
 
-# 过程
+## 过程
 九九八十一难第一难：**安装**。
 纯小白没接触过这些，什么都不懂，先是安装了opencode的桌面端，后来看评论，说桌面端有很多bug，目前阶段不推荐用。于是我就去下终端版，没想到这node.js非常难搞，具体细节忘了，反正是花了不少时间在配置环境上。嗐，由于我是搞完之后才写的分享，所以忘了好多内容。
 

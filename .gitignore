@@ -22,3 +22,7 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# local backups and tool outputs
+备份/
+升级优化规划.md

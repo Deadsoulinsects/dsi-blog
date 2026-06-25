@@ -1,33 +1,14 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getCollection } from 'astro:content';
+import { formatDate, formatDateTime, getAllDocCategories, getSortedDocs } from '../utils/content';
+import { withBase } from '../utils/paths';
 
-const docs = (await getCollection('docs')).sort(
-	(a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime(),
-);
-
-const formatDate = (date: Date) =>
-	date.toLocaleDateString('zh-CN', {
-		year: 'numeric',
-		month: 'long',
-		day: 'numeric',
-		timeZone: 'UTC',
-	});
-
-const formatDateTime = (date: Date) =>
-	`${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;
-
+const docs = await getSortedDocs();
+const categories = await getAllDocCategories();
 const base = import.meta.env.BASE_URL;
-
-const withBase = (path: string) => {
-	const trimmedBase = base.endsWith('/') ? base.slice(0, -1) : base;
-	const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-
-	return `${trimmedBase}${normalizedPath}`;
-};
 ---
 
-<Layout title="文档 | Dead Soul Insects" description="Dead Soul Insects 的文档列表页，整理分享文档、学习资料与配置说明。">
+<Layout title="文档 | Dead Soul Insects" description="Dead Soul Insects 的文档列表页，整理分享文档、学习资料与配置说明。" canonicalPath="/docs/">
 	<section class="page-card intro-card">
 		<header class="page-intro">
 			<p class="kicker">文档</p>
@@ -35,13 +16,25 @@ const withBase = (path: string) => {
 			<p class="lead">
 				博客偏向持续写下来的过程，文档页更偏向整理后的结果。这里直接列出当前可读的说明页，方便查阅，也方便在需要时重新打开。
 			</p>
+			{categories.length > 0 && (
+				<ul class="category-entry-list" aria-label="文档分类入口">
+					{categories.map((category) => (
+						<li>
+							<a href={withBase(base, `/categories/${category.slug}/`)}>
+								<span>{category.name}</span>
+								<span>{category.count}</span>
+							</a>
+						</li>
+					))}
+				</ul>
+			)}
 		</header>
 	</section>
 
 	<section class="doc-list" aria-label="文档列表">
 		{
 			docs.map((doc) => (
-				<a class="doc-card" href={withBase(`/docs/${doc.id}/`)}>
+				<a class="doc-card" href={withBase(base, `/docs/${doc.id}/`)}>
 					<div class="doc-card-top">
 						<time class="doc-date" datetime={formatDateTime(doc.data.pubDate)}>{formatDate(doc.data.pubDate)}</time>
 					</div>
@@ -109,6 +102,38 @@ const withBase = (path: string) => {
 	.lead {
 		margin-bottom: 0;
 		font-size: 1.02rem;
+	}
+
+	.category-entry-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+		margin: 18px 0 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.category-entry-list a {
+		display: inline-flex;
+		gap: 8px;
+		align-items: center;
+		padding: 7px 12px;
+		border: 1px solid rgba(110, 195, 255, 0.18);
+		border-radius: 999px;
+		background: rgba(110, 195, 255, 0.08);
+		color: var(--text);
+		text-decoration: none;
+		transition:
+			border-color 0.2s ease,
+			background 0.2s ease,
+			transform 0.2s ease;
+	}
+
+	.category-entry-list a:hover,
+	.category-entry-list a:focus-visible {
+		transform: translateY(-1px);
+		border-color: rgba(157, 140, 255, 0.28);
+		background: rgba(157, 140, 255, 0.14);
 	}
 
 	.doc-list {

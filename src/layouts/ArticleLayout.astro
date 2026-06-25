@@ -1,0 +1,580 @@
+---
+import Layout from './Layout.astro';
+
+interface Heading {
+	depth: number;
+	slug: string;
+	text: string;
+}
+
+interface NavLink {
+	href: string;
+	label: string;
+}
+
+interface Props {
+	title: string;
+	description: string;
+	sectionLabel: string;
+	backHref: string;
+	backLabel: string;
+	dateLabel?: string;
+	dateTime?: string;
+	tags?: string[];
+	headings?: Heading[];
+	canonicalPath?: string;
+	prevLink?: NavLink;
+	nextLink?: NavLink;
+	publishedTime?: string;
+}
+
+const {
+	title,
+	description,
+	sectionLabel,
+	backHref,
+	backLabel,
+	dateLabel,
+	dateTime,
+	tags = [],
+	headings = [],
+	canonicalPath,
+	prevLink,
+	nextLink,
+	publishedTime,
+} = Astro.props;
+
+const tocHeadings = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+const hasToc = tocHeadings.length > 0;
+const articleStructuredData = canonicalPath
+	? {
+			'@context': 'https://schema.org',
+			'@type': 'Article',
+			headline: title,
+			description,
+			datePublished: publishedTime,
+			url: canonicalPath,
+		}
+	: null;
+---
+
+<Layout
+	title={`${title} | Dead Soul Insects`}
+	description={description}
+	canonicalPath={canonicalPath}
+	ogType="article"
+	twitterTitle={`${title} | Dead Soul Insects`}
+	twitterDescription={description}
+>
+	{articleStructuredData && <script type="application/ld+json" set:html={JSON.stringify(articleStructuredData)}></script>}
+	<article class="article-shell">
+		<header class="article-header">
+			<a class="back-link" href={backHref}>← {backLabel}</a>
+			<p class="kicker">{sectionLabel}</p>
+			<h1>{title}</h1>
+			<p class="article-description">{description}</p>
+			<div class="article-meta" aria-label="文章信息">
+				{dateLabel && dateTime && <time datetime={dateTime}>{dateLabel}</time>}
+			</div>
+			{tags.length > 0 && (
+				<ul class="tag-list" aria-label="标签列表">
+					{tags.map((tag) => (
+						<li>{tag}</li>
+					))}
+				</ul>
+			)}
+		</header>
+
+		<div class:list={['article-grid', { 'has-toc': hasToc }]}>
+			{hasToc && (
+				<aside class="toc-card" aria-labelledby="toc-title">
+					<h2 id="toc-title">目录</h2>
+					<ul>
+						{tocHeadings.map((heading) => (
+							<li class:list={{ nested: heading.depth === 3 }}>
+								<a href={`#${heading.slug}`} data-toc-link>{heading.text}</a>
+							</li>
+						))}
+					</ul>
+				</aside>
+			)}
+
+			<div class="article-main">
+				<div class="article-body" id="article-body">
+					<slot />
+				</div>
+
+				{(prevLink || nextLink) && (
+					<nav class="article-nav" aria-label="上一篇下一篇导航">
+						{prevLink ? (
+							<a class="article-nav-link" href={prevLink.href}>
+								<span>上一篇</span>
+								<strong>{prevLink.label}</strong>
+							</a>
+						) : (
+							<span class="article-nav-link placeholder"></span>
+						)}
+
+						{nextLink ? (
+							<a class="article-nav-link" href={nextLink.href}>
+								<span>下一篇</span>
+								<strong>{nextLink.label}</strong>
+							</a>
+						) : (
+							<span class="article-nav-link placeholder"></span>
+						)}
+					</nav>
+				)}
+			</div>
+		</div>
+
+		<button class="back-to-top" id="back-to-top" type="button">返回顶部</button>
+	</article>
+</Layout>
+
+<script>
+	const articleBody = document.querySelector<HTMLElement>('#article-body');
+	const backToTopButton = document.querySelector<HTMLButtonElement>('#back-to-top');
+	const tocLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]'));
+	const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	const tocTargets = tocLinks
+		.map((link) => {
+			const slug = decodeURIComponent(link.hash.slice(1));
+			const target = document.getElementById(slug) ?? document.getElementById(link.hash.slice(1));
+
+			return target ? { link, target } : null;
+		})
+		.filter((item): item is { link: HTMLAnchorElement; target: HTMLElement } => Boolean(item));
+	let lockedTocLink: HTMLAnchorElement | null = null;
+	let lockedTocTarget: HTMLElement | null = null;
+	let unlockTocTimer = 0;
+
+	const setActiveTocLink = (activeLink?: HTMLAnchorElement) => {
+		for (const link of tocLinks) {
+			const isActive = link === activeLink;
+
+			link.classList.toggle('is-active', isActive);
+			if (isActive) {
+				link.setAttribute('aria-current', 'true');
+			} else {
+				link.removeAttribute('aria-current');
+			}
+		}
+	};
+
+	const getCurrentTocLink = () => {
+		let activeLink = tocTargets[0]?.link;
+
+		for (const item of tocTargets) {
+			if (item.target.getBoundingClientRect().top <= 72) {
+				activeLink = item.link;
+			}
+		}
+
+		return activeLink;
+	};
+
+	const updateActiveTocLink = () => {
+		if (lockedTocLink) {
+			setActiveTocLink(lockedTocLink);
+			return;
+		}
+
+		setActiveTocLink(getCurrentTocLink());
+	};
+
+	const unlockTocWhenSettled = () => {
+		if (!lockedTocTarget) {
+			return;
+		}
+
+		if (Math.abs(lockedTocTarget.getBoundingClientRect().top) <= 96) {
+			lockedTocLink = null;
+			lockedTocTarget = null;
+			setActiveTocLink(getCurrentTocLink());
+			return;
+		}
+
+		unlockTocTimer = window.setTimeout(unlockTocWhenSettled, 80);
+	};
+
+	const lockTocToTarget = (link: HTMLAnchorElement, target: HTMLElement) => {
+		window.clearTimeout(unlockTocTimer);
+		lockedTocLink = link;
+		lockedTocTarget = target;
+		setActiveTocLink(link);
+		target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+		history.pushState(null, '', link.hash);
+		unlockTocTimer = window.setTimeout(unlockTocWhenSettled, reduceMotion ? 0 : 160);
+
+		window.setTimeout(() => {
+			if (lockedTocLink === link) {
+				lockedTocLink = null;
+				lockedTocTarget = null;
+				setActiveTocLink(getCurrentTocLink());
+			}
+		}, 1600);
+	};
+
+	let tocAnimationFrame = 0;
+	const queueActiveTocUpdate = () => {
+		if (tocAnimationFrame) {
+			return;
+		}
+
+		tocAnimationFrame = window.requestAnimationFrame(() => {
+			tocAnimationFrame = 0;
+			updateActiveTocLink();
+		});
+	};
+
+	articleBody?.querySelectorAll('pre').forEach((pre) => {
+		const code = pre.querySelector('code');
+
+		if (!code) {
+			return;
+		}
+
+		const button = document.createElement('button');
+		button.type = 'button';
+		button.className = 'copy-code-btn';
+		button.textContent = '复制代码';
+
+		button.addEventListener('click', async () => {
+			await navigator.clipboard.writeText(code.textContent ?? '');
+			button.textContent = '已复制';
+
+			window.setTimeout(() => {
+				button.textContent = '复制代码';
+			}, 1200);
+		});
+
+		pre.appendChild(button);
+	});
+
+	backToTopButton?.addEventListener('click', () => {
+		window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+	});
+
+	for (const { link, target } of tocTargets) {
+		link.addEventListener('click', (event) => {
+			event.preventDefault();
+			lockTocToTarget(link, target);
+		});
+	}
+
+	if (tocTargets.length > 0) {
+		updateActiveTocLink();
+		window.addEventListener('scroll', queueActiveTocUpdate, { passive: true });
+		window.addEventListener('resize', queueActiveTocUpdate);
+	}
+</script>
+
+<style>
+	.article-shell {
+		position: relative;
+		display: grid;
+		gap: 24px;
+	}
+
+	.article-header,
+	.toc-card,
+	.article-body,
+	.article-nav-link {
+		border: 1px solid var(--line);
+		border-radius: 28px;
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+			var(--panel);
+		backdrop-filter: blur(18px);
+		box-shadow: var(--shadow);
+	}
+
+	.article-header,
+	.toc-card,
+	.article-body {
+		padding: 32px;
+	}
+
+	.back-link {
+		display: inline-flex;
+		align-items: center;
+		margin-bottom: 20px;
+		padding: 8px 12px;
+		border: 1px solid rgba(153, 176, 255, 0.18);
+		border-radius: 999px;
+		background: rgba(153, 176, 255, 0.08);
+		color: var(--text);
+		font-size: 0.95rem;
+		font-weight: 600;
+		text-decoration: none;
+	}
+
+	.kicker {
+		margin: 0 0 12px;
+		font-size: 0.88rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--accent-soft);
+	}
+
+	h1,
+	h2,
+	p,
+	ul {
+		margin-top: 0;
+	}
+
+	h1 {
+		margin-bottom: 18px;
+		font-size: clamp(2rem, 4vw, 3.2rem);
+		line-height: 1.08;
+		overflow-wrap: anywhere;
+	}
+
+	.article-description {
+		margin: 0 0 22px;
+		max-width: 48rem;
+		line-height: 1.8;
+		color: var(--text-soft);
+	}
+
+	.article-meta,
+	.tag-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+		align-items: center;
+	}
+
+	.article-meta {
+		margin-bottom: 18px;
+		color: var(--accent-soft);
+	}
+
+	.tag-list {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.tag-list li {
+		padding: 6px 10px;
+		border: 1px solid rgba(110, 195, 255, 0.16);
+		border-radius: 999px;
+		background: rgba(110, 195, 255, 0.08);
+	}
+
+	.article-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 18px;
+		align-items: start;
+	}
+
+	.article-grid.has-toc {
+		grid-template-columns: minmax(0, 16rem) minmax(0, 1fr);
+	}
+
+	.toc-card {
+		position: sticky;
+		top: 20px;
+	}
+
+	.toc-card h2 {
+		margin-bottom: 14px;
+		font-size: 1.1rem;
+	}
+
+	.toc-card ul {
+		margin-bottom: 0;
+		padding: 0;
+		list-style: none;
+		display: grid;
+		gap: 10px;
+	}
+
+	.toc-card li.nested {
+		padding-left: 14px;
+	}
+
+	.toc-card a {
+		display: block;
+		padding: 6px 10px;
+		border-radius: 12px;
+		color: var(--text-soft);
+		text-decoration: none;
+		transition:
+			background 160ms ease,
+			color 160ms ease,
+			transform 160ms ease;
+	}
+
+	.toc-card a:hover,
+	.toc-card a.is-active {
+		background: rgba(110, 195, 255, 0.1);
+		color: var(--text);
+	}
+
+	.toc-card a.is-active {
+		transform: translateX(4px);
+	}
+
+	.article-main {
+		display: grid;
+		gap: 18px;
+	}
+
+	.article-body {
+		font-size: 1.03rem;
+		line-height: 1.95;
+		color: #d8e0f8;
+	}
+
+	.article-body :global(h2),
+	.article-body :global(h3) {
+		margin: 40px 0 16px;
+		line-height: 1.24;
+		scroll-margin-top: 24px;
+	}
+
+	.article-body :global(h2) {
+		font-size: clamp(1.5rem, 3vw, 2rem);
+	}
+
+	.article-body :global(h3) {
+		font-size: clamp(1.2rem, 2.2vw, 1.45rem);
+	}
+
+	.article-body :global(p),
+	.article-body :global(ul),
+	.article-body :global(ol),
+	.article-body :global(pre),
+	.article-body :global(blockquote) {
+		margin: 0 0 20px;
+	}
+
+	.article-body :global(ul),
+	.article-body :global(ol) {
+		padding-left: 1.4rem;
+	}
+
+	.article-body :global(li) {
+		margin-bottom: 10px;
+		color: var(--text-soft);
+	}
+
+	.article-body :global(strong) {
+		color: var(--text);
+	}
+
+	.article-body :global(a) {
+		color: var(--accent-soft);
+		text-decoration-color: rgba(110, 195, 255, 0.5);
+		text-underline-offset: 0.18em;
+	}
+
+	.article-body :global(blockquote) {
+		padding: 18px 20px;
+		border-left: 3px solid rgba(157, 140, 255, 0.7);
+		border-radius: 18px;
+		background: rgba(157, 140, 255, 0.08);
+		color: var(--text);
+	}
+
+	.article-body :global(code) {
+		padding: 2px 7px;
+		border-radius: 8px;
+		background: rgba(153, 176, 255, 0.12);
+		color: #f3f6ff;
+		font-size: 0.94em;
+	}
+
+	.article-body :global(pre) {
+		position: relative;
+		padding: 20px;
+		border: 1px solid rgba(153, 176, 255, 0.14);
+		border-radius: 20px;
+		background: rgba(8, 10, 18, 0.88);
+		overflow-x: auto;
+	}
+
+	.article-body :global(pre code) {
+		padding: 0;
+		border-radius: 0;
+		background: transparent;
+		font-size: 0.95rem;
+		line-height: 1.8;
+	}
+
+	.article-nav {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 14px;
+	}
+
+	.article-nav-link {
+		display: grid;
+		gap: 6px;
+		padding: 20px;
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.article-nav-link span {
+		color: var(--accent-soft);
+		font-size: 0.88rem;
+	}
+
+	.article-nav-link strong {
+		overflow-wrap: anywhere;
+	}
+
+	.article-nav-link.placeholder {
+		visibility: hidden;
+	}
+
+	.back-to-top,
+	:global(.copy-code-btn) {
+		border: 1px solid rgba(153, 176, 255, 0.18);
+		border-radius: 999px;
+		background: rgba(153, 176, 255, 0.08);
+		color: var(--text);
+		font: inherit;
+		cursor: pointer;
+	}
+
+	.back-to-top {
+		justify-self: end;
+		padding: 10px 16px;
+	}
+
+	:global(.copy-code-btn) {
+		position: absolute;
+		top: 14px;
+		right: 14px;
+		padding: 7px 12px;
+	}
+
+	@media (max-width: 900px) {
+		.article-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.toc-card {
+			position: static;
+		}
+	}
+
+	@media (max-width: 720px) {
+		.article-header,
+		.toc-card,
+		.article-body {
+			padding: 24px;
+		}
+
+		.article-nav {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

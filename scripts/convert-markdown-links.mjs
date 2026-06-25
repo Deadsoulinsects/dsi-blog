@@ -36,6 +36,7 @@ const collectMarkdownFiles = (directory) => {
 	return files;
 };
 
+// Match Astro content route IDs: remove dots, collapse spaces, and keep Chinese names intact.
 const toRouteSlug = (file) => {
 	const name = basename(file, extname(file));
 
@@ -62,6 +63,7 @@ const splitTarget = (target) => {
 
 const isIgnoredHref = (href) => /^(?:[a-z][a-z0-9+.-]*:|\/|#)/i.test(href);
 
+// Preserve heading anchors when rewriting relative Markdown links to public routes.
 const splitHash = (href) => {
 	const hashIndex = href.indexOf('#');
 

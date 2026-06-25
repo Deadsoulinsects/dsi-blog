@@ -1,0 +1,73 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getAllDocCategories } from '../../utils/content';
+import { withBase } from '../../utils/paths';
+
+const categories = await getAllDocCategories();
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout title="分类 | Dead Soul Insects" description="查看 Dead Soul Insects 文档分类入口。" canonicalPath="/categories/">
+	<section class="page-card">
+		<p class="kicker">分类</p>
+		<h1>按分类浏览文档</h1>
+		<ul class="entry-list">
+			{categories.map((category) => (
+				<li>
+					<a href={withBase(base, `/categories/${category.slug}/`)}>
+						<span>{category.name}</span>
+						<span>{category.count}</span>
+					</a>
+				</li>
+			))}
+		</ul>
+	</section>
+</Layout>
+
+<style>
+	.page-card {
+		padding: 32px;
+		border: 1px solid var(--line);
+		border-radius: 28px;
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+			var(--panel);
+		backdrop-filter: blur(18px);
+		box-shadow: var(--shadow);
+	}
+
+	.kicker {
+		margin: 0 0 12px;
+		font-size: 0.88rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--accent-soft);
+	}
+
+	h1 {
+		margin: 0 0 20px;
+		font-size: clamp(2rem, 4vw, 3rem);
+		line-height: 1.1;
+	}
+
+	.entry-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.entry-list a {
+		display: inline-flex;
+		gap: 8px;
+		align-items: center;
+		padding: 10px 14px;
+		border: 1px solid rgba(110, 195, 255, 0.18);
+		border-radius: 999px;
+		background: rgba(110, 195, 255, 0.08);
+		color: var(--text);
+		text-decoration: none;
+	}
+</style>

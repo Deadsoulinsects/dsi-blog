@@ -4,31 +4,37 @@ interface Props {
 	description?: string;
 	hideChrome?: boolean;
 	fullBleed?: boolean;
+	canonicalPath?: string;
+	ogType?: string;
+	twitterTitle?: string;
+	twitterDescription?: string;
 }
+
+import { withBase } from '../utils/paths';
 
 const {
 	title = 'Dead Soul Insects',
 	description = '在灵魂残光中，记录技术、项目与碎片。',
 	hideChrome = false,
 	fullBleed = false,
+	canonicalPath,
+	ogType = 'website',
+	twitterTitle = title,
+	twitterDescription = description,
 } = Astro.props;
 
 const navItems = [
 	{ href: '/blog', label: '博客' },
 	{ href: '/projects', label: '项目' },
 	{ href: '/docs', label: '文档' },
+	{ href: '/search', label: '搜索' },
 	{ href: '/origin', label: '起源' },
 	{ href: '/about', label: '关于' },
 ];
 
 const base = import.meta.env.BASE_URL;
-
-const withBase = (path: string) => {
-	const trimmedBase = base.endsWith('/') ? base.slice(0, -1) : base;
-	const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-
-	return `${trimmedBase}${normalizedPath}`;
-};
+const site = Astro.site;
+const canonicalUrl = canonicalPath && site ? new URL(canonicalPath, site).toString() : undefined;
 
 const normalizePath = (path: string) => {
 	if (path === '/') {
@@ -46,10 +52,18 @@ const currentPath = normalizePath(Astro.url.pathname);
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
-		<link rel="icon" href={withBase('/favicon.ico')} />
+		<link rel="icon" type="image/svg+xml" href={withBase(base, '/favicon.svg')} />
+		<link rel="icon" href={withBase(base, '/favicon.ico')} />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content={description} />
+		{canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:type" content={ogType} />
+		{canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={twitterTitle} />
+		<meta name="twitter:description" content={twitterDescription} />
 		<title>{title}</title>
 	</head>
 	<body>
@@ -65,15 +79,15 @@ const currentPath = normalizePath(Astro.url.pathname);
 					</a>
 
 					<nav class="site-nav" aria-label="主导航">
-						{
-							navItems.map((item) => {
-								const isActive = currentPath === normalizePath(withBase(item.href));
+							{
+								navItems.map((item) => {
+									const isActive = currentPath === normalizePath(withBase(base, item.href));
 
-								return (
-									<a class:list={{ active: isActive }} aria-current={isActive ? 'page' : undefined} href={withBase(item.href)}>
-										{item.label}
-									</a>
-								);
+									return (
+										<a class:list={{ active: isActive }} aria-current={isActive ? 'page' : undefined} href={withBase(base, item.href)}>
+											{item.label}
+										</a>
+									);
 							})
 						}
 					</nav>

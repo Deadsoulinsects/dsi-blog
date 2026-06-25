@@ -56,6 +56,7 @@ const createSeededRandom = (seed: number) => {
 	};
 };
 
+// Use a fixed seed so the starfield stays visually stable across builds.
 const buildStars = (): Star[] => {
 	const random = createSeededRandom(20260517);
 	const count = 160;
@@ -374,7 +375,7 @@ const stars = buildStars();
 		max-width: min(1200px, 100%);
 		margin: 26px auto 0;
 		font-size: var(--title-size);
-		font-weight: 900;
+		font-weight: 800;
 		line-height: 0.88;
 		letter-spacing: -0.08em;
 		color: #f8fafc;

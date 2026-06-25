@@ -1,0 +1,73 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getAllBlogTags } from '../../utils/content';
+import { withBase } from '../../utils/paths';
+
+const tags = await getAllBlogTags();
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout title="标签 | Dead Soul Insects" description="查看 Dead Soul Insects 博客的标签入口。" canonicalPath="/tags/">
+	<section class="page-card">
+		<p class="kicker">标签</p>
+		<h1>按标签浏览博客内容</h1>
+		<ul class="entry-list">
+			{tags.map((tag) => (
+				<li>
+					<a href={withBase(base, `/tags/${tag.slug}/`)}>
+						<span>{tag.name}</span>
+						<span>{tag.count}</span>
+					</a>
+				</li>
+			))}
+		</ul>
+	</section>
+</Layout>
+
+<style>
+	.page-card {
+		padding: 32px;
+		border: 1px solid var(--line);
+		border-radius: 28px;
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+			var(--panel);
+		backdrop-filter: blur(18px);
+		box-shadow: var(--shadow);
+	}
+
+	.kicker {
+		margin: 0 0 12px;
+		font-size: 0.88rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--accent-soft);
+	}
+
+	h1 {
+		margin: 0 0 20px;
+		font-size: clamp(2rem, 4vw, 3rem);
+		line-height: 1.1;
+	}
+
+	.entry-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.entry-list a {
+		display: inline-flex;
+		gap: 8px;
+		align-items: center;
+		padding: 10px 14px;
+		border: 1px solid rgba(110, 195, 255, 0.18);
+		border-radius: 999px;
+		background: rgba(110, 195, 255, 0.08);
+		color: var(--text);
+		text-decoration: none;
+	}
+</style>
