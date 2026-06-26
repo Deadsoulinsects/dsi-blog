@@ -3,6 +3,7 @@ title: "SBTI2.0的设计思路"
 description: "详细描述SBTI2.0的设计思路、创新点和未完成的方案"
 pubDate: 2026-05-07
 tags: ["SBTI2.0","AI项目","思路"]
+topic: "SBTI"
 ---
 
 ## 奠定缘分

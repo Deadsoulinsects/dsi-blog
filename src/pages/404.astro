@@ -63,16 +63,17 @@ const links = [
 		position: relative;
 		isolation: isolate;
 		overflow: hidden;
+		box-sizing: border-box;
 		width: min(100%, 42rem);
 		padding: 32px;
 		border: 1px solid var(--line);
-		border-radius: 28px;
+		border-radius: var(--radius-panel);
 		background:
 			radial-gradient(circle at top, rgba(157, 140, 255, 0.18), transparent 34%),
 			radial-gradient(circle at bottom right, rgba(110, 195, 255, 0.12), transparent 36%),
 			linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
 			var(--panel);
-		backdrop-filter: blur(18px);
+		backdrop-filter: var(--glass-blur);
 		box-shadow: var(--shadow);
 		text-align: center;
 	}
@@ -81,7 +82,7 @@ const links = [
 	.not-found-card::after {
 		content: '';
 		position: absolute;
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		pointer-events: none;
 		z-index: -1;
 		filter: blur(18px);
@@ -153,7 +154,7 @@ const links = [
 	.actions button {
 		padding: 12px 18px;
 		border: 0;
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		text-decoration: none;
 		font: inherit;
 		font-weight: 600;
@@ -175,8 +176,8 @@ const links = [
 
 	.actions a:focus-visible,
 	.actions button:focus-visible {
-		outline: 2px solid rgba(110, 195, 255, 0.9);
-		outline-offset: 3px;
+		outline: var(--focus-ring);
+		outline-offset: var(--focus-offset);
 	}
 
 	.primary-link {
@@ -196,7 +197,7 @@ const links = [
 
 	.secondary-link:hover,
 		.secondary-link:focus-visible {
-		border-color: rgba(157, 140, 255, 0.3);
+		border-color: var(--hover-border);
 		background: rgba(157, 140, 255, 0.14);
 	}
 

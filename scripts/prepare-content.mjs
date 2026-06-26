@@ -22,12 +22,14 @@ const escapeYamlString = (value) => value.replace(/\\/g, '\\\\').replace(/"/g, '
 const targets = [
 	{
 		directory: join(root, 'src', 'content', 'blog'),
+		ensureFrontmatterFields: ['topic: ""'],
 		createFrontmatter: (file) => [
 			'---',
 			`title: "${escapeYamlString(getTitleFromFile(file))}"`,
 			'description: ""',
 			`pubDate: ${today}`,
 			'tags: []',
+			'topic: ""',
 			'---',
 			'',
 		].join('\n'),
@@ -77,6 +79,32 @@ const removeBom = (content) => content.replace(/^\uFEFF/, '');
 
 const hasFrontmatter = (content) => content.startsWith('---\n') || content.startsWith('---\r\n');
 
+const ensureFrontmatterFields = (content, fields) => {
+	if (fields.length === 0 || !hasFrontmatter(content)) {
+		return content;
+	}
+
+	const lineEnding = content.includes('\r\n') ? '\r\n' : '\n';
+	const closeMarker = `${lineEnding}---`;
+	const closeIndex = content.indexOf(closeMarker, 3);
+
+	if (closeIndex === -1) {
+		return content;
+	}
+
+	const frontmatter = content.slice(0, closeIndex);
+	const missingFields = fields.filter((field) => {
+		const key = field.split(':', 1)[0];
+		return !new RegExp(`^${key}:`, 'm').test(frontmatter);
+	});
+
+	if (missingFields.length === 0) {
+		return content;
+	}
+
+	return `${frontmatter}${lineEnding}${missingFields.join(lineEnding)}${content.slice(closeIndex)}`;
+};
+
 for (const target of targets) {
 	ensureDirectory(target.directory);
 
@@ -90,6 +118,18 @@ for (const target of targets) {
 		const normalized = removeBom(original);
 
 		if (hasFrontmatter(normalized)) {
+			const nextContent = ensureFrontmatterFields(normalized, target.ensureFrontmatterFields ?? []);
+
+			if (nextContent !== normalized) {
+				if (isDryRun) {
+					console.log(`[dry-run] Would update frontmatter fields: ${relative(root, file)}`);
+					continue;
+				}
+
+				writeFileSync(file, nextContent, 'utf8');
+				console.log(`Updated frontmatter fields: ${relative(root, file)}`);
+			}
+
 			continue;
 		}
 

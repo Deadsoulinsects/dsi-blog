@@ -120,6 +120,17 @@ const currentPath = normalizePath(Astro.url.pathname);
 		--accent: #9d8cff;
 		--accent-soft: #6ec3ff;
 		--shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+		--shadow-soft: 0 24px 80px rgba(0, 0, 0, 0.22);
+		--shadow-hover: 0 28px 90px rgba(0, 0, 0, 0.3);
+		--radius-panel: 28px;
+		--radius-card: 24px;
+		--radius-pill: 999px;
+		--glass-blur: blur(18px);
+		--focus-ring: 2px solid rgba(110, 195, 255, 0.9);
+		--focus-offset: 3px;
+		--hover-border: rgba(157, 140, 255, 0.3);
+		--tag-border: rgba(110, 195, 255, 0.16);
+		--tag-bg: rgba(110, 195, 255, 0.08);
 	}
 
 	html {
@@ -197,9 +208,9 @@ const currentPath = normalizePath(Astro.url.pathname);
 		gap: 20px;
 		padding: 18px 20px;
 		border: 1px solid var(--line);
-		border-radius: 24px;
+		border-radius: var(--radius-card);
 		background: var(--bg-soft);
-		backdrop-filter: blur(18px);
+		backdrop-filter: var(--glass-blur);
 		box-shadow: var(--shadow);
 	}
 
@@ -231,7 +242,7 @@ const currentPath = normalizePath(Astro.url.pathname);
 	.site-nav a {
 		padding: 10px 14px;
 		border: 1px solid transparent;
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		text-decoration: none;
 		color: var(--text-soft);
 		transition:
@@ -245,15 +256,15 @@ const currentPath = normalizePath(Astro.url.pathname);
 	.site-nav a:focus-visible,
 	.site-nav a.active {
 		color: var(--text);
-		border-color: rgba(157, 140, 255, 0.3);
+		border-color: var(--hover-border);
 		background: rgba(157, 140, 255, 0.12);
 		transform: translateY(-1px);
 	}
 
 	.site-nav a:focus-visible,
 	.brand:focus-visible {
-		outline: 2px solid rgba(110, 195, 255, 0.9);
-		outline-offset: 3px;
+		outline: var(--focus-ring);
+		outline-offset: var(--focus-offset);
 	}
 
 	.page-content {

@@ -168,6 +168,8 @@ In non-user environments, sync scripts may warn that the source directory does n
 
 Preserve the current visual direction: dark background, cool colors, translucent panels, rounded cards, subtle glow, and restrained animation.
 
+For visual or interaction effects such as reading progress bars, table-of-contents highlight states, hover effects, click transitions, scroll feedback, glows, gradients, or animation tuning, create a sandbox/playground first under `D:\ai-output` and sync to production only after the user confirms the direction. Do not place playground files in the repository root.
+
 
 
 Do not introduce new UI frameworks, Tailwind, React, or large dependencies by default. If there is a long-term benefit, explain the purpose, alternatives, necessity, and impact before adding them.

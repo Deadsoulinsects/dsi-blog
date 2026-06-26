@@ -69,11 +69,11 @@ const projectGroups = [
 	.page-card {
 		padding: 32px;
 		border: 1px solid var(--line);
-		border-radius: 28px;
+		border-radius: var(--radius-panel);
 		background:
 			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
 			var(--panel);
-		backdrop-filter: blur(18px);
+		backdrop-filter: var(--glass-blur);
 		box-shadow: var(--shadow);
 	}
 
@@ -87,7 +87,7 @@ const projectGroups = [
 	.closing-note {
 		padding: 24px;
 		border: 1px solid var(--line);
-		border-radius: 24px;
+		border-radius: var(--radius-card);
 		background: var(--panel-strong);
 	}
 
@@ -154,7 +154,7 @@ const projectGroups = [
 	.content-card {
 		padding: 24px;
 		border: 1px solid var(--line);
-		border-radius: 24px;
+		border-radius: var(--radius-card);
 		background:
 			radial-gradient(circle at top right, rgba(110, 195, 255, 0.08), transparent 34%),
 			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),

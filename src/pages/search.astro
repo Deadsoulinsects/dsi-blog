@@ -80,8 +80,8 @@ const searchItems = [
 	.page-card,
 	.result-card {
 		border: 1px solid var(--line);
-		border-radius: 28px;
-		backdrop-filter: blur(18px);
+		border-radius: var(--radius-panel);
+		backdrop-filter: var(--glass-blur);
 		box-shadow: var(--shadow);
 	}
 
@@ -153,8 +153,8 @@ const searchItems = [
 	.result-meta span {
 		display: inline-flex;
 		padding: 6px 10px;
-		border-radius: 999px;
-		background: rgba(110, 195, 255, 0.08);
+		border-radius: var(--radius-pill);
+		background: var(--tag-bg);
 		color: var(--accent-soft);
 		font-size: 0.84rem;
 	}

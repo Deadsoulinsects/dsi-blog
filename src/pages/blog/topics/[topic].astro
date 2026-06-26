@@ -1,0 +1,311 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import { formatDate, formatDateTime, getSortedPosts } from '../../../utils/content';
+import { withBase } from '../../../utils/paths';
+import { getTopicGroups } from '../../../utils/topics';
+
+export async function getStaticPaths() {
+	const posts = await getSortedPosts();
+	const topicGroups = getTopicGroups(posts);
+
+	return topicGroups.map((topicGroup) => ({
+		params: { topic: topicGroup.slug },
+		props: { topicGroup },
+	}));
+}
+
+const { topicGroup } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const sortedPosts = [...topicGroup.posts].sort((a, b) => a.data.pubDate.getTime() - b.data.pubDate.getTime());
+---
+
+<Layout title={`${topicGroup.name} | 专题 | Dead Soul Insects`} description={`查看 ${topicGroup.name} 专题下的博客文章。`} canonicalPath={`/blog/topics/${topicGroup.slug}/`}>
+	<section class="page-card intro-card">
+		<a class="back-link" href={withBase(base, '/blog')}>← 返回博客列表</a>
+		<div class="topic-header">
+			<div class="topic-title-block">
+				<h1>{topicGroup.name}</h1>
+				<div class="topic-actions">
+					<span class="topic-badge">{topicGroup.posts.length} 篇文章</span>
+				</div>
+			</div>
+
+			<div class="topic-sort-area">
+				<button class="time-sort-button" type="button" data-sort-toggle aria-label="按时间排序，当前为旧到新">
+					<span>时间</span>
+					<span class="arrow" data-sort-arrow>↑</span>
+				</button>
+			</div>
+		</div>
+	</section>
+
+	<section class="post-list" aria-label={`${topicGroup.name} 专题文章列表`} data-post-list>
+		{sortedPosts.map((post) => (
+			<a class="post-card" href={withBase(base, `/blog/${post.id}/`)} data-date={formatDateTime(post.data.pubDate)}>
+				<div class="post-card-top">
+					<time class="post-date" datetime={formatDateTime(post.data.pubDate)}>{formatDate(post.data.pubDate)}</time>
+					{post.data.tags.length > 0 && (
+						<ul class="tag-list" aria-label="文章标签">
+							{post.data.tags.map((tag) => (
+								<li>{tag}</li>
+							))}
+						</ul>
+					)}
+				</div>
+				<div class="post-card-body">
+					<h2>{post.data.title}</h2>
+					<p>{post.data.description}</p>
+				</div>
+			</a>
+		))}
+	</section>
+</Layout>
+
+<script>
+	const postList = document.querySelector<HTMLElement>('[data-post-list]');
+	const sortButton = document.querySelector<HTMLButtonElement>('[data-sort-toggle]');
+	const sortArrow = document.querySelector<HTMLElement>('[data-sort-arrow]');
+	let ascending = true;
+
+	const applySort = () => {
+		if (!postList) {
+			return;
+		}
+
+		Array.from(postList.querySelectorAll<HTMLElement>('[data-date]'))
+			.sort((a, b) => {
+				const first = new Date(a.dataset.date ?? '').getTime();
+				const second = new Date(b.dataset.date ?? '').getTime();
+
+				return ascending ? first - second : second - first;
+			})
+			.forEach((card) => postList.appendChild(card));
+
+		if (sortArrow) {
+			sortArrow.textContent = ascending ? '↑' : '↓';
+		}
+
+		sortButton?.setAttribute('aria-label', `按时间排序，当前为${ascending ? '旧到新' : '新到旧'}`);
+	};
+
+	sortButton?.addEventListener('click', () => {
+		ascending = !ascending;
+		applySort();
+	});
+
+	applySort();
+</script>
+
+<style>
+	.page-card,
+	.post-card {
+		border: 1px solid var(--line);
+		border-radius: var(--radius-panel);
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+			var(--panel);
+		backdrop-filter: var(--glass-blur);
+		box-shadow: var(--shadow);
+	}
+
+	.page-card {
+		padding: 32px;
+	}
+
+	.intro-card {
+		margin-bottom: 22px;
+	}
+
+	.topic-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 18px;
+	}
+
+	.topic-title-block {
+		display: grid;
+		gap: 10px;
+		min-width: 0;
+	}
+
+	.topic-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+		align-items: center;
+	}
+
+	.topic-sort-area {
+		display: flex;
+		justify-content: flex-end;
+	}
+
+	.back-link {
+		display: inline-flex;
+		align-items: center;
+		margin-bottom: 20px;
+		padding: 8px 12px;
+		border: 1px solid rgba(153, 176, 255, 0.18);
+		border-radius: var(--radius-pill);
+		background: rgba(153, 176, 255, 0.08);
+		color: var(--text);
+		font-size: 0.95rem;
+		font-weight: 600;
+		text-decoration: none;
+	}
+
+	.kicker {
+		margin: 0;
+		font-size: 0.88rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--accent-soft);
+	}
+
+	.topic-badge {
+		display: inline-flex;
+		justify-self: start;
+		padding: 6px 10px;
+		border: 1px solid var(--tag-border);
+		border-radius: var(--radius-pill);
+		background: var(--tag-bg);
+		color: var(--accent-soft);
+		font-size: 0.82rem;
+	}
+
+	.time-sort-button {
+		display: inline-flex;
+		gap: 8px;
+		align-items: center;
+		padding: 7px 11px;
+		border: 1px solid rgba(153, 176, 255, 0.18);
+		border-radius: var(--radius-pill);
+		background: rgba(153, 176, 255, 0.08);
+		color: var(--text);
+		font: inherit;
+		font-weight: 700;
+		cursor: pointer;
+		transition:
+			transform 0.2s ease,
+			border-color 0.2s ease,
+			background 0.2s ease;
+	}
+
+	.time-sort-button:hover,
+	.time-sort-button:focus-visible {
+		transform: translateY(-1px);
+		border-color: var(--hover-border);
+		background: rgba(157, 140, 255, 0.14);
+	}
+
+	.time-sort-button .arrow {
+		color: var(--accent-soft);
+	}
+
+	h1,
+	h2,
+	p,
+	time {
+		margin-top: 0;
+		overflow-wrap: anywhere;
+	}
+
+	h1 {
+		margin-bottom: 0;
+		font-size: clamp(2rem, 4vw, 3rem);
+		line-height: 1.08;
+	}
+
+	h2 {
+		margin: 0;
+		font-size: clamp(1.3rem, 2.4vw, 1.65rem);
+		line-height: 1.25;
+	}
+
+	p,
+	time {
+		color: var(--text-soft);
+		line-height: 1.8;
+	}
+
+	.post-list {
+		display: grid;
+		gap: 18px;
+	}
+
+	.post-card {
+		display: grid;
+		grid-template-rows: auto 1fr;
+		gap: 20px;
+		padding: 24px;
+		color: inherit;
+		text-decoration: none;
+		transition:
+			transform 0.2s ease,
+			border-color 0.2s ease,
+			background 0.2s ease;
+	}
+
+	.post-card-top,
+	.tag-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+		align-items: center;
+	}
+
+	.tag-list {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.tag-list li {
+		padding: 6px 10px;
+		border: 1px solid var(--tag-border);
+		border-radius: var(--radius-pill);
+		background: var(--tag-bg);
+		color: var(--text);
+		font-size: 0.82rem;
+		line-height: 1.2;
+		overflow-wrap: anywhere;
+	}
+
+	.post-card-body {
+		display: grid;
+		gap: 12px;
+	}
+
+	.post-date {
+		font-size: 0.9rem;
+		color: var(--accent-soft);
+	}
+
+	.post-card:hover,
+	.post-card:focus-visible {
+		transform: translateY(-2px);
+		border-color: var(--hover-border);
+		background:
+			radial-gradient(circle at top right, rgba(110, 195, 255, 0.14), transparent 36%),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
+			var(--panel-strong);
+	}
+
+	@media (max-width: 720px) {
+		.topic-header {
+			display: grid;
+			grid-template-columns: 1fr;
+		}
+
+		.topic-sort-area,
+		.time-sort-button {
+			justify-self: start;
+		}
+
+		.page-card,
+		.post-card {
+			padding: 24px;
+		}
+	}
+</style>

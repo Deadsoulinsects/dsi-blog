@@ -28,11 +28,11 @@ const base = import.meta.env.BASE_URL;
 	.page-card {
 		padding: 32px;
 		border: 1px solid var(--line);
-		border-radius: 28px;
+		border-radius: var(--radius-panel);
 		background:
 			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
 			var(--panel);
-		backdrop-filter: blur(18px);
+		backdrop-filter: var(--glass-blur);
 		box-shadow: var(--shadow);
 	}
 
@@ -65,8 +65,8 @@ const base = import.meta.env.BASE_URL;
 		align-items: center;
 		padding: 10px 14px;
 		border: 1px solid rgba(110, 195, 255, 0.18);
-		border-radius: 999px;
-		background: rgba(110, 195, 255, 0.08);
+		border-radius: var(--radius-pill);
+		background: var(--tag-bg);
 		color: var(--text);
 		text-decoration: none;
 	}
