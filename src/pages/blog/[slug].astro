@@ -2,42 +2,42 @@
 import ArticleLayout from '../../layouts/ArticleLayout.astro';
 import { render } from 'astro:content';
 import { formatDate, formatDateTime, getSortedPosts } from '../../utils/content';
-import { withBase } from '../../utils/paths';
+import { toParamSlug, withBase } from '../../utils/paths';
+import { normalizeTopic } from '../../utils/topics';
 
 export async function getStaticPaths() {
 	const posts = await getSortedPosts();
 
-	return posts.map((post, index) => ({
+	return posts.map((post) => ({
 		params: { slug: post.id },
 		props: {
 			post,
-			prevPost: posts[index - 1] ?? null,
-			nextPost: posts[index + 1] ?? null,
 		},
 	}));
 }
 
-const { post, prevPost, nextPost } = Astro.props;
+const { post } = Astro.props;
 const { Content, headings } = await render(post);
 const dateLabel = formatDate(post.data.pubDate);
 const dateTime = formatDateTime(post.data.pubDate);
 const base = import.meta.env.BASE_URL;
+const topic = normalizeTopic(post.data.topic);
+const backHref = topic ? withBase(base, `/blog/topics/${toParamSlug(topic)}/`) : withBase(base, '/blog');
+const backLabel = topic ? `返回${topic}专题` : '返回博客列表';
 ---
 
 <ArticleLayout
 	title={post.data.title}
 	description={post.data.description}
 	sectionLabel="文章"
-	backHref={withBase(base, '/blog')}
-	backLabel="返回博客列表"
+	backHref={backHref}
+	backLabel={backLabel}
 	dateLabel={dateLabel}
 	dateTime={dateTime}
 	tags={post.data.tags}
 	headings={headings}
 	canonicalPath={`/blog/${post.id}/`}
 	publishedTime={post.data.pubDate.toISOString()}
-	prevLink={prevPost ? { href: withBase(base, `/blog/${prevPost.id}/`), label: prevPost.data.title } : undefined}
-	nextLink={nextPost ? { href: withBase(base, `/blog/${nextPost.id}/`), label: nextPost.data.title } : undefined}
 >
 	<Content />
 </ArticleLayout>

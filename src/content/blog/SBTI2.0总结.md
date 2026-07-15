@@ -6,7 +6,7 @@ tags: ["SBTI2.0","AI项目","分享"]
 topic: "SBTI"
 ---
 
-相关链接：[[SBTI2.0/SBTI2.0的设计思路]]
+相关链接：[SBTI2.0的设计思路](/blog/sbti20的设计思路/)
 
 ## 介绍
 受前一段时间比较火的SBTI人格测试启发，借助AI搭建了SBTI2.0网站
@@ -17,7 +17,7 @@ topic: "SBTI"
 ## 开发工具
 opencode 终端:
 **下载网址**：[https://opencode.ai/](https://opencode.ai/)
-**下载方式**：通过[node.js](https://nodejs.org/en/download)安装，安装完成后cmd输入 npm i -g opencode-ai
+**下载方式**：通过[node.js](https://nodejs.org/en/download)安装，安装完成后cmd输入 `npm i -g opencode-ai`
 
 **AI**模型:
 **MiniMax M2.5 Free**（opencode初始免费模型之一）

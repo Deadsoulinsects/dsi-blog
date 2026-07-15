@@ -107,7 +107,7 @@ const resolveMarkdownFile = (fromFile, pathname, byFilePath, bySlug) => {
 		return null;
 	}
 
-	return bySlug.get(lastSegment.toLowerCase().replace(/\./g, '').replace(/\s+/g, '-')) ?? null;
+	return bySlug.get(lastSegment.replace(/\.md$/i, '').toLowerCase().replace(/\./g, '').replace(/\s+/g, '-')) ?? null;
 };
 
 const allFiles = targets.flatMap(({ directory }) => collectMarkdownFiles(directory));
@@ -123,6 +123,7 @@ for (const target of targets) {
 }
 
 const changes = [];
+const unresolvedLinks = [];
 
 for (const file of allFiles) {
 	const stats = statSync(file);
@@ -147,6 +148,10 @@ for (const file of allFiles) {
 		const route = resolveMarkdownFile(file, pathname, byFilePath, bySlug);
 
 		if (!route) {
+			if (/\.md$/i.test(pathname)) {
+				unresolvedLinks.push(`${toPosixPath(relative(root, file))}: unresolved local Markdown link: ${href}`);
+			}
+
 			return match;
 		}
 
@@ -161,7 +166,7 @@ for (const file of allFiles) {
 	}
 }
 
-if (changes.length === 0) {
+if (changes.length === 0 && unresolvedLinks.length === 0) {
 	console.log('Markdown links are already normalized.');
 	process.exit(0);
 }
@@ -170,8 +175,27 @@ for (const change of changes) {
 	console.log(change);
 }
 
+if (unresolvedLinks.length > 0) {
+	console.error('Unresolved local Markdown links:');
+	for (const link of unresolvedLinks) {
+		console.error(`- ${link}`);
+	}
+}
+
 if (mode === 'check') {
-	console.error('Markdown links need conversion. Run npm run links:apply.');
+	if (changes.length > 0) {
+		console.error('Markdown links need conversion. Run npm run links:apply.');
+	}
+
+	if (unresolvedLinks.length > 0) {
+		console.error('Some local Markdown links do not match content files. Add the target files or update the links.');
+	}
+
+	process.exit(1);
+}
+
+if (unresolvedLinks.length > 0) {
+	console.error('Some local Markdown links do not match content files. Add the target files or update the links.');
 	process.exit(1);
 }
 

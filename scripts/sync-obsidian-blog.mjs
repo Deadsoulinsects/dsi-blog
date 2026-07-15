@@ -5,9 +5,9 @@ const root = process.cwd();
 const isDryRun = process.argv.includes('--dry-run');
 
 const sources = [
-	'D:\\GitHub\\cloud-storage\\obsidian\\AI项目\\博客发布',
-	'D:\\GitHub\\cloud-storage\\obsidian\\improving\\博客发布',
-	'D:\\GitHub\\cloud-storage\\obsidian\\问题\\博客发布',
+	'D:\\GitHub\\cloud-storage\\obsidian\\思考与实践\\AI项目\\博客发布',
+	'D:\\GitHub\\cloud-storage\\obsidian\\思考与实践\\improving\\博客发布',
+	'D:\\GitHub\\cloud-storage\\obsidian\\思考与实践\\问题\\博客发布',
 ];
 
 const destination = join(root, 'src', 'content', 'blog');

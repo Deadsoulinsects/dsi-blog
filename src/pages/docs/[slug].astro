@@ -7,17 +7,15 @@ import { withBase } from '../../utils/paths';
 export async function getStaticPaths() {
 	const docs = await getSortedDocs();
 
-	return docs.map((doc, index) => ({
+	return docs.map((doc) => ({
 		params: { slug: doc.id },
 		props: {
 			doc,
-			prevDoc: docs[index - 1] ?? null,
-			nextDoc: docs[index + 1] ?? null,
 		},
 	}));
 }
 
-const { doc, prevDoc, nextDoc } = Astro.props;
+const { doc } = Astro.props;
 const { Content, headings } = await render(doc);
 const dateLabel = formatDate(doc.data.pubDate);
 const dateTime = formatDateTime(doc.data.pubDate);
@@ -36,8 +34,6 @@ const base = import.meta.env.BASE_URL;
 	headings={headings}
 	canonicalPath={`/docs/${doc.id}/`}
 	publishedTime={doc.data.pubDate.toISOString()}
-	prevLink={prevDoc ? { href: withBase(base, `/docs/${prevDoc.id}/`), label: prevDoc.data.title } : undefined}
-	nextLink={nextDoc ? { href: withBase(base, `/docs/${nextDoc.id}/`), label: nextDoc.data.title } : undefined}
 >
 	<Content />
 </ArticleLayout>

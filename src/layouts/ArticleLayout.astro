@@ -7,11 +7,6 @@ interface Heading {
 	text: string;
 }
 
-interface NavLink {
-	href: string;
-	label: string;
-}
-
 interface Props {
 	title: string;
 	description: string;
@@ -23,8 +18,6 @@ interface Props {
 	tags?: string[];
 	headings?: Heading[];
 	canonicalPath?: string;
-	prevLink?: NavLink;
-	nextLink?: NavLink;
 	publishedTime?: string;
 }
 
@@ -39,8 +32,6 @@ const {
 	tags = [],
 	headings = [],
 	canonicalPath,
-	prevLink,
-	nextLink,
 	publishedTime,
 } = Astro.props;
 
@@ -103,28 +94,6 @@ const articleStructuredData = canonicalPath
 				<div class="article-body" id="article-body">
 					<slot />
 				</div>
-
-				{(prevLink || nextLink) && (
-					<nav class="article-nav" aria-label="上一篇下一篇导航">
-						{prevLink ? (
-							<a class="article-nav-link" href={prevLink.href}>
-								<span>上一篇</span>
-								<strong>{prevLink.label}</strong>
-							</a>
-						) : (
-							<span class="article-nav-link placeholder"></span>
-						)}
-
-						{nextLink ? (
-							<a class="article-nav-link" href={nextLink.href}>
-								<span>下一篇</span>
-								<strong>{nextLink.label}</strong>
-							</a>
-						) : (
-							<span class="article-nav-link placeholder"></span>
-						)}
-					</nav>
-				)}
 			</div>
 		</div>
 
@@ -279,8 +248,7 @@ const articleStructuredData = canonicalPath
 
 	.article-header,
 	.toc-card,
-	.article-body,
-	.article-nav-link {
+	.article-body {
 		border: 1px solid var(--line);
 		border-radius: var(--radius-panel);
 		background:
@@ -379,6 +347,14 @@ const articleStructuredData = canonicalPath
 	.toc-card {
 		position: sticky;
 		top: 20px;
+		--toc-line-x: 6px;
+		--toc-line-width: 2px;
+		--toc-line-opacity: 0.72;
+		--toc-node-size: 6px;
+		--toc-branch-width: 12px;
+		--toc-nested-indent: 22px;
+		--toc-gap: 10px;
+		--toc-active-shift: 4px;
 	}
 
 	.toc-card h2 {
@@ -387,15 +363,70 @@ const articleStructuredData = canonicalPath
 	}
 
 	.toc-card ul {
+		position: relative;
 		margin-bottom: 0;
 		padding: 0;
 		list-style: none;
 		display: grid;
-		gap: 10px;
+		gap: var(--toc-gap);
+	}
+
+	.toc-card ul::before {
+		content: '';
+		position: absolute;
+		top: 0.95rem;
+		bottom: 0.95rem;
+		left: var(--toc-line-x);
+		width: var(--toc-line-width);
+		border-radius: var(--radius-pill);
+		background: linear-gradient(
+			180deg,
+			transparent,
+			rgba(110, 195, 255, var(--toc-line-opacity)),
+			rgba(157, 140, 255, calc(var(--toc-line-opacity) * 0.72)),
+			transparent
+		);
+		pointer-events: none;
+	}
+
+	.toc-card li {
+		position: relative;
+		padding-left: calc(var(--toc-line-x) + var(--toc-branch-width));
+	}
+
+	.toc-card li::before {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: var(--toc-line-x);
+		width: var(--toc-branch-width);
+		height: var(--toc-line-width);
+		background: rgba(110, 195, 255, var(--toc-line-opacity));
+		transform: translateY(-50%);
+		pointer-events: none;
+	}
+
+	.toc-card li::after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: calc(var(--toc-line-x) - var(--toc-node-size) / 2 + var(--toc-line-width) / 2);
+		width: var(--toc-node-size);
+		height: var(--toc-node-size);
+		border-radius: var(--radius-pill);
+		background: rgba(110, 195, 255, 0.78);
+		box-shadow: 0 0 12px rgba(110, 195, 255, 0.28);
+		transform: translateY(-50%);
+		pointer-events: none;
 	}
 
 	.toc-card li.nested {
-		padding-left: 14px;
+		margin-left: var(--toc-nested-indent);
+	}
+
+	.toc-card li.nested::after {
+		background: rgba(157, 140, 255, 0.68);
+		box-shadow: 0 0 10px rgba(157, 140, 255, 0.22);
 	}
 
 	.toc-card a {
@@ -417,7 +448,7 @@ const articleStructuredData = canonicalPath
 	}
 
 	.toc-card a.is-active {
-		transform: translateX(4px);
+		transform: translateX(var(--toc-active-shift));
 	}
 
 	.article-main {
@@ -507,33 +538,6 @@ const articleStructuredData = canonicalPath
 		line-height: 1.8;
 	}
 
-	.article-nav {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 14px;
-	}
-
-	.article-nav-link {
-		display: grid;
-		gap: 6px;
-		padding: 20px;
-		color: inherit;
-		text-decoration: none;
-	}
-
-	.article-nav-link span {
-		color: var(--accent-soft);
-		font-size: 0.88rem;
-	}
-
-	.article-nav-link strong {
-		overflow-wrap: anywhere;
-	}
-
-	.article-nav-link.placeholder {
-		visibility: hidden;
-	}
-
 	.back-to-top,
 	:global(.copy-code-btn) {
 		border: 1px solid rgba(153, 176, 255, 0.18);
@@ -573,8 +577,5 @@ const articleStructuredData = canonicalPath
 			padding: 24px;
 		}
 
-		.article-nav {
-			grid-template-columns: 1fr;
-		}
 	}
 </style>
