@@ -78,16 +78,21 @@ const articleStructuredData = canonicalPath
 
 		<div class:list={['article-grid', { 'has-toc': hasToc }]}>
 			{hasToc && (
-				<aside class="toc-card" aria-labelledby="toc-title">
-					<h2 id="toc-title">目录</h2>
-					<ul>
-						{tocHeadings.map((heading) => (
-							<li class:list={{ nested: heading.depth === 3 }}>
-								<a href={`#${heading.slug}`} data-toc-link>{heading.text}</a>
-							</li>
-						))}
-					</ul>
-				</aside>
+				<details class="toc-card" open>
+					<summary>
+						<span id="toc-title">目录</span>
+						<span class="toc-count">{tocHeadings.length} 节</span>
+					</summary>
+					<div class="toc-panel" aria-labelledby="toc-title">
+						<ul>
+							{tocHeadings.map((heading) => (
+								<li class:list={{ nested: heading.depth === 3 }}>
+									<a href={`#${heading.slug}`} data-toc-link>{heading.text}</a>
+								</li>
+							))}
+						</ul>
+					</div>
+				</details>
 			)}
 
 			<div class="article-main">
@@ -357,9 +362,33 @@ const articleStructuredData = canonicalPath
 		--toc-active-shift: 4px;
 	}
 
-	.toc-card h2 {
+	.toc-card summary {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
 		margin-bottom: 14px;
 		font-size: 1.1rem;
+		font-weight: 700;
+		cursor: pointer;
+		list-style: none;
+	}
+
+	.toc-card summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.toc-count {
+		display: none;
+		padding: 4px 8px;
+		border-radius: var(--radius-pill);
+		background: rgba(110, 195, 255, 0.1);
+		color: var(--accent-soft);
+		font-size: 0.78rem;
+	}
+
+	.toc-panel {
+		overflow: visible;
 	}
 
 	.toc-card ul {
@@ -572,10 +601,55 @@ const articleStructuredData = canonicalPath
 
 	@media (max-width: 720px) {
 		.article-header,
-		.toc-card,
 		.article-body {
 			padding: 24px;
 		}
 
+		.article-shell,
+		.article-main {
+			gap: 14px;
+		}
+
+		.toc-card {
+			--toc-line-x: 7px;
+			--toc-line-opacity: 0.58;
+			--toc-node-size: 7px;
+			--toc-branch-width: 11px;
+			--toc-nested-indent: 18px;
+			--toc-gap: 8px;
+			padding: 0;
+			overflow: hidden;
+		}
+
+		.toc-card summary {
+			margin-bottom: 0;
+			padding: 16px 22px;
+		}
+
+		.toc-count {
+			display: inline-flex;
+		}
+
+		.toc-panel {
+			max-height: 210px;
+			padding: 0 22px 18px;
+			overflow: auto;
+			-webkit-overflow-scrolling: touch;
+		}
+
+		.toc-card ul {
+			padding: 2px 0;
+		}
+
+		.article-body {
+			font-size: 1.01rem;
+			line-height: 1.9;
+			overflow-wrap: anywhere;
+		}
+
+		.article-body :global(h2),
+		.article-body :global(h3) {
+			margin-top: 32px;
+		}
 	}
 </style>

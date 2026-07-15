@@ -540,7 +540,14 @@ const stars = buildStars();
 		.cover-frame {
 			--content-y: -2.4vh;
 			--starfield-opacity: 0.72;
+			height: auto;
 			padding: 42px 18px 96px;
+			overflow: visible;
+		}
+
+		.cover-motto {
+			position: static;
+			margin-top: 28px;
 		}
 
 		.star:nth-child(n + 111) {
@@ -579,6 +586,7 @@ const stars = buildStars();
 		.cover-frame {
 			--starfield-opacity: 0.66;
 			padding-top: 34px;
+			padding-bottom: 48px;
 		}
 
 		.cover-title {
