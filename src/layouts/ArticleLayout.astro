@@ -109,8 +109,10 @@ const articleStructuredData = canonicalPath
 <script>
 	const articleBody = document.querySelector<HTMLElement>('#article-body');
 	const backToTopButton = document.querySelector<HTMLButtonElement>('#back-to-top');
+	const tocCard = document.querySelector<HTMLDetailsElement>('.toc-card');
 	const tocLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]'));
 	const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	const mobileTocQuery = window.matchMedia('(max-width: 720px)');
 	const tocTargets = tocLinks
 		.map((link) => {
 			const slug = decodeURIComponent(link.hash.slice(1));
@@ -191,6 +193,21 @@ const articleStructuredData = canonicalPath
 	};
 
 	let tocAnimationFrame = 0;
+	let userChangedTocState = false;
+	let syncingTocState = false;
+
+	const syncTocStateForViewport = () => {
+		if (!tocCard || userChangedTocState) {
+			return;
+		}
+
+		syncingTocState = true;
+		tocCard.open = !mobileTocQuery.matches;
+		window.setTimeout(() => {
+			syncingTocState = false;
+		}, 0);
+	};
+
 	const queueActiveTocUpdate = () => {
 		if (tocAnimationFrame) {
 			return;
@@ -233,9 +250,27 @@ const articleStructuredData = canonicalPath
 	for (const { link, target } of tocTargets) {
 		link.addEventListener('click', (event) => {
 			event.preventDefault();
+			if (mobileTocQuery.matches && tocCard) {
+				tocCard.open = false;
+			}
 			lockTocToTarget(link, target);
 		});
 	}
+
+	tocCard?.addEventListener('toggle', () => {
+		if (syncingTocState) {
+			return;
+		}
+
+		userChangedTocState = true;
+	});
+
+	mobileTocQuery.addEventListener('change', () => {
+		userChangedTocState = false;
+		syncTocStateForViewport();
+	});
+
+	syncTocStateForViewport();
 
 	if (tocTargets.length > 0) {
 		updateActiveTocLink();
@@ -376,6 +411,17 @@ const articleStructuredData = canonicalPath
 
 	.toc-card summary::-webkit-details-marker {
 		display: none;
+	}
+
+	.toc-card summary::after {
+		content: '⌄';
+		display: none;
+		color: var(--accent-soft);
+		transition: transform 160ms ease;
+	}
+
+	.toc-card[open] summary::after {
+		transform: rotate(180deg);
 	}
 
 	.toc-count {
@@ -624,6 +670,10 @@ const articleStructuredData = canonicalPath
 		.toc-card summary {
 			margin-bottom: 0;
 			padding: 16px 22px;
+		}
+
+		.toc-card summary::after {
+			display: inline-block;
 		}
 
 		.toc-count {
