@@ -5,101 +5,132 @@ const originSections = [
 	{
 		title: 'Dead Soul Insects 名字来源',
 		description:
-			'这个名字保留下来，不是为了显得完整或神秘，而是因为它准确对应了站点的气质。它带一点冷意和距离感，也保留了微弱发光的余地。',
+			'这个名字被保留下来，是因为它和站点的气质贴得很近：冷一点、静一点，也还留着一丝微弱的光。',
 		link: {
 			href: '/origin/详情文章/名字来源/',
 			label: '查看详情',
 		},
 	},
 	{
-		title: 'Dead Soul Insects的意象',
+		title: 'Dead Soul Insects 的意象',
 		description:
-			'这里的“Dead Soul Insects”更接近一种意象，而不是具体设定。它适合承接夜色、残光、碎片与缓慢整理中的内容，也让文章、项目与文档拥有相近的语气。',
+			'“Dead Soul Insects”更接近一种意象，而不是完整设定。它能把夜色、残光、碎片和缓慢整理中的内容放进同一条语气里。',
 	},
 ];
 ---
 
 <Layout title="起源 | Dead Soul Insects" description="解释 Dead Soul Insects 的名字来源、死魂虫意象与站点视觉选择。" canonicalPath="/origin/">
-	<section class="page-card">
-		<header class="page-intro">
-			<p class="kicker">起源</p>
-			<h1>这个名字更像一种语气</h1>
-			<p class="lead">
-				Dead Soul Insects 不是一套设定，也不是需要被完全解释的符号。它只是为这个站点留下一个稳定的语气：安静、冷调，还有一点微弱的光。
-			</p>
-		</header>
+	<div class="page-shell">
+		<section class="page-card intro-card">
+			<header class="page-intro">
+				<p class="kicker">起源</p>
+				<h1>这个名字留下了一种冷静的语气</h1>
+				<p class="lead">
+					Dead Soul Insects 不是完整设定，更像给这个站点定下的气息：安静、偏冷，留一点微光。
+				</p>
+			</header>
+		</section>
 
-		<div class="section-stack" aria-label="起源说明">
-			{
-				originSections.map((section) => (
+		<section class="section-block" aria-label="起源说明">
+			<div class="section-heading">
+				<div class="section-copy">
+					<p class="kicker">说明</p>
+					<h2>这一页只解释它为什么合适</h2>
+				</div>
+				<p class="section-note">想知道这个名字从哪里来，可以从这里开始；剩下的部分留给读者自己感受。</p>
+			</div>
+
+			<div class="section-stack">
+				{originSections.map((section) => (
 					<section class="content-card">
-						<h2>{section.title}</h2>
-						<div class="origin-description-row">
-							<p>{section.description}</p>
-							{section.link && (
-								<a class="origin-arrow-link" href={section.link.href}>
-									{section.link.label}
-									<span aria-hidden="true">→</span>
-								</a>
-							)}
-						</div>
+						<h3>{section.title}</h3>
+						<p>{section.description}</p>
+						{section.link && (
+							<a class="origin-arrow-link" href={section.link.href}>
+								{section.link.label}
+								<span aria-hidden="true">→</span>
+							</a>
+						)}
 					</section>
-				))
-			}
-		</div>
+				))}
+			</div>
+		</section>
 
 		<section class="closing-note" aria-labelledby="origin-note-title">
-			<h2 id="origin-note-title">保留一点模糊感</h2>
+			<div class="section-heading compact">
+				<div class="section-copy">
+					<p class="kicker">AFTERTONE</p>
+					<h2 id="origin-note-title">保留一点模糊感</h2>
+				</div>
+			</div>
 			<p>
-				这个名字不需要被解释得毫无剩余。只要它仍能让人感到安静、冷调，这一页的作用就已经足够。
+				不必把每个意象都说尽。只要它还能让人感到安静、冷调和一点微光，这个名字就成立。
 			</p>
 		</section>
-	</section>
+	</div>
 </Layout>
 
 <style>
-	.page-card {
-		padding: 32px;
+	.page-shell {
+		display: grid;
+		gap: 20px;
+	}
+
+	.page-card,
+	.content-card,
+	.closing-note {
 		border: 1px solid var(--line);
+		backdrop-filter: var(--glass-blur);
+	}
+
+	.page-card,
+	.closing-note {
+		padding: clamp(24px, 3.8vw, 36px);
 		border-radius: var(--radius-panel);
 		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0)),
 			var(--panel);
-		backdrop-filter: var(--glass-blur);
 		box-shadow: var(--shadow);
 	}
 
-	.page-intro {
-		max-width: 46rem;
-	}
-
-	.closing-note,
-	.section-stack {
-		box-sizing: border-box;
-		width: 100%;
-		max-width: none;
-	}
-
-	.closing-note,
+	.page-intro,
+	.section-copy,
 	.content-card {
-		padding: 24px;
-		border: 1px solid var(--line);
-		border-radius: var(--radius-card);
+		display: grid;
+		gap: 12px;
 	}
 
-	.content-card:has(.origin-arrow-link) {
-		padding-bottom: 12px;
-	}
-	.closing-note {
-		background: var(--panel-strong);
+	.page-intro {
+		max-width: 52rem;
 	}
 
-	.closing-note {
-		margin-top: 20px;
+	.section-heading {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: 14px 18px;
+	}
+
+	.section-heading {
+		align-items: end;
+		margin-bottom: 12px;
+	}
+
+	.section-heading.compact {
+		margin-bottom: 16px;
+	}
+
+	.section-copy {
+		gap: 8px;
+	}
+
+	.section-note {
+		max-width: 36rem;
+		align-self: end;
 	}
 
 	.kicker {
-		margin: 0 0 12px;
+		margin: 0;
 		font-size: 0.88rem;
 		letter-spacing: 0.12em;
 		text-transform: uppercase;
@@ -108,109 +139,103 @@ const originSections = [
 
 	h1,
 	h2,
-	p {
-		margin-top: 0;
-	}
-
-	h1 {
-		margin-bottom: 18px;
-		font-size: clamp(2rem, 4vw, 3rem);
-		line-height: 1.1;
-	}
-
-	h2 {
-		margin-bottom: 12px;
-		font-size: clamp(1.2rem, 2.4vw, 1.6rem);
-		line-height: 1.25;
-	}
-
-	h1,
-	h2,
-	p {
+	h3,
+	p,
+	span {
+		margin: 0;
 		overflow-wrap: anywhere;
 	}
 
+	h1 {
+		font-size: clamp(2rem, 4vw, 3rem);
+		line-height: 1.08;
+	}
+
+	h2 {
+		font-size: clamp(1.35rem, 2.5vw, 1.8rem);
+		line-height: 1.16;
+	}
+
+	h3 {
+		font-size: clamp(1.16rem, 2vw, 1.4rem);
+		line-height: 1.24;
+	}
+
 	p {
-		margin-bottom: 0;
-		line-height: 1.8;
 		color: var(--text-soft);
+		line-height: 1.78;
 	}
 
 	.lead {
-		margin-bottom: 28px;
 		font-size: 1.02rem;
+	}
+
+	.origin-arrow-link {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 28px;
+		padding: 5px 10px;
+		border-radius: var(--radius-pill);
+		font-size: 0.82rem;
+	}
+
+	.origin-arrow-link {
+		border: 1px solid rgba(153, 176, 255, 0.16);
+		background: rgba(255, 255, 255, 0.045);
 		color: var(--text-soft);
 	}
 
 	.section-stack {
 		display: grid;
-		gap: 18px;
+		gap: 16px;
 	}
 
 	.content-card {
-		box-sizing: border-box;
-		width: 100%;
+		display: grid;
+		gap: 10px;
+		padding: 20px;
+		border-radius: var(--radius-card);
 		background:
 			radial-gradient(circle at top right, rgba(110, 195, 255, 0.08), transparent 34%),
 			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
 			var(--panel);
-	}
-
-	.origin-description-row {
-		display: flex;
-		flex-direction: column;
-		gap: 5px;
-		align-items: stretch;
-		width: 100%;
-	}
-
-	.origin-description-row p {
-		margin: 0;
+		box-shadow: var(--shadow-soft);
 	}
 
 	.origin-arrow-link {
-		display: inline-flex;
-		flex-shrink: 0;
 		gap: 8px;
-		align-items: center;
-		align-self: flex-end;
-		padding: 5px 12px;
-		border: 1px solid rgba(153, 176, 255, 0.18);
-		border-radius: var(--radius-pill);
-		background: rgba(153, 176, 255, 0.08);
-		color: var(--text);
-		font-size: 0.95rem;
-		font-weight: 600;
-		line-height: 1.2;
+		justify-self: start;
 		text-decoration: none;
 		transition:
+			transform 0.2s ease,
 			border-color 0.2s ease,
 			background 0.2s ease,
-			color 0.2s ease,
-			opacity 0.2s ease;
+			color 0.2s ease;
 	}
 
-	.origin-arrow-link:hover,
-	.origin-arrow-link:focus-visible {
-		border-color: rgba(157, 140, 255, 0.28);
+	.origin-arrow-link:is(:hover, :focus-visible) {
+		transform: translateY(-1px);
+		border-color: var(--hover-border);
 		background: rgba(157, 140, 255, 0.14);
-		color: #f3f6ff;
-		opacity: 0.82;
+		color: var(--text);
+	}
+
+	.origin-arrow-link:focus-visible {
+		outline: var(--focus-ring);
+		outline-offset: var(--focus-offset);
+	}
+
+	.closing-note {
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0)),
+			var(--panel-strong);
 	}
 
 	@media (max-width: 640px) {
-		.page-card,
-		.content-card,
-		.closing-note {
-			padding: 24px;
-		}
-
-		.lead {
-			margin-bottom: 24px;
-		}
-
-		.origin-arrow-link {
-			align-self: flex-start;
+		.section-heading {
+			flex-direction: column;
+			align-items: flex-start;
 		}
 	}
 </style>

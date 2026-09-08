@@ -5,12 +5,17 @@ const aboutSections = [
 	{
 		title: '这个站是做什么的',
 		description:
-			'Dead Soul Insects 是一个偏安静的个人站点，用来放博客、项目入口和整理后的说明页。不追求把一切都展示出来，只保留那些愿意慢慢写清楚的内容。',
+			'Dead Soul Insects 用来收纳博客、项目入口和整理后的说明页。不求面面俱到，只保留愿意长期留下的内容。',
 	},
 	{
-		title: '主要内容',
+		title: '主要内容方向',
 		description:
-			'内容主要围绕建站记录、借助AI完成的事情、工具实践与少量仍在成形的想法。以小白的视角看待遇到的问题，为和我一样的人提供解决问题的思路。',
+			'目前主要写建站记录、AI 工具实践，以及一些还在继续完善的项目和想法。',
+	},
+	{
+		title: '这一页为什么存在',
+		description:
+			'这一页只补充必要的信息：这里是谁在写、内容大致覆盖什么、如果需要该怎样联系。',
 	},
 ];
 
@@ -37,62 +42,66 @@ const contacts = [
 		icon: '/icons/wechat.svg',
 	},
 ];
-
 ---
 
 <Layout title="关于 | Dead Soul Insects" description="Dead Soul Insects 的简要站点介绍与写作方向说明。" canonicalPath="/about/">
-	<section class="page-card">
-		<header class="page-intro">
-			<p class="kicker">关于</p>
-			<h1>突发奇想创建的个人站。</h1>
-			<p class="lead">
-				这里不是完整履历，也不是社交主页。它更像一个安静的公开出口，把愿意留下的文字、项目与说明整理出来。
-			</p>
-		</header>
-
-		<section class="summary-block" aria-labelledby="about-summary-title">
-			<h2 id="about-summary-title">这一页的边界</h2>
-			<p>
-				这里只保留必要的站点说明，不展开过多私人信息。重心放在内容本身，也让这个页面保持简洁。
-			</p>
+	<div class="page-shell">
+		<section class="page-card intro-card">
+			<header class="page-intro">
+				<p class="kicker">关于</p>
+				<h1>简要说明这个站和写它的人</h1>
+				<p class="lead">这里不放完整履历，只把站点用途、写作方向和联系方式说明白。</p>
+			</header>
 		</section>
 
-		<div class="section-grid" aria-label="关于页面内容分组">
-			{
-				aboutSections.map((section) => (
+		<section class="section-block" aria-label="关于页面内容分组">
+			<div class="section-heading">
+				<div class="section-copy">
+					<p class="kicker">说明</p>
+					<h2>把必要的信息留在这里</h2>
+				</div>
+				<p class="section-note">更多内容会回到博客、项目和文档里展开，这里只保留最必要的说明。</p>
+			</div>
+
+			<div class="section-grid">
+				{aboutSections.map((section) => (
 					<section class="content-card">
-						<h2>{section.title}</h2>
+						<h3>{section.title}</h3>
 						<p>{section.description}</p>
 					</section>
-				))
-			}
-		</div>
+				))}
+			</div>
+		</section>
 
 		<section class="contact-card" aria-labelledby="contact-title">
-			<h2 id="contact-title">联系方式</h2>
+			<div class="section-heading compact">
+				<div class="section-copy">
+					<p class="kicker">CONTACT</p>
+					<h2 id="contact-title">联系方式</h2>
+				</div>
+			</div>
+
 			<ul class="contact-list">
-				{
-					contacts.map((contact) => (
-						<li class="contact-item">
-							<div class="contact-main">
-								<span class="contact-icon" aria-hidden="true">
-									<img src={contact.icon} alt="" loading="lazy" />
-								</span>
-								<div class="contact-text">
-									<span class="contact-label">{contact.label}</span>
-									<span class="contact-value">{contact.value}</span>
-								</div>
+				{contacts.map((contact) => (
+					<li class="contact-item">
+						<div class="contact-main">
+							<span class="contact-icon" aria-hidden="true">
+								<img src={contact.icon} alt="" loading="lazy" />
+							</span>
+							<div class="contact-text">
+								<span class="contact-label">{contact.label}</span>
+								<span class="contact-value">{contact.value}</span>
 							</div>
-							<button class="copy-btn" type="button" data-copy-value={contact.copyValue}>
-								<img src="/icons/copy.svg" alt="" aria-hidden="true" />
-								<span>复制</span>
-							</button>
-						</li>
-					))
-				}
+						</div>
+						<button class="copy-btn" type="button" data-copy-value={contact.copyValue}>
+							<img src="/icons/copy.svg" alt="" aria-hidden="true" />
+							<span>复制</span>
+						</button>
+					</li>
+				))}
 			</ul>
 		</section>
-	</section>
+	</div>
 </Layout>
 
 <script>
@@ -127,45 +136,66 @@ const contacts = [
 </script>
 
 <style>
-	.page-card {
-		padding: 32px;
+	.page-shell {
+		display: grid;
+		gap: 20px;
+	}
+
+	.page-card,
+	.content-card,
+	.contact-card {
 		border: 1px solid var(--line);
+		backdrop-filter: var(--glass-blur);
+	}
+
+	.page-card,
+	.contact-card {
+		padding: clamp(24px, 3.8vw, 36px);
 		border-radius: var(--radius-panel);
 		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0)),
 			var(--panel);
-		backdrop-filter: var(--glass-blur);
 		box-shadow: var(--shadow);
 	}
 
+	.page-intro,
+	.section-copy,
+	.contact-text {
+		display: grid;
+		gap: 12px;
+	}
+
 	.page-intro {
-		max-width: 46rem;
+		max-width: 52rem;
 	}
 
-	.summary-block {
-		box-sizing: border-box;
-		width: 100%;
-		max-width: none;
+	.section-heading {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: 14px 18px;
 	}
 
-	.summary-block,
-	.content-card,
-	.contact-card {
-		padding: 24px;
-		border: 1px solid var(--line);
-		border-radius: var(--radius-card);
+	.section-heading {
+		align-items: end;
+		margin-bottom: 12px;
 	}
 
-	.summary-block {
-		background: var(--panel-strong);
+	.section-heading.compact {
+		margin-bottom: 16px;
 	}
 
-	.summary-block {
-		margin: 0 0 20px;
+	.section-copy {
+		gap: 8px;
+	}
+
+	.section-note {
+		max-width: 36rem;
+		align-self: end;
 	}
 
 	.kicker {
-		margin: 0 0 12px;
+		margin: 0;
 		font-size: 0.88rem;
 		letter-spacing: 0.12em;
 		text-transform: uppercase;
@@ -174,70 +204,75 @@ const contacts = [
 
 	h1,
 	h2,
-	p {
-		margin-top: 0;
-	}
-
-	h1 {
-		margin-bottom: 18px;
-		font-size: clamp(2rem, 4vw, 3rem);
-		line-height: 1.1;
-	}
-
-	h2 {
-		margin-bottom: 12px;
-		font-size: clamp(1.2rem, 2.4vw, 1.6rem);
-		line-height: 1.25;
-	}
-
-	h1,
-	h2,
-	p {
+	h3,
+	p,
+	span {
+		margin: 0;
 		overflow-wrap: anywhere;
 	}
 
+	h1 {
+		font-size: clamp(2rem, 4vw, 3rem);
+		line-height: 1.08;
+	}
+
+	h2 {
+		font-size: clamp(1.35rem, 2.5vw, 1.8rem);
+		line-height: 1.16;
+	}
+
+	h3 {
+		font-size: clamp(1.16rem, 2vw, 1.4rem);
+		line-height: 1.24;
+	}
+
 	p {
-		margin-bottom: 0;
-		line-height: 1.8;
 		color: var(--text-soft);
+		line-height: 1.78;
 	}
 
 	.lead {
-		margin-bottom: 28px;
 		font-size: 1.02rem;
-		color: var(--text-soft);
+	}
+
+	.copy-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 28px;
+		padding: 5px 10px;
+		border-radius: var(--radius-pill);
+		font-size: 0.82rem;
 	}
 
 	.section-grid {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-		gap: 28px;
-		width: 100%;
-		max-width: none;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 16px;
 	}
 
 	.content-card {
-		box-sizing: border-box;
-		min-width: 0;
-		width: auto;
+		display: grid;
+		gap: 10px;
+		padding: 20px;
+		border-radius: var(--radius-card);
 		background:
 			radial-gradient(circle at top right, rgba(110, 195, 255, 0.08), transparent 34%),
 			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
 			var(--panel);
+		box-shadow: var(--shadow-soft);
 	}
 
 	.contact-card {
-		box-sizing: border-box;
-		margin-top: 28px;
 		background:
-			radial-gradient(circle at top right, rgba(157, 140, 255, 0.1), transparent 34%),
-			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+			radial-gradient(circle at top right, rgba(157, 140, 255, 0.08), transparent 34%),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0)),
 			var(--panel);
 	}
 
 	.contact-list {
 		display: grid;
-		gap: 14px;
+		gap: 12px;
 		margin: 0;
 		padding: 0;
 		list-style: none;
@@ -248,12 +283,10 @@ const contacts = [
 		gap: 16px;
 		align-items: center;
 		justify-content: space-between;
-		padding: 16px;
+		padding: 14px;
 		border: 1px solid rgba(153, 176, 255, 0.14);
 		border-radius: 18px;
 		background: rgba(8, 10, 18, 0.35);
-		color: var(--text-soft);
-		line-height: 1.6;
 	}
 
 	.contact-main {
@@ -280,7 +313,6 @@ const contacts = [
 			0 0 18px rgba(110, 195, 255, 0.12),
 			0 10px 24px rgba(0, 0, 0, 0.18),
 			inset 0 1px 0 rgba(255, 255, 255, 0.14);
-		color: var(--accent-soft);
 	}
 
 	.contact-icon img {
@@ -290,9 +322,8 @@ const contacts = [
 	}
 
 	.contact-text {
-		display: grid;
-		gap: 2px;
 		min-width: 0;
+		gap: 2px;
 	}
 
 	.contact-label {
@@ -303,57 +334,36 @@ const contacts = [
 
 	.contact-value {
 		color: var(--text);
-		overflow-wrap: anywhere;
 	}
 
 	.copy-btn {
-		display: inline-flex;
-		flex: 0 0 auto;
 		gap: 7px;
-		align-items: center;
-		justify-content: center;
-		padding: 9px 14px;
 		border: 1px solid rgba(153, 210, 255, 0.38);
-		border-radius: var(--radius-pill);
 		background:
 			radial-gradient(circle at 24% 18%, rgba(178, 225, 255, 0.28), transparent 58%),
 			linear-gradient(135deg, rgba(110, 195, 255, 0.2), rgba(157, 140, 255, 0.16)),
 			rgba(14, 27, 48, 0.82);
-		box-shadow:
-			0 0 18px rgba(110, 195, 255, 0.1),
-			0 10px 24px rgba(0, 0, 0, 0.16),
-			inset 0 1px 0 rgba(255, 255, 255, 0.12);
 		color: var(--text);
-		font: inherit;
-		font-size: 0.9rem;
-		font-weight: 700;
 		cursor: pointer;
 		transition:
-			background 0.2s ease,
+			transform 0.2s ease,
 			border-color 0.2s ease,
-			color 0.2s ease,
-			transform 0.2s ease;
+			background 0.2s ease;
 	}
 
 	.copy-btn img {
 		width: 16px;
 		height: 16px;
-		filter: brightness(1.18) contrast(1.08) drop-shadow(0 0 4px rgba(110, 195, 255, 0.16));
+		filter: brightness(1.2);
 	}
 
-	.copy-btn:hover,
-	.copy-btn:focus-visible {
+	.copy-btn:is(:hover, :focus-visible) {
 		transform: translateY(-1px);
-		border-color: rgba(178, 225, 255, 0.5);
+		border-color: var(--hover-border);
 		background:
 			radial-gradient(circle at 24% 18%, rgba(178, 225, 255, 0.34), transparent 58%),
-			linear-gradient(135deg, rgba(110, 195, 255, 0.24), rgba(157, 140, 255, 0.2)),
-			rgba(14, 27, 48, 0.9);
-		box-shadow:
-			0 0 22px rgba(110, 195, 255, 0.14),
-			0 12px 26px rgba(0, 0, 0, 0.18),
-			inset 0 1px 0 rgba(255, 255, 255, 0.16);
-		color: #f3f6ff;
+			linear-gradient(135deg, rgba(110, 195, 255, 0.24), rgba(157, 140, 255, 0.18)),
+			rgba(22, 31, 52, 0.88);
 	}
 
 	.copy-btn:focus-visible {
@@ -362,16 +372,7 @@ const contacts = [
 	}
 
 	.copy-btn.copied {
-		border-color: rgba(178, 225, 255, 0.56);
-		background:
-			radial-gradient(circle at 24% 18%, rgba(178, 225, 255, 0.36), transparent 58%),
-			linear-gradient(135deg, rgba(110, 195, 255, 0.28), rgba(157, 140, 255, 0.2)),
-			rgba(14, 27, 48, 0.92);
-		box-shadow:
-			0 0 24px rgba(110, 195, 255, 0.16),
-			0 12px 26px rgba(0, 0, 0, 0.18),
-			inset 0 1px 0 rgba(255, 255, 255, 0.18);
-		color: #f3f6ff;
+		border-color: rgba(110, 195, 255, 0.34);
 	}
 
 	@media (max-width: 900px) {
@@ -381,24 +382,14 @@ const contacts = [
 	}
 
 	@media (max-width: 640px) {
-		.page-card,
-		.summary-block,
-		.content-card,
-		.contact-card {
-			padding: 24px;
-		}
-
-		.lead {
-			margin-bottom: 24px;
-		}
-
-		.contact-item {
-			align-items: stretch;
+		.contact-item,
+		.section-heading {
 			flex-direction: column;
+			align-items: flex-start;
 		}
 
 		.copy-btn {
-			width: 100%;
+			align-self: stretch;
 		}
 	}
 </style>
