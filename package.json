@@ -21,6 +21,8 @@
     "content:prepare:dry": "npm run prepare:content:dry && npm run prepare:origin:dry && npm run links:check",
     "prebuild": "npm run sync:blog && npm run sync:origin && npm run prepare:content && npm run prepare:origin && npm run links:apply",
     "build:astro": "astro build",
+    "verify:field-notebook": "node scripts/verify-field-notebook.mjs",
+    "verify:full-bleed-topnav": "node scripts/verify-full-bleed-topnav.mjs",
     "build": "astro build",
     "publish": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/publish.ps1",
     "preview": "astro preview",
