@@ -1,0 +1,33 @@
+---
+import { withBase } from '../../utils/paths';
+import PageHeader from './PageHeader.astro';
+import { fieldEntries, fieldTopics } from './mock-data';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<PageHeader
+	eyebrow="SUBJECT INDEX / MOCK DATA"
+	title="主题分类"
+	intro="主题编号位于窄列，条目保持普通有序列表，让分类成为路径而不是标签云。"
+/>
+
+<div class="field-notebook__subject-index">
+	{fieldTopics.map((topic, topicIndex) => (
+		<section aria-labelledby={`subject-${topicIndex + 1}`}>
+			<header>
+				<span class="field-notebook__row-number" aria-hidden="true">{String(topicIndex + 1).padStart(2, '0')}</span>
+				<h2 id={`subject-${topicIndex + 1}`}>{topic.name}</h2>
+				<p class="field-notebook__meta">{topic.count} ENTRIES</p>
+			</header>
+			<ol>
+				{fieldEntries.slice(0, topicIndex + 2).map((entry) => (
+					<li>
+						<a href={withBase(base, entry.href)}>{entry.title}</a>
+						<time datetime={entry.date}>{entry.date}</time>
+					</li>
+				))}
+			</ol>
+		</section>
+	))}
+</div>

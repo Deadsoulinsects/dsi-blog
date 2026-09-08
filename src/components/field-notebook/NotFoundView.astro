@@ -1,0 +1,23 @@
+---
+import { withBase } from '../../utils/paths';
+import PageHeader from './PageHeader.astro';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<PageHeader
+	eyebrow="FIELD NOTE MISSING / MOCK STATE"
+	title="这页没有入档"
+	intro="请求的虚构记录不存在。它不会替换站点的正式 404，只演示 Field Notebook 家族中的缺页状态。"
+/>
+
+<div class="field-notebook__not-found">
+	<span aria-hidden="true">404</span>
+	<div>
+		<p class="field-notebook__meta">INDEX GAP / NO MATCH</p>
+		<div class="field-notebook__actions">
+			<a href={withBase(base, '/lab/field-notebook/')}>返回最新日志</a>
+			<a href={withBase(base, '/lab/field-notebook/blog/')}>打开文章索引</a>
+		</div>
+	</div>
+</div>
