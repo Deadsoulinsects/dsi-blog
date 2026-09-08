@@ -1,0 +1,52 @@
+---
+import { articleCode } from './mock-data';
+---
+
+<div class="field-notebook__prose">
+	<p class="field-notebook__opening">本文是为 Field Notebook 视觉实验制作的虚构样章。它不来自站点内容，只用于检验中文长文、代码、宽表格与图注在不同版式下的可读性。</p>
+
+	<h2 id="question">问题从哪里开始</h2>
+	<p>失败通常不是一个孤立的红点，而是一连串边界的组合。先写下可观察到的现象，再区分事实、假设与尚未验证的部分，排查才会从猜测变成路径。</p>
+	<blockquote>一份好的排错记录，不只是解释昨天发生了什么，也应该缩短下一次抵达答案的距离。</blockquote>
+
+	<h2 id="signals">先收集信号</h2>
+	<p>把时间、输入、环境和输出放在同一张记录表里。读者不需要知道作者当时的全部思路，但必须能够理解证据之间的先后关系。</p>
+
+	<h3 id="build-log">构建日志</h3>
+	<p>日志应保留关键上下文，同时避免把整段噪声倾倒进正文。下面的虚构片段用于测试长行在本地横向滚动。</p>
+	<pre class="field-notebook__code-scroll" tabindex="0" aria-label="可横向滚动的虚构代码示例"><code>{articleCode}</code></pre>
+
+	<h3 id="runtime">运行时边界</h3>
+	<div class="field-notebook__table-scroll" role="region" tabindex="0" aria-label="可横向滚动的运行边界比较表">
+		<table>
+			<caption>虚构排错记录中的边界、信号、证据来源、负责人、处理时限与下一步</caption>
+			<thead>
+				<tr>
+					<th scope="col">边界</th>
+					<th scope="col">可见信号</th>
+					<th scope="col">证据来源</th>
+					<th scope="col">记录责任</th>
+					<th scope="col">处理时限</th>
+					<th scope="col">下一步</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr><th scope="row">内容输入</th><td>条目数量变化</td><td>虚构清单快照</td><td>内容维护者</td><td>构建前</td><td>核对来源与过滤条件</td></tr>
+				<tr><th scope="row">构建阶段</th><td>模块解析失败</td><td>虚构构建日志</td><td>站点维护者</td><td>十五分钟</td><td>缩小失败入口</td></tr>
+				<tr><th scope="row">部署环境</th><td>静态资源不可达</td><td>虚构请求记录</td><td>发布维护者</td><td>发布后</td><td>检查基础路径</td></tr>
+			</tbody>
+		</table>
+	</div>
+
+	<h2 id="map">画出排错地图</h2>
+	<p>地图不需要精致，但需要表达因果方向。将每个检查点写成可以回答“是”或“否”的问题，能够减少在同一个分支上反复绕行。</p>
+	<figure>
+		<div class="field-notebook__figure" role="img" aria-label="从观察到记录的四步虚构排错路径">OBSERVE → ISOLATE → VERIFY → RECORD</div>
+		<figcaption>图 1：虚构的排错路径示意，用于检验图注与纸面材料的关系。</figcaption>
+	</figure>
+
+	<h2 id="after">把结论留给下一次</h2>
+	<p>最后记录哪些判断被证伪、哪些设置真正产生影响，以及哪些临时措施需要撤回。长文的终点不是一次成功，而是一条更短、更可靠的返程路线。</p>
+	<p>当页面收窄到手机宽度时，正文保持自然换行；代码与表格只在自己的区域内滚动，不把整个视口撑开。</p>
+	<a class="field-notebook__back-top" href="#article-top">返回文章顶部</a>
+</div>

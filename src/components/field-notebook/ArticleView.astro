@@ -1,0 +1,25 @@
+---
+import ArticleBody from './ArticleBody.astro';
+import ContentTypeLabel from './ContentTypeLabel.astro';
+import SectionLabel from './SectionLabel.astro';
+import { articleEntry, articleToc } from './mock-data';
+---
+
+<article id="article-top" class="field-notebook__article">
+	<header class="field-notebook__article-head">
+		<p class="field-notebook__meta">SYSTEM PRACTICE / FIELD NOTE 018</p>
+		<div class="field-notebook__article-type"><ContentTypeLabel type={articleEntry.type} /></div>
+		<h1>{articleEntry.title}</h1>
+		<p class="field-notebook__lead">{articleEntry.summary}</p>
+		<p class="field-notebook__byline"><time datetime={articleEntry.date}>{articleEntry.date}</time> / {articleEntry.readTime} / FICTIONAL ARTICLE</p>
+	</header>
+	<div class="field-notebook__article-grid">
+		<nav class="field-notebook__toc" aria-label="本文目录">
+			<SectionLabel label="On this page" count="06" />
+			{articleToc.map((item) => (
+				<a href={`#${item.id}`} class:list={{ 'field-notebook__toc-nested': item.depth === 3 }}>{item.label}</a>
+			))}
+		</nav>
+		<ArticleBody />
+	</div>
+</article>
