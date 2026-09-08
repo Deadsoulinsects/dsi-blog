@@ -1,0 +1,728 @@
+---
+import type { ListMasterVariant } from '../data/listMasterVariants';
+import { withBase } from '../utils/paths';
+
+interface TopicPreview {
+	name: string;
+	description?: string;
+	count: number;
+	href: string;
+}
+
+interface PostPreview {
+	title: string;
+	description: string;
+	dateLabel: string;
+	topic?: string;
+	href: string;
+}
+
+interface CategoryPreview {
+	name: string;
+	count: number;
+	href: string;
+}
+
+interface ArchivePreview {
+	year: string;
+	items: Array<{
+		title: string;
+		dateLabel: string;
+		href: string;
+	}>;
+}
+
+interface Props {
+	variant: ListMasterVariant;
+	topics: TopicPreview[];
+	posts: PostPreview[];
+	categories: CategoryPreview[];
+	archiveGroups: ArchivePreview[];
+	base: string;
+}
+
+const { variant, topics, posts, categories, archiveGroups, base } = Astro.props;
+const styleVars = Object.entries(variant.tokens)
+	.map(([key, value]) => `${key}: ${value}`)
+	.join('; ');
+---
+
+<section class:list={['master-shell', `layout-${variant.layout}`]} style={styleVars}>
+	<div class="master-ambient" aria-hidden="true"></div>
+
+	<header class="master-intro">
+		<a class="back-link" href={withBase(base, '/lab/list-exploration/')}>返回第一轮对照</a>
+		<p class="eyebrow">{variant.shortName}</p>
+		<h1>{variant.name}</h1>
+		<p class="thesis">{variant.thesis}</p>
+	</header>
+
+	<section class="method-panel">
+		<div>
+			<p class="label">开场方式</p>
+			<p>{variant.opening}</p>
+		</div>
+		<div>
+			<p class="label">卡片原型</p>
+			<p>{variant.cardArchetype}</p>
+		</div>
+		<div>
+			<p class="label">分组方式</p>
+			<p>{variant.grouping}</p>
+		</div>
+		<div>
+			<p class="label">元信息角色</p>
+			<p>{variant.metadataRole}</p>
+		</div>
+		<div>
+			<p class="label">空间节奏</p>
+			<p>{variant.spacing}</p>
+		</div>
+		<div>
+			<p class="label">配色说明</p>
+			<p>{variant.paletteNote}</p>
+		</div>
+	</section>
+
+	{variant.layout === 'order' && (
+		<>
+			<section class="order-frame">
+				<div class="order-head block-surface">
+					<div class="order-copy">
+						<p class="section-kicker">阅读路径</p>
+						<h2>先看专题，再顺着时间继续</h2>
+						<p>这一版强调的是秩序、稳定和阅读的连续性，所以开场、导语和列表之间的距离都更克制。</p>
+					</div>
+					<div class="order-index">
+						{categories.slice(0, 4).map((category) => (
+							<a href={withBase(base, category.href)}>
+								<span>{category.name}</span>
+								<strong>{category.count}</strong>
+							</a>
+						))}
+					</div>
+				</div>
+
+				<div class="order-columns">
+					<div class="block-surface order-main">
+						<div class="section-row">
+							<p class="section-kicker">专题入口</p>
+							<h3>优先走已经成形的线索</h3>
+						</div>
+						<div class="order-topic-list">
+							{topics.map((topic) => (
+								<a class="order-topic" href={withBase(base, topic.href)}>
+									<div>
+										<h4>{topic.name}</h4>
+										<p>{topic.description ?? '继续沿着同一条记录线索向下看。'}</p>
+									</div>
+									<span>{topic.count}</span>
+								</a>
+							))}
+						</div>
+					</div>
+
+					<div class="block-surface order-archive">
+						<div class="section-row compact">
+							<p class="section-kicker">归档索引</p>
+							<h3>较早的记录</h3>
+						</div>
+						{archiveGroups.slice(0, 2).map((group) => (
+							<div class="archive-mini-group">
+								<div class="archive-mini-head">
+									<strong>{group.year}</strong>
+									<span>{group.items.length} 条</span>
+								</div>
+								<ul>
+									{group.items.slice(0, 3).map((item) => (
+										<li><a href={withBase(base, item.href)}>{item.title}</a></li>
+									))}
+								</ul>
+							</div>
+						))}
+					</div>
+				</div>
+
+				<div class="block-surface order-post-list">
+					<div class="section-row">
+						<p class="section-kicker">主列表</p>
+						<h3>像被整理过的阅读条目</h3>
+					</div>
+					<div class="order-post-items">
+						{posts.map((post) => (
+							<a class="order-post" href={withBase(base, post.href)}>
+								<div class="order-post-meta">
+									<span>{post.dateLabel}</span>
+									{post.topic && <em>{post.topic}</em>}
+								</div>
+								<div class="order-post-copy">
+									<h4>{post.title}</h4>
+									<p>{post.description}</p>
+								</div>
+							</a>
+						))}
+					</div>
+				</div>
+			</section>
+		</>
+	)}
+
+	{variant.layout === 'spirit' && (
+		<section class="spirit-frame">
+			<section class="spirit-hero block-surface">
+				<div class="spirit-cloud"></div>
+				<div class="spirit-lead">
+					<p class="section-kicker">浮现中的入口</p>
+					<h2>不是把内容摆平，而是让它一层层露出来</h2>
+					<p>这条母版故意让条目轻微错位、分组强弱不均、元信息像附着在周边的漂浮注记，用结构来制造幽冷灵性的气。</p>
+				</div>
+				<div class="spirit-ribbon">
+					{topics.slice(0, 2).map((topic) => (
+						<a href={withBase(base, topic.href)}>
+							<strong>{topic.name}</strong>
+							<span>{topic.count} 篇</span>
+						</a>
+					))}
+				</div>
+			</section>
+
+			<section class="spirit-stagger">
+				{posts.map((post, index) => (
+					<a class:list={['spirit-card block-surface', `spirit-card-${index + 1}`, { emphasis: index === 0 || index === 3 }]} href={withBase(base, post.href)}>
+						<div class="spirit-meta">
+							<span>{post.dateLabel}</span>
+							{post.topic && <em>{post.topic}</em>}
+						</div>
+						<h3>{post.title}</h3>
+						<p>{post.description}</p>
+					</a>
+				))}
+			</section>
+
+			<section class="spirit-bottom">
+				<div class="block-surface spirit-categories">
+					<p class="section-kicker">附着标记</p>
+					<div class="spirit-tags">
+						{categories.slice(0, 6).map((category) => <a href={withBase(base, category.href)}>{category.name}</a>)}
+					</div>
+				</div>
+
+				<div class="block-surface spirit-archive">
+					<p class="section-kicker">回流</p>
+					{archiveGroups.slice(0, 2).map((group) => (
+						<div class="spirit-year">
+							<strong>{group.year}</strong>
+							<div>
+								{group.items.slice(0, 2).map((item) => <a href={withBase(base, item.href)}>{item.title}</a>)}
+							</div>
+						</div>
+					))}
+				</div>
+			</section>
+		</section>
+	)}
+
+	{variant.layout === 'catalog' && (
+		<section class="catalog-frame">
+			<section class="catalog-intro block-surface">
+				<div class="catalog-heading">
+					<p class="section-kicker">展区前言</p>
+					<h2>内容不是排成网格，而是被编号、封签、陈列</h2>
+				</div>
+				<div class="catalog-guide">
+					<div>
+						<span class="catalog-no">01</span>
+						<p>专题像章节牌，先建立展区身份。</p>
+					</div>
+					<div>
+						<span class="catalog-no">02</span>
+						<p>列表项像档案条目，元信息直接参与版式。</p>
+					</div>
+					<div>
+						<span class="catalog-no">03</span>
+						<p>归档像回看目录，负责把时间显性化。</p>
+					</div>
+				</div>
+			</section>
+
+			<section class="catalog-sections">
+				<div class="catalog-column block-surface">
+					<div class="catalog-label-row">
+						<span class="catalog-no">A</span>
+						<h3>专题牌</h3>
+					</div>
+					{topics.map((topic) => (
+						<a class="catalog-ticket" href={withBase(base, topic.href)}>
+							<div>
+								<strong>{topic.name}</strong>
+								<p>{topic.description ?? '按同一条内容线索继续进入。'}</p>
+							</div>
+							<span>{topic.count}</span>
+						</a>
+					))}
+				</div>
+
+				<div class="catalog-column block-surface">
+					<div class="catalog-label-row">
+						<span class="catalog-no">B</span>
+						<h3>主展签</h3>
+					</div>
+					<div class="catalog-post-list">
+						{posts.map((post, index) => (
+							<a class="catalog-post" href={withBase(base, post.href)}>
+								<div class="catalog-post-index">{String(index + 1).padStart(2, '0')}</div>
+								<div class="catalog-post-copy">
+									<div class="catalog-post-meta">
+										<span>{post.dateLabel}</span>
+										{post.topic && <em>{post.topic}</em>}
+									</div>
+									<h4>{post.title}</h4>
+									<p>{post.description}</p>
+								</div>
+							</a>
+						))}
+					</div>
+				</div>
+
+				<div class="catalog-column block-surface compact-column">
+					<div class="catalog-label-row">
+						<span class="catalog-no">C</span>
+						<h3>编目</h3>
+					</div>
+					<div class="catalog-mini-index">
+						{categories.slice(0, 6).map((category) => (
+							<a href={withBase(base, category.href)}>
+								<span>{category.name}</span>
+								<strong>{category.count}</strong>
+							</a>
+						))}
+					</div>
+					{archiveGroups.slice(0, 2).map((group) => (
+						<div class="catalog-year-group">
+							<div class="catalog-year-head">
+								<strong>{group.year}</strong>
+								<span>{group.items.length}</span>
+							</div>
+							<ul>
+								{group.items.slice(0, 3).map((item) => <li><a href={withBase(base, item.href)}>{item.title}</a></li>)}
+							</ul>
+						</div>
+					))}
+				</div>
+			</section>
+		</section>
+	)}
+</section>
+
+<style>
+	.master-shell {
+		position: relative;
+		display: grid;
+		gap: clamp(24px, 3vw, 34px);
+		color: var(--master-text);
+	}
+
+	.master-ambient {
+		position: fixed;
+		inset: 0;
+		z-index: -1;
+		pointer-events: none;
+		background:
+			radial-gradient(circle at 12% 10%, var(--master-glow), transparent 30%),
+			radial-gradient(circle at 82% 18%, color-mix(in srgb, var(--master-accent) 10%, transparent), transparent 26%),
+			linear-gradient(180deg, var(--master-bg-soft) 0%, var(--master-bg) 100%);
+	}
+
+	.master-intro,
+	.method-panel,
+	.block-surface,
+	.catalog-post,
+	.order-index a,
+	.order-post,
+	.order-topic,
+	.catalog-ticket,
+	.catalog-mini-index a,
+	.spirit-card,
+	.spirit-ribbon a,
+	.spirit-tags a,
+	.spirit-year a {
+		position: relative;
+		border: 1px solid var(--master-line);
+		background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0)), var(--master-surface);
+		box-shadow: var(--master-shadow);
+		backdrop-filter: blur(16px);
+		color: inherit;
+		text-decoration: none;
+		box-sizing: border-box;
+	}
+
+	.block-surface,
+	.master-intro,
+	.method-panel {
+		box-shadow: 0 20px 44px rgba(0, 0, 0, 0.2);
+	}
+
+	.catalog-post,
+	.order-index a,
+	.order-post,
+	.order-topic,
+	.catalog-ticket,
+	.catalog-mini-index a,
+	.spirit-card,
+	.spirit-ribbon a,
+	.spirit-tags a,
+	.spirit-year a {
+		box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+	}
+
+	.master-intro,
+	.method-panel,
+	.block-surface {
+		border-radius: 28px;
+		padding: clamp(20px, 3vw, 30px);
+	}
+
+	.order-frame,
+	.catalog-frame,
+	.order-copy,
+	.order-main,
+	.order-archive,
+	.order-post-copy,
+	.catalog-heading,
+	.catalog-column,
+	.catalog-post-copy {
+		display: grid;
+	}
+
+	.order-frame,
+	.catalog-frame {
+		gap: clamp(22px, 2.8vw, 30px);
+	}
+
+	.order-copy,
+	.catalog-heading,
+	.order-post-copy,
+	.catalog-post-copy {
+		gap: 10px;
+	}
+
+	.master-intro,
+	.method-panel,
+	.order-head,
+	.order-columns,
+	.order-post-list,
+	.spirit-hero,
+	.spirit-bottom,
+	.catalog-intro,
+	.catalog-sections,
+	.catalog-guide,
+	.catalog-post-list,
+	.catalog-mini-index,
+	.catalog-year-group,
+	.archive-mini-group,
+	.spirit-year,
+	.spirit-ribbon,
+	.order-index,
+	.order-topic-list,
+	.order-post-items,
+	.spirit-stagger {
+		display: grid;
+		gap: 16px;
+	}
+
+	.eyebrow,
+	.section-kicker,
+	.label,
+	.catalog-no {
+		margin: 0;
+		font-size: 0.8rem;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--master-accent-soft);
+	}
+
+	h1,h2,h3,h4,p,span,strong,em,ul,li {
+		margin: 0;
+		overflow-wrap: anywhere;
+	}
+
+	h1 { font-size: clamp(2.4rem, 5vw, 4.8rem); line-height: 0.98; max-width: 10ch; }
+	h2 { font-size: clamp(1.55rem, 3vw, 2.3rem); line-height: 1.08; }
+	h3 { font-size: clamp(1.18rem, 2vw, 1.45rem); line-height: 1.16; }
+	h4 { font-size: 1.08rem; line-height: 1.24; }
+	p,span,li,em { line-height: 1.7; color: var(--master-text-soft); font-style: normal; }
+
+	.thesis { max-width: 42rem; font-size: 1.05rem; }
+	.back-link {
+		display: inline-flex; justify-self: start; align-items: center; padding: 7px 12px; border-radius: 999px;
+		border: 1px solid var(--master-line); color: var(--master-text-soft); text-decoration: none; background: rgba(255,255,255,0.04);
+	}
+
+	.method-panel {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	.method-panel > div { display: grid; gap: 8px; }
+
+	.order-head {
+		grid-template-columns: minmax(0, 1.4fr) minmax(18rem, 0.8fr);
+	}
+
+	.order-index,
+	.catalog-mini-index { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+	.order-index a,
+	.catalog-mini-index a {
+		padding: 14px 16px; border-radius: 18px; display: flex; justify-content: space-between; align-items: center;
+	}
+
+	.order-columns { grid-template-columns: minmax(0, 1.3fr) minmax(18rem, 0.7fr); }
+
+	.order-topic,
+	.order-post,
+	.catalog-ticket,
+	.catalog-post {
+		padding: 18px 20px; border-radius: 20px;
+	}
+
+	.order-topic,
+	.order-post,
+	.catalog-ticket { display: flex; justify-content: space-between; gap: 18px; align-items: start; }
+
+	.order-post-meta,
+	.catalog-post-meta,
+	.archive-mini-head,
+	.catalog-year-head,
+	.spirit-meta,
+	.topic-head,
+	.archive-header,
+	.catalog-label-row { display: flex; justify-content: space-between; gap: 12px; align-items: start; }
+
+	.order-post-items,
+	.catalog-post-list { gap: 18px; }
+
+	.archive-mini-group ul,
+	.catalog-year-group ul { list-style: none; padding: 0; display: grid; gap: 8px; }
+
+	.spirit-hero {
+		min-height: 20rem; overflow: clip;
+		grid-template-columns: minmax(0, 1.25fr) minmax(18rem, 0.8fr);
+		align-items: end;
+	}
+
+	.spirit-cloud {
+		position: absolute; inset: auto 8% 16% auto; width: 18rem; height: 18rem; border-radius: 999px;
+		background: radial-gradient(circle, color-mix(in srgb, var(--master-accent) 24%, transparent), transparent 60%);
+		filter: blur(12px); opacity: 0.85;
+	}
+
+	.spirit-ribbon { grid-template-columns: 1fr; align-self: end; gap: 10px; }
+	.spirit-ribbon a,
+	.spirit-tags a,
+	.spirit-year a { padding: 12px 14px; border-radius: 999px; display: flex; justify-content: space-between; gap: 10px; }
+
+	.spirit-stagger {
+		grid-template-columns: repeat(6, minmax(0, 1fr));
+		align-items: start;
+		column-gap: 24px;
+		row-gap: 28px;
+	}
+	.spirit-card { padding: 20px; border-radius: 24px; display: grid; gap: 12px; min-height: 13rem; }
+	.spirit-card.emphasis { min-height: 15rem; }
+	.spirit-card-1 { grid-column: 1 / span 4; }
+	.spirit-card-2 { grid-column: 5 / span 2; margin-top: 36px; }
+	.spirit-card-3 { grid-column: 2 / span 2; margin-top: 8px; }
+	.spirit-card-4 { grid-column: 4 / span 3; margin-top: 30px; }
+	.spirit-card-5 { grid-column: 1 / span 3; margin-top: 14px; }
+	.spirit-card-6 { grid-column: 4 / span 2; margin-top: 10px; }
+	.spirit-bottom { grid-template-columns: minmax(0, 1fr) minmax(20rem, 0.9fr); align-items: start; }
+	.spirit-tags { display: flex; flex-wrap: wrap; gap: 10px; }
+	.spirit-year div { display: grid; gap: 8px; }
+
+	.catalog-guide { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+	.catalog-guide > div { border-top: 1px solid var(--master-line); padding-top: 12px; display: grid; gap: 8px; }
+	.catalog-sections { grid-template-columns: minmax(19rem, 0.95fr) minmax(0, 1.35fr) minmax(18rem, 0.9fr); align-items: start; gap: 24px; }
+	.catalog-column { gap: 20px; }
+	.compact-column { align-self: stretch; }
+	.catalog-post { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 16px; }
+	.catalog-post-index {
+		font-size: 1.4rem; color: var(--master-accent-soft); border-right: 1px solid var(--master-line); padding-right: 12px;
+	}
+
+	.catalog-year-group { border-top: 1px solid var(--master-line); padding-top: 16px; }
+
+	.layout-order :is(.order-head, .order-main, .order-archive, .order-post-list),
+	.layout-catalog :is(.catalog-intro, .catalog-column) {
+		overflow: clip;
+		box-shadow: 0 16px 34px rgba(0, 0, 0, 0.18);
+	}
+
+	.layout-order .order-columns {
+		gap: 22px;
+	}
+
+	.layout-order .order-head {
+		align-items: stretch;
+		gap: 24px;
+	}
+
+	.layout-order :is(.order-main, .order-archive) {
+		gap: 18px;
+	}
+
+	.layout-order :is(.order-index, .order-topic-list, .order-post-items) {
+		gap: 14px;
+	}
+
+	.layout-order .order-index {
+		align-content: start;
+	}
+
+	.layout-order .order-index a {
+		padding: 18px 18px;
+		border-radius: 20px;
+		box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+	}
+
+	.layout-order .order-index > :only-child {
+		grid-column: 1 / -1;
+		min-height: 100%;
+		align-content: space-between;
+	}
+
+	.layout-order :is(.order-topic, .order-post) {
+		padding: 20px 22px;
+		gap: 20px;
+		box-shadow: 0 8px 18px rgba(0, 0, 0, 0.14);
+	}
+
+	.layout-order .order-post {
+		display: grid;
+		gap: 14px;
+		align-content: start;
+	}
+
+	.layout-order .order-post-meta {
+		justify-content: flex-start;
+		align-items: center;
+		gap: 10px 18px;
+		flex-wrap: wrap;
+	}
+
+	.layout-order .order-post-meta em {
+		padding: 2px 10px;
+		border: 1px solid color-mix(in srgb, var(--master-line) 88%, transparent);
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.03);
+		line-height: 1.5;
+	}
+
+	.layout-order .archive-mini-group,
+	.layout-catalog .catalog-year-group {
+		padding: 18px 18px 16px;
+		border: 1px solid color-mix(in srgb, var(--master-line) 82%, transparent);
+		border-radius: 20px;
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.022), rgba(255, 255, 255, 0)),
+			color-mix(in srgb, var(--master-surface-strong) 78%, transparent);
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.022);
+	}
+
+	.layout-catalog .catalog-sections {
+		gap: clamp(26px, 2.8vw, 34px);
+		align-items: start;
+	}
+
+	.layout-catalog .catalog-column {
+		gap: 18px;
+	}
+
+	.layout-catalog :is(.catalog-post-list, .catalog-mini-index, .catalog-year-group) {
+		gap: 14px;
+	}
+
+	.layout-catalog .catalog-mini-index {
+		align-content: start;
+	}
+
+	.layout-catalog :is(.catalog-ticket, .catalog-post, .catalog-mini-index a) {
+		box-shadow: 0 8px 18px rgba(0, 0, 0, 0.14);
+	}
+
+	.layout-catalog .catalog-mini-index a {
+		padding: 18px 18px;
+		border-radius: 20px;
+		box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+	}
+
+	.layout-catalog .catalog-mini-index > :only-child {
+		grid-column: 1 / -1;
+		min-height: 7rem;
+		align-content: center;
+	}
+
+	.layout-catalog .catalog-ticket,
+	.layout-catalog .catalog-post {
+		padding: 20px 22px;
+	}
+
+	.layout-catalog .catalog-post {
+		grid-template-columns: 62px minmax(0, 1fr);
+		gap: 18px;
+	}
+
+	.layout-catalog .catalog-post-index {
+		padding-right: 14px;
+	}
+
+	.layout-catalog .catalog-year-group {
+		border-top: 0;
+		padding-top: 18px;
+	}
+
+	.layout-catalog .compact-column {
+		align-self: start;
+	}
+
+	@media (max-width: 1220px) {
+		.catalog-sections {
+			grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		}
+
+		.compact-column {
+			grid-column: 1 / -1;
+		}
+	}
+
+	@media (max-width: 1040px) {
+		.spirit-hero,
+		.spirit-bottom,
+		.spirit-stagger {
+			grid-template-columns: 1fr;
+		}
+
+		.spirit-card-1,
+		.spirit-card-2,
+		.spirit-card-3,
+		.spirit-card-4,
+		.spirit-card-5,
+		.spirit-card-6 {
+			grid-column: auto;
+			margin-top: 0;
+		}
+	}
+
+	@media (max-width: 960px) {
+		.method-panel,
+		.order-head,
+		.order-columns,
+		.spirit-bottom,
+		.catalog-guide,
+		.catalog-sections,
+		.order-index,
+		.catalog-mini-index,
+		.spirit-ribbon {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

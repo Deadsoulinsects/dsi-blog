@@ -1,0 +1,73 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import { listMasterVariants } from '../../../data/listMasterVariants';
+import { withBase } from '../../../utils/paths';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout title="第二轮母版探索 | Dead Soul Insects" description="三种结构母版，用来重做列表页风格探索。" canonicalPath="/lab/list-masters/" hideChrome={true}>
+	<div class="master-index-shell">
+		<section class="hero-card">
+			<p class="eyebrow">第二轮结构母版</p>
+			<h1>这次先改空间，不先改色</h1>
+			<p class="lead">这三页不是最终三选一，而是三种真正分叉的结构母体：低温整理、漂浮灵体、静态陈列。之后的五条后续路线，将从它们继续长出来。</p>
+			<a class="back-link" href={withBase(base, '/lab/list-exploration/')}>回看第一轮失败版</a>
+			<a class="back-link" href={withBase(base, '/lab/list-route-schemes/')}>进入五条后续路线</a>
+		</section>
+
+		<section class="principle-grid">
+			<article>
+				<h2>不再先换色</h2>
+				<p>先让开场、卡片物种、分组方式、元信息角色和呼吸节奏分叉，再谈配色细化。</p>
+			</article>
+			<article>
+				<h2>先做结构母版</h2>
+				<p>每个母版都像一个真正的列表页样页，而不是一张概念 moodboard 或同模板换皮稿。</p>
+			</article>
+			<article>
+				<h2>再长成五条路线</h2>
+				<p>确认三套结构成立后，再从中派生“当前升级 / 两条过渡 / 两条新路线”。</p>
+			</article>
+		</section>
+
+		<section class="variant-grid">
+			{listMasterVariants.map((variant) => (
+				<a class="variant-card" href={withBase(base, `/lab/list-masters/${variant.slug}/`)}>
+					<p class="eyebrow">{variant.shortName}</p>
+					<h2>{variant.name}</h2>
+					<p>{variant.thesis}</p>
+					<ul>
+						<li><strong>开场：</strong>{variant.opening}</li>
+						<li><strong>卡片：</strong>{variant.cardArchetype}</li>
+						<li><strong>分组：</strong>{variant.grouping}</li>
+					</ul>
+					<span class="jump-link">进入这个母版 →</span>
+				</a>
+			))}
+		</section>
+	</div>
+</Layout>
+
+<style>
+	.master-index-shell { display: grid; gap: 22px; }
+	.hero-card, .principle-grid article, .variant-card {
+		border: 1px solid var(--line); border-radius: 28px; padding: 24px;
+		background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0)), var(--panel);
+		box-shadow: var(--shadow); backdrop-filter: var(--glass-blur);
+	}
+	.hero-card, .variant-card { display: grid; gap: 14px; }
+	.principle-grid, .variant-grid { display: grid; gap: 16px; }
+	.principle-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
+	.variant-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
+	.eyebrow { margin: 0; font-size: 0.82rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-soft); }
+	h1,h2,p,ul,li,span { margin: 0; overflow-wrap: anywhere; }
+	h1 { font-size: clamp(2.2rem, 4.8vw, 4rem); line-height: 1.02; max-width: 12ch; }
+	h2 { font-size: clamp(1.25rem, 2.2vw, 1.7rem); line-height: 1.14; }
+	p,li,span { line-height: 1.72; color: var(--text-soft); }
+	.lead { max-width: 54rem; font-size: 1.04rem; }
+	.back-link, .jump-link { display: inline-flex; justify-self: start; align-items: center; padding: 7px 12px; border: 1px solid rgba(153,176,255,0.16); border-radius: 999px; color: var(--text-soft); text-decoration: none; background: rgba(255,255,255,0.04); }
+	.variant-card { text-decoration: none; color: inherit; }
+	.variant-card ul { padding-left: 18px; display: grid; gap: 8px; }
+	@media (max-width: 960px) { .principle-grid, .variant-grid { grid-template-columns: 1fr; } }
+</style>
