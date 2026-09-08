@@ -19,31 +19,6 @@ export const getSortedPosts = async () => sortByPubDateDesc(await getCollection(
 
 export const getSortedDocs = async () => sortByPubDateDesc(await getCollection('docs'));
 
-export const getAllBlogTags = async () => {
-	const posts = await getSortedPosts();
-	const tagMap = new Map<string, number>();
-
-	for (const post of posts) {
-		for (const tag of post.data.tags) {
-			const normalizedTag = tag.trim();
-
-			if (!normalizedTag) {
-				continue;
-			}
-
-			tagMap.set(normalizedTag, (tagMap.get(normalizedTag) ?? 0) + 1);
-		}
-	}
-
-	return Array.from(tagMap.entries())
-		.map(([name, count]) => ({
-			name,
-			count,
-			slug: toParamSlug(name),
-		}))
-		.sort((a, b) => a.name.localeCompare(b.name, 'zh-CN'));
-};
-
 export const getAllDocCategories = async () => {
 	const docs = await getSortedDocs();
 	const categoryMap = new Map<string, number>();
