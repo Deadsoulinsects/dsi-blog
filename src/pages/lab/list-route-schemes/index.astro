@@ -1,0 +1,285 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import { listRouteSchemes } from '../../../data/listRouteSchemes';
+import { withBase } from '../../../utils/paths';
+
+const base = import.meta.env.BASE_URL;
+const mainlineScheme = listRouteSchemes.find((scheme) => scheme.branch === 'mainline');
+const orderSchemes = listRouteSchemes.filter((scheme) => scheme.branch === 'order').sort((left, right) => left.tier - right.tier);
+const atmosphereSchemes = listRouteSchemes.filter((scheme) => scheme.branch === 'atmosphere').sort((left, right) => left.tier - right.tier);
+
+if (!mainlineScheme || orderSchemes.length !== 2 || atmosphereSchemes.length !== 2) {
+	throw new Error('Unexpected list route scheme hierarchy.');
+}
+---
+
+<Layout title="五条后续路线 | Dead Soul Insects" description="从 A / B / C 关系继续长出来的五条实验路线页面。" canonicalPath="/lab/list-route-schemes/" hideChrome={true}>
+	<div class="route-index-shell">
+		<section class="hero-card">
+			<p class="eyebrow">第二轮母版之后</p>
+			<h1>这次不再是五个并列方案，而是一棵可读的路线树</h1>
+			<p class="lead">A 现在已经是正式内容页主线，C 退回为秩序增强支线，B 退回为局部氛围支线。这一组页面的目的，就是把“当前升级 / 两条过渡 / 两条更远新路”真正做成可打开、可比较、可复盘的实验家族。</p>
+			<div class="hero-actions">
+				<a class="back-link" href={withBase(base, '/lab/list-masters/')}>回看第二轮母版</a>
+				<a class="back-link subtle" href={withBase(base, `/lab/list-route-schemes/${mainlineScheme.slug}/`)}>先看 A 当前升级</a>
+			</div>
+		</section>
+
+		<section class="map-card" aria-label="五条路线层级图">
+			<article class="root-card">
+				<p class="node-label">主根</p>
+				<h2>{mainlineScheme.routeLabel}</h2>
+				<p>{mainlineScheme.name}</p>
+				<p class="node-copy">{mainlineScheme.summary}</p>
+				<a href={withBase(base, `/lab/list-route-schemes/${mainlineScheme.slug}/`)}>进入主线样页 →</a>
+			</article>
+
+			<div class="branch-grid">
+				<section class="branch-lane">
+					<header>
+						<p class="node-label">秩序增强支线</p>
+						<h3>C 路径</h3>
+					</header>
+					{orderSchemes.map((scheme) => (
+						<a class="branch-card" href={withBase(base, `/lab/list-route-schemes/${scheme.slug}/`)}>
+							<p class="card-route">{scheme.routeLabel}</p>
+							<h4>{scheme.name}</h4>
+							<p>{scheme.summary}</p>
+						</a>
+					))}
+				</section>
+
+				<section class="branch-lane">
+					<header>
+						<p class="node-label">局部氛围支线</p>
+						<h3>B 路径</h3>
+					</header>
+					{atmosphereSchemes.map((scheme) => (
+						<a class="branch-card" href={withBase(base, `/lab/list-route-schemes/${scheme.slug}/`)}>
+							<p class="card-route">{scheme.routeLabel}</p>
+							<h4>{scheme.name}</h4>
+							<p>{scheme.summary}</p>
+						</a>
+					))}
+				</section>
+			</div>
+		</section>
+
+		<section class="principle-grid">
+			<article>
+				<h2>先看主线能不能再长</h2>
+				<p>A 现在已经是正式生产主线，所以第一张页不是“新风格提案”，而是把当前语言继续收紧的样页。</p>
+			</article>
+			<article>
+				<h2>过渡页负责解释迁移</h2>
+				<p>两条过渡页不争正式位，它们的意义是让维护者看见：往 C 或往 B 借语言时，应该先借到哪一层。</p>
+			</article>
+			<article>
+				<h2>更远新路只留在实验层</h2>
+				<p>C 新路和 B 新路都故意走得更远，用来验证边界，不直接同步到生产路由。</p>
+			</article>
+		</section>
+
+		<section class="route-grid" aria-label="路线明细卡片">
+			{listRouteSchemes.map((scheme) => (
+				<a class="route-card" href={withBase(base, `/lab/list-route-schemes/${scheme.slug}/`)}>
+					<p class="card-route">{scheme.routeLabel}</p>
+					<h2>{scheme.name}</h2>
+					<p>{scheme.thesis}</p>
+					<ul>
+						<li><strong>来源：</strong>{scheme.derivedFrom}</li>
+						<li><strong>位置：</strong>{scheme.pathLabel}</li>
+						<li><strong>边界：</strong>{scheme.usageBoundary}</li>
+					</ul>
+					<span class="jump-link">进入这条路线 →</span>
+				</a>
+			))}
+		</section>
+	</div>
+</Layout>
+
+<style>
+	.route-index-shell {
+		display: grid;
+		gap: 22px;
+	}
+
+	.hero-card,
+	.map-card,
+	.principle-grid article,
+	.route-card,
+	.root-card,
+	.branch-card,
+	.branch-lane {
+		border: 1px solid var(--line);
+		border-radius: 28px;
+		background: linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0)), var(--panel);
+		box-shadow: var(--shadow);
+		backdrop-filter: var(--glass-blur);
+	}
+
+	.hero-card,
+	.map-card,
+	.root-card,
+	.branch-lane,
+	.route-card {
+		padding: 24px;
+	}
+
+	.hero-card,
+	.map-card,
+	.root-card,
+	.branch-lane,
+	.route-card,
+	.branch-card,
+	.principle-grid article {
+		display: grid;
+		gap: 14px;
+	}
+
+	.hero-actions,
+	.branch-grid,
+	.route-grid,
+	.principle-grid {
+		display: grid;
+		gap: 16px;
+	}
+
+	.branch-grid,
+	.principle-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.route-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.hero-actions {
+		grid-template-columns: repeat(2, max-content);
+	}
+
+	.eyebrow,
+	.node-label,
+	.card-route {
+		margin: 0;
+		font-size: 0.82rem;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--accent-soft);
+	}
+
+	h1,
+	h2,
+	h3,
+	h4,
+	p,
+	span,
+	ul,
+	li {
+		margin: 0;
+		overflow-wrap: anywhere;
+	}
+
+	h1 {
+		font-size: clamp(2.2rem, 4.8vw, 4rem);
+		line-height: 1.02;
+		max-width: 13ch;
+	}
+
+	h2 {
+		font-size: clamp(1.3rem, 2.2vw, 1.8rem);
+		line-height: 1.14;
+	}
+
+	h3,
+	h4 {
+		font-size: clamp(1.08rem, 2vw, 1.36rem);
+		line-height: 1.2;
+	}
+
+	p,
+	li,
+	span {
+		line-height: 1.72;
+		color: var(--text-soft);
+	}
+
+	.lead {
+		max-width: 58rem;
+		font-size: 1.04rem;
+	}
+
+	.map-card {
+		gap: 18px;
+	}
+
+	.root-card {
+		border-color: rgba(153, 176, 255, 0.24);
+	}
+
+	.root-card a,
+	.branch-card,
+	.back-link,
+	.jump-link {
+		display: inline-flex;
+		justify-self: start;
+		align-items: center;
+		padding: 7px 12px;
+		border-radius: 999px;
+		border: 1px solid rgba(153, 176, 255, 0.16);
+		background: rgba(255, 255, 255, 0.04);
+		color: var(--text-soft);
+		text-decoration: none;
+	}
+
+	.branch-lane {
+		align-content: start;
+	}
+
+	.branch-card {
+		border-radius: 20px;
+		padding: 18px;
+		display: grid;
+		gap: 10px;
+	}
+
+	.route-card {
+		text-decoration: none;
+		color: inherit;
+	}
+
+	.route-card ul {
+		padding-left: 18px;
+		display: grid;
+		gap: 8px;
+	}
+
+	.route-card:is(:hover, :focus-visible),
+	.branch-card:is(:hover, :focus-visible),
+	.root-card a:is(:hover, :focus-visible),
+	.back-link:is(:hover, :focus-visible) {
+		border-color: var(--hover-border);
+		box-shadow: 0 18px 36px rgba(0, 0, 0, 0.18);
+	}
+
+	.back-link.subtle {
+		background: rgba(255, 255, 255, 0.025);
+	}
+
+	.route-card:focus-visible,
+	.branch-card:focus-visible,
+	.back-link:focus-visible,
+	.root-card a:focus-visible {
+		outline: var(--focus-ring);
+		outline-offset: var(--focus-offset);
+	}
+
+	@media (max-width: 960px) {
+		.branch-grid,
+		.route-grid,
+		.principle-grid,
+		.hero-actions {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

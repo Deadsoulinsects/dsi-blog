@@ -1,0 +1,62 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import ListRouteSchemeView from '../../../components/ListRouteSchemeView.astro';
+import { listRouteSchemeMap, listRouteSchemes } from '../../../data/listRouteSchemes';
+import { formatDate, formatDateTime, getAllDocCategories, getArchiveGroups, getSortedPosts } from '../../../utils/content';
+import { getTopicGroups } from '../../../utils/topics';
+
+export async function getStaticPaths() {
+	return listRouteSchemes.map((scheme) => ({
+		params: { scheme: scheme.slug },
+		props: { schemeSlug: scheme.slug },
+	}));
+}
+
+const { schemeSlug } = Astro.props;
+const scheme = listRouteSchemeMap.get(schemeSlug);
+
+if (!scheme) {
+	throw new Error(`Unknown list route scheme: ${schemeSlug}`);
+}
+
+const posts = await getSortedPosts();
+const topics = getTopicGroups(posts)
+	.slice(0, 3)
+	.map((topic) => ({
+		name: topic.name,
+		description: topic.description,
+		count: topic.posts.length,
+		href: `/blog/topics/${topic.slug}/`,
+	}));
+
+const postPreviews = posts.slice(0, 6).map((post) => ({
+	title: post.data.title,
+	description: post.data.description,
+	dateLabel: formatDate(post.data.pubDate),
+	dateTime: formatDateTime(post.data.pubDate),
+	topic: post.data.topic.trim() || undefined,
+	href: `/blog/${post.id}/`,
+}));
+
+const categories = (await getAllDocCategories()).slice(0, 8).map((category) => ({
+	name: category.name,
+	count: category.count,
+	href: `/categories/${category.slug}/`,
+}));
+
+const archiveGroups = (await getArchiveGroups()).slice(0, 3).map((group) => ({
+	year: group.year,
+	items: group.items.slice(0, 4).map((item) => ({
+		title: item.data.title,
+		dateLabel: formatDate(item.data.pubDate),
+		dateTime: formatDateTime(item.data.pubDate),
+		href: `/blog/${item.id}/`,
+	})),
+}));
+
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout title={`${scheme.name} | 五条后续路线 | Dead Soul Insects`} description={scheme.thesis} canonicalPath={`/lab/list-route-schemes/${scheme.slug}/`} hideChrome={true}>
+	<ListRouteSchemeView scheme={scheme} topics={topics} posts={postPreviews} categories={categories} archiveGroups={archiveGroups} base={base} />
+</Layout>

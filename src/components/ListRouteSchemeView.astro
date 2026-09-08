@@ -1,0 +1,1244 @@
+---
+import type { ListRouteScheme } from '../data/listRouteSchemes';
+import { withBase } from '../utils/paths';
+
+interface TopicPreview {
+	name: string;
+	description?: string;
+	count: number;
+	href: string;
+}
+
+interface PostPreview {
+	title: string;
+	description: string;
+	dateLabel: string;
+	dateTime: string;
+	topic?: string;
+	href: string;
+}
+
+interface CategoryPreview {
+	name: string;
+	count: number;
+	href: string;
+}
+
+interface ArchivePreview {
+	year: string;
+	items: Array<{
+		title: string;
+		dateLabel: string;
+		dateTime: string;
+		href: string;
+	}>;
+}
+
+interface Props {
+	scheme: ListRouteScheme;
+	topics: TopicPreview[];
+	posts: PostPreview[];
+	categories: CategoryPreview[];
+	archiveGroups: ArchivePreview[];
+	base: string;
+}
+
+const { scheme, topics, posts, categories, archiveGroups, base } = Astro.props;
+
+const styleVars = Object.entries(scheme.tokens)
+	.map(([key, value]) => `${key}: ${value}`)
+	.join('; ');
+
+const secondaryArchives = archiveGroups.slice(1);
+---
+
+<section class:list={['scheme-shell', `layout-${scheme.layout}`]} style={styleVars}>
+	<div class="scheme-ambient" aria-hidden="true"></div>
+
+	<header class="surface scheme-intro">
+		<div class="intro-actions">
+			<a class="back-link" href={withBase(base, '/lab/list-route-schemes/')}>返回路线总览</a>
+			<a class="back-link subtle" href={withBase(base, '/lab/list-masters/')}>回看第二轮母版</a>
+		</div>
+
+		<div class="path-chip">
+			<span>路线树</span>
+			<strong>{scheme.pathLabel}</strong>
+		</div>
+
+		<p class="eyebrow">{scheme.routeLabel}</p>
+		<h1>{scheme.name}</h1>
+		<p class="summary">{scheme.summary}</p>
+		<p class="thesis">{scheme.thesis}</p>
+	</header>
+
+	<section class="descriptor-grid">
+		<article class="surface descriptor-card">
+			<p class="label">路线位置</p>
+			<p>{scheme.branchLabel}</p>
+		</article>
+		<article class="surface descriptor-card">
+			<p class="label">来源母体</p>
+			<p>{scheme.derivedFrom}</p>
+		</article>
+		<article class="surface descriptor-card">
+			<p class="label">开场方式</p>
+			<p>{scheme.opening}</p>
+		</article>
+		<article class="surface descriptor-card">
+			<p class="label">卡片原型</p>
+			<p>{scheme.cardArchetype}</p>
+		</article>
+		<article class="surface descriptor-card">
+			<p class="label">分组方式</p>
+			<p>{scheme.grouping}</p>
+		</article>
+		<article class="surface descriptor-card">
+			<p class="label">元信息角色</p>
+			<p>{scheme.metadataRole}</p>
+		</article>
+		<article class="surface descriptor-card">
+			<p class="label">使用边界</p>
+			<p>{scheme.usageBoundary}</p>
+		</article>
+		<article class="surface descriptor-card">
+			<p class="label">迁移提醒</p>
+			<p>{scheme.migrationHint}</p>
+		</article>
+	</section>
+
+	<section class="surface route-note">
+		<p class="label">配色说明</p>
+		<p>{scheme.paletteNote}</p>
+	</section>
+
+	{scheme.layout === 'baseline' && (
+		<section class="baseline-frame">
+			<section class="surface baseline-head">
+				<div class="section-copy">
+					<p class="section-kicker">正式主线继续收紧</p>
+					<h2>还是先看专题，再继续按时间浏览</h2>
+					<p>这条路线故意保留正式 A 页的熟悉阅读秩序，只把侧轨、索引和导语的关系重新梳理，让它更像一个完整家族，而不是几张各自成立的页面。</p>
+				</div>
+
+				<div class="stat-grid">
+					<div>
+						<span>专题入口</span>
+						<strong>{topics.length}</strong>
+					</div>
+					<div>
+						<span>预览文章</span>
+						<strong>{posts.length}</strong>
+					</div>
+					<div>
+						<span>分类索引</span>
+						<strong>{categories.length}</strong>
+					</div>
+					<div>
+						<span>归档年份</span>
+						<strong>{archiveGroups.length}</strong>
+					</div>
+				</div>
+			</section>
+
+			<div class="baseline-columns">
+				<section class="surface baseline-main">
+					<div class="section-row">
+						<p class="section-kicker">专题入口</p>
+						<h3>先沿着已经成形的线索进入</h3>
+					</div>
+					<div class="stack-list">
+						{topics.map((topic) => (
+							<a class="link-card stable-link" href={withBase(base, topic.href)}>
+								<div>
+									<h4>{topic.name}</h4>
+									<p>{topic.description ?? '继续沿着同一条记录线索往下看。'}</p>
+								</div>
+								<span>{topic.count}</span>
+							</a>
+						))}
+					</div>
+				</section>
+
+				<aside class="surface baseline-rail">
+					<div class="section-row compact">
+						<p class="section-kicker">辅助侧轨</p>
+						<h3>让索引与归档先承担辅助阅读</h3>
+					</div>
+
+					<div class="mini-grid">
+						{categories.slice(0, 4).map((category) => (
+							<a class="mini-chip" href={withBase(base, category.href)}>
+								<span>{category.name}</span>
+								<strong>{category.count}</strong>
+							</a>
+						))}
+					</div>
+
+					{secondaryArchives.map((group) => (
+						<section class="archive-panel">
+							<div class="archive-head">
+								<strong>{group.year}</strong>
+								<span>{group.items.length} 条</span>
+							</div>
+							<ul>
+								{group.items.slice(0, 2).map((item) => (
+									<li><a href={withBase(base, item.href)}>{item.title}</a></li>
+								))}
+							</ul>
+						</section>
+					))}
+				</aside>
+			</div>
+
+			<section class="surface baseline-posts">
+				<div class="section-row">
+					<p class="section-kicker">主列表</p>
+					<h3>让正式内容页家族看起来更像同一套系统</h3>
+				</div>
+				<div class="stack-list wide-gap">
+					{posts.map((post) => (
+						<a class="link-card post-link" href={withBase(base, post.href)}>
+							<div class="post-meta-row">
+								<time datetime={post.dateTime}>{post.dateLabel}</time>
+								{post.topic && <em>{post.topic}</em>}
+							</div>
+							<div class="section-copy compact-gap">
+								<h4>{post.title}</h4>
+								<p>{post.description}</p>
+							</div>
+						</a>
+					))}
+				</div>
+			</section>
+		</section>
+	)}
+
+	{scheme.layout === 'c-bridge' && (
+		<section class="c-bridge-frame">
+			<section class="surface c-bridge-head">
+				<div class="section-copy">
+					<p class="section-kicker">过渡方法</p>
+					<h2>先给 A 增加章节感，再让 C 的编目语言慢慢进来</h2>
+				</div>
+				<div class="step-grid">
+					<article>
+						<span class="step-no">01</span>
+						<p>先保留正式页的基本壳层，不重新发明入口逻辑。</p>
+					</article>
+					<article>
+						<span class="step-no">02</span>
+						<p>再让编号、章节牌、编目栏介入信息组织。</p>
+					</article>
+					<article>
+						<span class="step-no">03</span>
+						<p>最后观察秩序增强是否真的提高了可读性，而不只是看起来更“设计”。</p>
+					</article>
+				</div>
+			</section>
+
+			<section class="c-bridge-grid">
+				<section class="surface chapter-stack">
+					<div class="section-row compact">
+						<p class="section-kicker">章节牌</p>
+						<h3>专题开始像展区入口</h3>
+					</div>
+					{topics.map((topic, index) => (
+						<a class="chapter-ticket" href={withBase(base, topic.href)}>
+							<span class="ticket-no">{String.fromCharCode(65 + index)}</span>
+							<div>
+								<strong>{topic.name}</strong>
+								<p>{topic.description ?? '顺着这一条内容线索继续进入。'}</p>
+							</div>
+							<span>{topic.count}</span>
+						</a>
+					))}
+				</section>
+
+				<section class="surface registry-stack">
+					<div class="section-row compact">
+						<p class="section-kicker">主登记</p>
+						<h3>文章开始带着序号进入秩序系统</h3>
+					</div>
+					<div class="registry-list">
+						{posts.map((post, index) => (
+							<a class="registry-card" href={withBase(base, post.href)}>
+								<div class="registry-index">{String(index + 1).padStart(2, '0')}</div>
+								<div class="section-copy compact-gap">
+									<div class="post-meta-row">
+										<time datetime={post.dateTime}>{post.dateLabel}</time>
+										{post.topic && <em>{post.topic}</em>}
+									</div>
+									<h4>{post.title}</h4>
+									<p>{post.description}</p>
+								</div>
+							</a>
+						))}
+					</div>
+				</section>
+
+				<aside class="surface catalog-rail">
+					<div class="section-row compact">
+						<p class="section-kicker">编目栏</p>
+						<h3>分类与归档开始直接参与布局</h3>
+					</div>
+					<div class="mini-grid tall-grid">
+						{categories.slice(0, 6).map((category) => (
+							<a class="mini-chip" href={withBase(base, category.href)}>
+								<span>{category.name}</span>
+								<strong>{category.count}</strong>
+							</a>
+						))}
+					</div>
+
+					{archiveGroups.slice(0, 2).map((group) => (
+						<div class="ledger-group">
+							<div class="archive-head">
+								<strong>{group.year}</strong>
+								<span>{group.items.length} 条</span>
+							</div>
+							<ul>
+								{group.items.slice(0, 3).map((item) => (
+									<li>
+										<time datetime={item.dateTime}>{item.dateLabel}</time>
+										<a href={withBase(base, item.href)}>{item.title}</a>
+									</li>
+								))}
+							</ul>
+						</div>
+					))}
+				</aside>
+			</section>
+		</section>
+	)}
+
+	{scheme.layout === 'b-bridge' && (
+		<section class="b-bridge-frame">
+			<section class="surface b-bridge-hero">
+				<div class="mist-band" aria-hidden="true"></div>
+				<div class="section-copy">
+					<p class="section-kicker">局部氛围接入</p>
+					<h2>骨架还是 A，但内容开始被空气轻轻托起来</h2>
+					<p>这条过渡路线故意不大改正式页的骨架，只让卡片、注记和背景层之间的关系变轻，让维护者判断 B 的语言到底适合回收到什么程度。</p>
+				</div>
+				<div class="ribbon-list">
+					{topics.slice(0, 2).map((topic) => (
+						<a class="ribbon-link" href={withBase(base, topic.href)}>
+							<strong>{topic.name}</strong>
+							<span>{topic.count} 篇</span>
+						</a>
+					))}
+				</div>
+			</section>
+
+			<div class="b-bridge-columns">
+				<section class="surface drift-grid">
+					<div class="section-row compact">
+						<p class="section-kicker">轻悬主列表</p>
+						<h3>内容块开始拥有更不平均的呼吸</h3>
+					</div>
+					<div class="drift-post-grid">
+						{posts.map((post, index) => (
+							<a class:list={['drift-post', { feature: index === 0 }]} href={withBase(base, post.href)}>
+								<div class="post-meta-row">
+									<time datetime={post.dateTime}>{post.dateLabel}</time>
+									{post.topic && <em>{post.topic}</em>}
+								</div>
+								<h4>{post.title}</h4>
+								<p>{post.description}</p>
+							</a>
+						))}
+					</div>
+				</section>
+
+				<aside class="surface atmosphere-rail">
+					<div class="section-row compact">
+						<p class="section-kicker">附着标记</p>
+						<h3>分类不再只像硬标签</h3>
+					</div>
+					<div class="tag-cloud">
+						{categories.slice(0, 6).map((category) => <a href={withBase(base, category.href)}>{category.name}</a>)}
+					</div>
+
+					{archiveGroups.slice(0, 2).map((group) => (
+						<section class="tide-group">
+							<div class="archive-head">
+								<strong>{group.year}</strong>
+								<span>{group.items.length} 条</span>
+							</div>
+							<div class="tide-links">
+								{group.items.slice(0, 2).map((item) => <a href={withBase(base, item.href)}>{item.title}</a>)}
+							</div>
+						</section>
+					))}
+				</aside>
+			</div>
+		</section>
+	)}
+
+	{scheme.layout === 'c-grown' && (
+		<section class="c-grown-frame">
+			<section class="surface c-grown-intro">
+				<div class="section-copy">
+					<p class="section-kicker">更强秩序验证</p>
+					<h2>让章节、编号与编目本身变成页面气质</h2>
+					<p>这条路比 A 更远，也比过渡页更强。它不是说所有正式页都该这样，而是用真实内容检验：当结构密度持续上升时，页面会不会仍然可读、可维护。</p>
+				</div>
+				<div class="step-grid">
+					<article>
+						<span class="step-no">A</span>
+						<p>专题入口作为章节牌，先立区。</p>
+					</article>
+					<article>
+						<span class="step-no">B</span>
+						<p>主条目进入展签系统，顺序被显性化。</p>
+					</article>
+					<article>
+						<span class="step-no">C</span>
+						<p>分类与归档变成编目和回看目录，而不是附属边栏。</p>
+					</article>
+				</div>
+			</section>
+
+			<section class="c-grown-grid">
+				<section class="surface c-grown-topics">
+					<div class="section-row compact">
+						<p class="section-kicker">章节牌</p>
+						<h3>每条主题都先获得身份</h3>
+					</div>
+					{topics.map((topic, index) => (
+						<a class="chapter-ticket strong-ticket" href={withBase(base, topic.href)}>
+							<span class="ticket-no">{String(index + 1).padStart(2, '0')}</span>
+							<div>
+								<strong>{topic.name}</strong>
+								<p>{topic.description ?? '从章节牌进入，再向内查看具体内容。'}</p>
+							</div>
+						</a>
+					))}
+				</section>
+
+				<section class="surface c-grown-registry">
+					<div class="section-row compact">
+						<p class="section-kicker">展签主表</p>
+						<h3>条目不再只是列表，而是被系统性陈列</h3>
+					</div>
+					<div class="registry-chapters">
+						<section class="registry-chapter">
+							<div class="chapter-head">
+								<span class="step-no">I</span>
+								<div>
+									<h4>前排目录</h4>
+									<p>优先展示更适合作为入口的内容。</p>
+								</div>
+							</div>
+							<div class="registry-list compact-list">
+								{posts.slice(0, 3).map((post, index) => (
+									<a class="registry-card" href={withBase(base, post.href)}>
+										<div class="registry-index">{String(index + 1).padStart(2, '0')}</div>
+										<div class="section-copy compact-gap">
+											<div class="post-meta-row">
+												<time datetime={post.dateTime}>{post.dateLabel}</time>
+												{post.topic && <em>{post.topic}</em>}
+											</div>
+											<h4>{post.title}</h4>
+											<p>{post.description}</p>
+										</div>
+									</a>
+								))}
+							</div>
+						</section>
+
+						<section class="registry-chapter">
+							<div class="chapter-head">
+								<span class="step-no">II</span>
+								<div>
+									<h4>深层条目</h4>
+									<p>继续保留时间与主题，让回看路径更明确。</p>
+								</div>
+							</div>
+							<div class="registry-list compact-list">
+								{posts.slice(3, 6).map((post, index) => (
+									<a class="registry-card" href={withBase(base, post.href)}>
+										<div class="registry-index">{String(index + 4).padStart(2, '0')}</div>
+										<div class="section-copy compact-gap">
+											<div class="post-meta-row">
+												<time datetime={post.dateTime}>{post.dateLabel}</time>
+												{post.topic && <em>{post.topic}</em>}
+											</div>
+											<h4>{post.title}</h4>
+											<p>{post.description}</p>
+										</div>
+									</a>
+								))}
+							</div>
+						</section>
+					</div>
+				</section>
+
+				<aside class="surface c-grown-ledger">
+					<div class="section-row compact">
+						<p class="section-kicker">编目与回看</p>
+						<h3>侧栏本身也是结构主体</h3>
+					</div>
+					<div class="mini-grid tall-grid">
+						{categories.slice(0, 6).map((category) => (
+							<a class="mini-chip" href={withBase(base, category.href)}>
+								<span>{category.name}</span>
+								<strong>{category.count}</strong>
+							</a>
+						))}
+					</div>
+
+					{archiveGroups.slice(0, 3).map((group) => (
+						<section class="ledger-group dense-ledger">
+							<div class="archive-head">
+								<strong>{group.year}</strong>
+								<span>{group.items.length} 条</span>
+							</div>
+							<ul>
+								{group.items.slice(0, 3).map((item) => (
+									<li>
+										<time datetime={item.dateTime}>{item.dateLabel}</time>
+										<a href={withBase(base, item.href)}>{item.title}</a>
+									</li>
+								))}
+							</ul>
+						</section>
+					))}
+				</aside>
+			</section>
+		</section>
+	)}
+
+	{scheme.layout === 'b-grown' && (
+		<section class="b-grown-frame">
+			<section class="surface b-grown-hero">
+				<div class="tide-orb" aria-hidden="true"></div>
+				<div class="section-copy">
+					<p class="section-kicker">更强氛围验证</p>
+					<h2>让夜色、漂移和停泊点一起决定阅读动线</h2>
+					<p>这条路不再按正式页的稳定壳层组织，而是直接用几簇真实内容去验证：当漂浮关系被放大以后，页面还能不能保持内容中心与阅读节奏。</p>
+				</div>
+				<div class="hero-mark-cloud">
+					{categories.slice(0, 4).map((category) => <a href={withBase(base, category.href)}>{category.name}</a>)}
+				</div>
+			</section>
+
+			<section class="b-grown-drift">
+				{posts.map((post, index) => (
+					<a class:list={['drift-cluster', `cluster-${index + 1}`, { emphasis: index === 0 || index === 3 }]} href={withBase(base, post.href)}>
+						<div class="post-meta-row">
+							<time datetime={post.dateTime}>{post.dateLabel}</time>
+							{post.topic && <em>{post.topic}</em>}
+						</div>
+						<h3>{post.title}</h3>
+						<p>{post.description}</p>
+					</a>
+				))}
+			</section>
+
+			<section class="b-grown-bottom">
+				<section class="surface b-grown-topics">
+					<div class="section-row compact">
+						<p class="section-kicker">停泊点</p>
+						<h3>专题像几处更稳定的靠岸位置</h3>
+					</div>
+					<div class="ribbon-stack">
+						{topics.map((topic) => (
+							<a class="ribbon-link" href={withBase(base, topic.href)}>
+								<div>
+									<strong>{topic.name}</strong>
+									<p>{topic.description ?? '顺着一条更明确的线索继续进入。'}</p>
+								</div>
+								<span>{topic.count}</span>
+							</a>
+						))}
+					</div>
+				</section>
+
+				<section class="surface b-grown-archive">
+					<div class="section-row compact">
+						<p class="section-kicker">回潮簿</p>
+						<h3>归档不再像冷表，而像潮线回流</h3>
+					</div>
+					{archiveGroups.slice(0, 2).map((group) => (
+						<div class="tide-group dense-tide">
+							<div class="archive-head">
+								<strong>{group.year}</strong>
+								<span>{group.items.length} 条</span>
+							</div>
+							<div class="tide-links stacked-links">
+								{group.items.slice(0, 3).map((item) => (
+									<a href={withBase(base, item.href)}>
+										<time datetime={item.dateTime}>{item.dateLabel}</time>
+										<span>{item.title}</span>
+									</a>
+								))}
+							</div>
+						</div>
+					))}
+				</section>
+			</section>
+		</section>
+	)}
+</section>
+
+<style>
+	.scheme-shell {
+		position: relative;
+		display: grid;
+		gap: clamp(24px, 3vw, 34px);
+		color: var(--route-text);
+	}
+
+	.scheme-ambient {
+		position: fixed;
+		inset: 0;
+		z-index: -1;
+		pointer-events: none;
+		background:
+			radial-gradient(circle at 12% 12%, var(--route-glow), transparent 30%),
+			radial-gradient(circle at 82% 16%, color-mix(in srgb, var(--route-accent) 12%, transparent), transparent 26%),
+			linear-gradient(180deg, var(--route-bg-soft) 0%, var(--route-bg) 100%);
+	}
+
+	.surface,
+	.link-card,
+	.chapter-ticket,
+	.registry-card,
+	.drift-post,
+	.drift-cluster,
+	.ribbon-link,
+	.mini-chip,
+	.tag-cloud a,
+	.hero-mark-cloud a,
+	.tide-links a {
+		position: relative;
+		border: 1px solid var(--route-line);
+		background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0)), var(--route-panel);
+		box-shadow: var(--route-shadow);
+		backdrop-filter: blur(16px);
+		box-sizing: border-box;
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.surface {
+		padding: clamp(20px, 3vw, 30px);
+		border-radius: 28px;
+	}
+
+	.link-card,
+	.chapter-ticket,
+	.registry-card,
+	.drift-post,
+	.drift-cluster {
+		padding: 18px 20px;
+		border-radius: 20px;
+	}
+
+	.mini-chip,
+	.ribbon-link,
+	.tag-cloud a,
+	.hero-mark-cloud a,
+	.tide-links a {
+		padding: 12px 14px;
+		border-radius: 999px;
+	}
+
+	.scheme-intro,
+	.descriptor-grid,
+	.baseline-frame,
+	.c-bridge-frame,
+	.b-bridge-frame,
+	.c-grown-frame,
+	.b-grown-frame,
+	.baseline-columns,
+	.b-bridge-columns,
+	.c-bridge-grid,
+	.c-grown-grid,
+	.b-grown-bottom,
+	.registry-chapters,
+	.b-grown-drift,
+	.step-grid,
+	.stack-list,
+	.registry-list,
+	.mini-grid,
+		.tag-cloud,
+		.hero-mark-cloud,
+		.tide-links,
+	.drift-post-grid,
+	.ribbon-stack,
+	.stat-grid,
+	.descriptor-card,
+	.archive-panel,
+	.ledger-group,
+	.tide-group {
+		display: grid;
+		gap: 16px;
+	}
+
+	.section-copy,
+	.descriptor-card,
+	.route-note,
+	.chapter-head {
+		display: grid;
+		gap: 10px;
+	}
+
+	.intro-actions,
+	.path-chip,
+	.post-meta-row,
+	.section-row,
+	.archive-head,
+	.chapter-ticket,
+	.mini-chip,
+	.ribbon-link,
+	.chapter-head {
+		display: flex;
+		gap: 12px;
+		justify-content: space-between;
+		align-items: start;
+	}
+
+	.eyebrow,
+	.section-kicker,
+	.label,
+	.step-no,
+	.ticket-no {
+		margin: 0;
+		font-size: 0.8rem;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--route-accent-soft);
+	}
+
+	h1,
+	h2,
+	h3,
+	h4,
+	p,
+	span,
+	strong,
+	em,
+	time,
+	ul,
+	li {
+		margin: 0;
+		overflow-wrap: anywhere;
+	}
+
+	h1 {
+		font-size: clamp(2.3rem, 5vw, 4.6rem);
+		line-height: 0.98;
+		max-width: 10ch;
+	}
+
+	h2 {
+		font-size: clamp(1.55rem, 3vw, 2.2rem);
+		line-height: 1.08;
+	}
+
+	h3 {
+		font-size: clamp(1.16rem, 2vw, 1.42rem);
+		line-height: 1.18;
+	}
+
+	h4,
+	.chapter-ticket strong,
+	.ribbon-link strong {
+		font-size: 1.04rem;
+		line-height: 1.24;
+	}
+
+	p,
+	span,
+	time,
+	em,
+	li {
+		line-height: 1.7;
+		color: var(--route-text-soft);
+		font-style: normal;
+	}
+
+	.summary,
+	.thesis {
+		max-width: 46rem;
+	}
+
+	.summary {
+		font-size: 1.02rem;
+		color: var(--route-text);
+	}
+
+	.path-chip {
+		justify-self: start;
+		padding: 8px 14px;
+		border: 1px solid color-mix(in srgb, var(--route-line) 86%, transparent);
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.04);
+	}
+
+	.path-chip strong,
+	.stat-grid strong,
+	.mini-chip strong,
+	.archive-head strong,
+	.ticket-no,
+	.registry-index {
+		color: var(--route-text);
+	}
+
+	.back-link {
+		display: inline-flex;
+		align-items: center;
+		padding: 7px 12px;
+		border-radius: 999px;
+		border: 1px solid var(--route-line);
+		background: rgba(255, 255, 255, 0.04);
+		color: var(--route-text-soft);
+		text-decoration: none;
+	}
+
+	.back-link.subtle {
+		background: rgba(255, 255, 255, 0.02);
+	}
+
+	.back-link:focus-visible,
+	.link-card:focus-visible,
+	.chapter-ticket:focus-visible,
+	.registry-card:focus-visible,
+	.drift-post:focus-visible,
+	.drift-cluster:focus-visible,
+	.ribbon-link:focus-visible,
+	.mini-chip:focus-visible,
+	.tag-cloud a:focus-visible,
+	.hero-mark-cloud a:focus-visible,
+	.tide-links a:focus-visible {
+		outline: 2px solid var(--route-accent-soft);
+		outline-offset: 3px;
+	}
+
+	.descriptor-grid {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+
+	.descriptor-card,
+	.route-note {
+		box-shadow: 0 16px 34px rgba(0, 0, 0, 0.18);
+	}
+
+	.route-note {
+		padding: 18px 22px;
+	}
+
+	.section-row.compact {
+		align-items: end;
+	}
+
+	.compact-gap {
+		gap: 8px;
+	}
+
+	.wide-gap {
+		gap: 18px;
+	}
+
+	.stat-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.stat-grid > div {
+		display: grid;
+		gap: 8px;
+		padding: 16px 18px;
+		border: 1px solid color-mix(in srgb, var(--route-line) 84%, transparent);
+		border-radius: 20px;
+		background: color-mix(in srgb, var(--route-panel-strong) 82%, transparent);
+	}
+
+	.baseline-columns {
+		grid-template-columns: minmax(0, 1.25fr) minmax(18rem, 0.8fr);
+	}
+
+	.mini-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.mini-chip {
+		min-height: 3.2rem;
+	}
+
+	.stack-list,
+	.registry-list.compact-list,
+	.ribbon-stack {
+		grid-template-columns: 1fr;
+	}
+
+	.link-card,
+	.post-link {
+		transition:
+			transform 0.2s ease,
+			border-color 0.2s ease,
+			box-shadow 0.2s ease,
+			background 0.2s ease;
+	}
+
+	.link-card:is(:hover, :focus-visible),
+	.chapter-ticket:is(:hover, :focus-visible),
+	.registry-card:is(:hover, :focus-visible),
+	.drift-post:is(:hover, :focus-visible),
+	.drift-cluster:is(:hover, :focus-visible),
+	.ribbon-link:is(:hover, :focus-visible),
+	.mini-chip:is(:hover, :focus-visible),
+	.tag-cloud a:is(:hover, :focus-visible),
+	.hero-mark-cloud a:is(:hover, :focus-visible),
+	.tide-links a:is(:hover, :focus-visible) {
+		transform: translateY(-2px);
+		border-color: var(--route-line-strong);
+		box-shadow: 0 14px 28px rgba(0, 0, 0, 0.18);
+		background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0)), var(--route-panel-strong);
+	}
+
+	.post-meta-row {
+		justify-content: flex-start;
+		align-items: center;
+		gap: 10px 16px;
+		flex-wrap: wrap;
+	}
+
+	.post-meta-row em,
+	.time-tag {
+		padding: 2px 10px;
+		border: 1px solid color-mix(in srgb, var(--route-line) 88%, transparent);
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.03);
+		line-height: 1.5;
+	}
+
+	.archive-panel,
+	.ledger-group,
+	.tide-group {
+		padding: 18px;
+		border: 1px solid color-mix(in srgb, var(--route-line) 82%, transparent);
+		border-radius: 20px;
+		background: color-mix(in srgb, var(--route-panel-strong) 78%, transparent);
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.022);
+	}
+
+	.archive-panel ul,
+	.ledger-group ul {
+		padding: 0;
+		list-style: none;
+		display: grid;
+		gap: 8px;
+	}
+
+	.archive-panel li a,
+	.ledger-group li a {
+		color: var(--route-text);
+		text-decoration: none;
+	}
+
+	.step-grid {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	.step-grid article {
+		display: grid;
+		gap: 8px;
+		padding-top: 12px;
+		border-top: 1px solid var(--route-line);
+	}
+
+	.c-bridge-grid,
+	.c-grown-grid {
+		grid-template-columns: minmax(18rem, 0.92fr) minmax(0, 1.28fr) minmax(18rem, 0.84fr);
+		align-items: start;
+	}
+
+	.chapter-stack,
+	.c-grown-topics,
+	.registry-stack,
+	.c-grown-registry,
+	.catalog-rail,
+	.c-grown-ledger,
+	.baseline-main,
+	.baseline-rail,
+	.baseline-posts,
+	.drift-grid,
+	.atmosphere-rail,
+	.b-grown-topics,
+	.b-grown-archive {
+		display: grid;
+		gap: 18px;
+	}
+
+	.chapter-ticket,
+	.registry-card {
+		gap: 16px;
+	}
+
+	.ticket-no {
+		min-width: 2.2rem;
+	}
+
+	.registry-card {
+		display: grid;
+		grid-template-columns: 3.2rem minmax(0, 1fr);
+		gap: 16px;
+	}
+
+	.registry-index {
+		font-size: 1.35rem;
+		padding-right: 12px;
+		border-right: 1px solid var(--route-line);
+	}
+
+	.tall-grid {
+		align-content: start;
+	}
+
+	.ledger-group li {
+		display: grid;
+		grid-template-columns: minmax(7rem, auto) minmax(0, 1fr);
+		gap: 12px;
+	}
+
+	.b-bridge-hero,
+	.b-grown-hero {
+		overflow: clip;
+	}
+
+	.b-bridge-hero {
+		display: grid;
+		grid-template-columns: minmax(0, 1.2fr) minmax(18rem, 0.8fr);
+		align-items: end;
+		gap: 22px;
+	}
+
+	.mist-band,
+	.tide-orb {
+		position: absolute;
+		border-radius: 999px;
+		pointer-events: none;
+	}
+
+	.mist-band {
+		inset: auto 10% 12% auto;
+		width: 18rem;
+		height: 18rem;
+		background: radial-gradient(circle, color-mix(in srgb, var(--route-accent) 26%, transparent), transparent 60%);
+		filter: blur(14px);
+	}
+
+	.ribbon-list {
+		display: grid;
+		gap: 10px;
+	}
+
+	.b-bridge-columns {
+		grid-template-columns: minmax(0, 1.18fr) minmax(18rem, 0.82fr);
+		align-items: start;
+	}
+
+	.drift-post-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 16px;
+	}
+
+	.drift-post {
+		display: grid;
+		gap: 12px;
+		min-height: 13rem;
+	}
+
+	.drift-post.feature {
+		grid-column: 1 / -1;
+		min-height: 12rem;
+	}
+
+	.tag-cloud,
+	.hero-mark-cloud {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+	}
+
+	.tide-links {
+		grid-template-columns: 1fr;
+	}
+
+	.tide-links a {
+		display: grid;
+		gap: 4px;
+	}
+
+	.c-grown-intro {
+		display: grid;
+		gap: 18px;
+	}
+
+	.strong-ticket {
+		min-height: 8.8rem;
+	}
+
+	.registry-chapters {
+		grid-template-columns: 1fr;
+	}
+
+	.registry-chapter {
+		display: grid;
+		gap: 14px;
+		padding-top: 16px;
+		border-top: 1px solid var(--route-line);
+	}
+
+	.registry-chapter:first-child {
+		padding-top: 0;
+		border-top: 0;
+	}
+
+	.dense-ledger ul {
+		gap: 10px;
+	}
+
+	.b-grown-hero {
+		min-height: 19rem;
+		display: grid;
+		gap: 18px;
+		align-content: end;
+	}
+
+	.tide-orb {
+		inset: auto 6% 14% auto;
+		width: 20rem;
+		height: 20rem;
+		background: radial-gradient(circle, color-mix(in srgb, var(--route-accent) 24%, transparent), transparent 62%);
+		filter: blur(16px);
+		opacity: 0.9;
+	}
+
+	.b-grown-drift {
+		grid-template-columns: repeat(6, minmax(0, 1fr));
+		align-items: start;
+		column-gap: 24px;
+		row-gap: 28px;
+	}
+
+	.drift-cluster {
+		display: grid;
+		gap: 12px;
+		min-height: 13rem;
+		border-radius: 24px;
+	}
+
+	.drift-cluster.emphasis {
+		min-height: 15rem;
+	}
+
+	.cluster-1 { grid-column: 1 / span 4; }
+	.cluster-2 { grid-column: 5 / span 2; margin-top: 34px; }
+	.cluster-3 { grid-column: 2 / span 2; margin-top: 8px; }
+	.cluster-4 { grid-column: 4 / span 3; margin-top: 30px; }
+	.cluster-5 { grid-column: 1 / span 3; margin-top: 14px; }
+	.cluster-6 { grid-column: 4 / span 2; margin-top: 10px; }
+
+	.b-grown-bottom {
+		grid-template-columns: minmax(0, 1fr) minmax(20rem, 0.9fr);
+		align-items: start;
+	}
+
+	.dense-tide .tide-links {
+		gap: 10px;
+	}
+
+	.stacked-links a {
+		border-radius: 18px;
+	}
+
+	@media (max-width: 1220px) {
+		.descriptor-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.c-bridge-grid,
+		.c-grown-grid {
+			grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		}
+
+		.catalog-rail,
+		.c-grown-ledger {
+			grid-column: 1 / -1;
+		}
+	}
+
+	@media (max-width: 1040px) {
+		.b-grown-drift {
+			grid-template-columns: 1fr;
+		}
+
+		.cluster-1,
+		.cluster-2,
+		.cluster-3,
+		.cluster-4,
+		.cluster-5,
+		.cluster-6 {
+			grid-column: auto;
+			margin-top: 0;
+		}
+	}
+
+	@media (max-width: 960px) {
+		.descriptor-grid,
+		.step-grid,
+		.stat-grid,
+		.baseline-columns,
+		.c-bridge-grid,
+		.b-bridge-hero,
+		.b-bridge-columns,
+		.c-grown-grid,
+		.b-grown-bottom,
+		.drift-post-grid,
+		.mini-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.registry-card {
+			grid-template-columns: 1fr;
+		}
+
+		.registry-index {
+			padding-right: 0;
+			border-right: 0;
+		}
+
+		.chapter-ticket,
+		.ribbon-link,
+		.mini-chip,
+		.post-link,
+		.link-card {
+			display: grid;
+		}
+	}
+
+	@media (max-width: 640px) {
+		.surface {
+			padding: 20px;
+		}
+
+		.link-card,
+		.chapter-ticket,
+		.registry-card,
+		.drift-post,
+		.drift-cluster {
+			padding: 18px;
+		}
+
+		.archive-panel li a,
+		.ledger-group li a {
+			display: inline-flex;
+			align-items: center;
+			min-height: 28px;
+		}
+	}
+</style>
