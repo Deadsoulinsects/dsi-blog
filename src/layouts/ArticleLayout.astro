@@ -15,7 +15,6 @@ interface Props {
 	backLabel: string;
 	dateLabel?: string;
 	dateTime?: string;
-	tags?: string[];
 	headings?: Heading[];
 	canonicalPath?: string;
 	publishedTime?: string;
@@ -29,7 +28,6 @@ const {
 	backLabel,
 	dateLabel,
 	dateTime,
-	tags = [],
 	headings = [],
 	canonicalPath,
 	publishedTime,
@@ -37,6 +35,7 @@ const {
 
 const tocHeadings = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
 const hasToc = tocHeadings.length > 0;
+const hasHeaderMeta = Boolean(dateLabel && dateTime) || hasToc;
 const articleStructuredData = canonicalPath
 	? {
 			'@context': 'https://schema.org',
@@ -61,19 +60,30 @@ const articleStructuredData = canonicalPath
 	<article class="article-shell">
 		<header class="article-header">
 			<a class="back-link" href={backHref}>← {backLabel}</a>
-			<p class="kicker">{sectionLabel}</p>
-			<h1>{title}</h1>
-			<p class="article-description">{description}</p>
-			<div class="article-meta" aria-label="文章信息">
-				{dateLabel && dateTime && <time datetime={dateTime}>{dateLabel}</time>}
+			<div class="article-heading">
+				<div class="article-copy">
+					<p class="kicker">{sectionLabel}</p>
+					<h1>{title}</h1>
+					<p class="article-description">{description}</p>
+				</div>
+
+				{hasHeaderMeta && (
+					<div class="article-meta" aria-label="文章信息">
+						{dateLabel && dateTime && (
+							<div class="meta-index-item">
+								<span class="meta-label">发布时间</span>
+								<time datetime={dateTime}>{dateLabel}</time>
+							</div>
+						)}
+						{hasToc && (
+							<div class="meta-index-item muted">
+								<span class="meta-label">目录章节</span>
+								<strong>{tocHeadings.length}</strong>
+							</div>
+						)}
+					</div>
+				)}
 			</div>
-			{tags.length > 0 && (
-				<ul class="tag-list" aria-label="标签列表">
-					{tags.map((tag) => (
-						<li>{tag}</li>
-					))}
-				</ul>
-			)}
 		</header>
 
 		<div class:list={['article-grid', { 'has-toc': hasToc }]}>
@@ -95,10 +105,8 @@ const articleStructuredData = canonicalPath
 				</details>
 			)}
 
-			<div class="article-main">
-				<div class="article-body" id="article-body">
-					<slot />
-				</div>
+			<div class="article-body" id="article-body">
+				<slot />
 			</div>
 		</div>
 
@@ -282,95 +290,155 @@ const articleStructuredData = canonicalPath
 <style>
 	.article-shell {
 		position: relative;
+		container: article-shell / inline-size;
 		display: grid;
-		gap: 24px;
+		gap: clamp(20px, 2.7vw, 30px);
 	}
 
-	.article-header,
-	.toc-card,
-	.article-body {
+	.article-shell :where(.article-header, .toc-card, .article-body) {
 		border: 1px solid var(--line);
 		border-radius: var(--radius-panel);
 		background:
 			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
-			var(--panel);
-		backdrop-filter: var(--glass-blur);
-		box-shadow: var(--shadow);
+			color-mix(in srgb, var(--panel) 90%, var(--bg));
+		box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+		box-sizing: border-box;
+		overflow: clip;
 	}
 
 	.article-header,
-	.toc-card,
+	.article-copy,
+	.article-meta,
+	.meta-index-item,
 	.article-body {
-		padding: 32px;
+		display: grid;
+	}
+
+	.article-header {
+		gap: 22px;
+		padding: clamp(26px, 3.5vw, 34px);
+	}
+
+	.article-heading {
+		display: grid;
+		grid-template-columns: minmax(0, 1.4fr) minmax(15rem, 0.72fr);
+		align-items: start;
+		gap: 28px;
+	}
+
+	.article-copy {
+		gap: 14px;
+		max-width: 46rem;
+	}
+
+	.back-link,
+	.toc-count,
+	.back-to-top,
+		:global(.copy-code-btn) {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: var(--radius-pill);
+		font: inherit;
 	}
 
 	.back-link {
-		display: inline-flex;
-		align-items: center;
-		margin-bottom: 20px;
-		padding: 8px 12px;
-		border: 1px solid rgba(153, 176, 255, 0.18);
-		border-radius: var(--radius-pill);
-		background: rgba(153, 176, 255, 0.08);
-		color: var(--text);
-		font-size: 0.95rem;
-		font-weight: 600;
+		justify-self: start;
+		min-height: 30px;
+		padding: 6px 11px;
+		border: 1px solid rgba(153, 176, 255, 0.16);
+		background: rgba(255, 255, 255, 0.035);
+		color: var(--text-soft);
+		font-size: 0.86rem;
 		text-decoration: none;
+		transition:
+			transform 0.18s ease,
+			border-color 0.2s ease,
+			background 0.2s ease,
+			color 0.2s ease;
+	}
+
+	.back-link:is(:hover, :focus-visible) {
+		transform: translateY(-1px);
+		border-color: var(--hover-border);
+		background: rgba(157, 140, 255, 0.12);
+		color: var(--text);
+	}
+
+	.back-link:focus-visible,
+	.toc-card a:focus-visible,
+	.back-to-top:focus-visible,
+		:global(.copy-code-btn:focus-visible) {
+		outline: var(--focus-ring);
+		outline-offset: var(--focus-offset);
+	}
+
+	.kicker,
+	.meta-label {
+		margin: 0;
+		text-transform: uppercase;
 	}
 
 	.kicker {
-		margin: 0 0 12px;
-		font-size: 0.88rem;
-		letter-spacing: 0.12em;
-		text-transform: uppercase;
+		font-size: 0.82rem;
+		letter-spacing: 0.14em;
 		color: var(--accent-soft);
 	}
 
-	h1,
-	h2,
-	p,
-	ul {
-		margin-top: 0;
-	}
-
-	h1 {
-		margin-bottom: 18px;
-		font-size: clamp(2rem, 4vw, 3.2rem);
-		line-height: 1.08;
-		overflow-wrap: anywhere;
-	}
-
-	.article-description {
-		margin: 0 0 22px;
-		max-width: 48rem;
-		line-height: 1.8;
+	.meta-label {
+		font-size: 0.78rem;
+		letter-spacing: 0.12em;
 		color: var(--text-soft);
 	}
 
-	.article-meta,
-	.tag-list {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 10px;
-		align-items: center;
+	:is(h1, h2, p, ul, strong, time, span) {
+		margin-top: 0;
+		overflow-wrap: anywhere;
+	}
+
+	h1 {
+		margin: 0;
+		font-size: clamp(2rem, 4vw, 3rem);
+		line-height: 1.08;
+	}
+
+	.article-description {
+		margin: 0;
+		max-width: 44rem;
+		line-height: 1.82;
+		color: var(--text-soft);
 	}
 
 	.article-meta {
-		margin-bottom: 18px;
-		color: var(--accent-soft);
+		grid-template-columns: 1fr;
+		gap: 10px;
+		align-content: start;
+		padding-left: 20px;
+		border-left: 1px solid rgba(153, 176, 255, 0.12);
 	}
 
-	.tag-list {
-		margin: 0;
-		padding: 0;
-		list-style: none;
+	.meta-index-item {
+		grid-template-columns: minmax(0, 1fr) auto;
+		align-items: end;
+		gap: 12px;
+		min-height: 72px;
+		padding: 14px 16px;
+		border: 1px solid rgba(153, 176, 255, 0.14);
+		border-radius: 20px;
+		background: color-mix(in srgb, var(--panel-strong) 78%, var(--bg));
 	}
 
-	.tag-list li {
-		padding: 6px 10px;
-		border: 1px solid var(--tag-border);
-		border-radius: var(--radius-pill);
-		background: var(--tag-bg);
+	.meta-index-item.muted {
+		background: color-mix(in srgb, var(--panel) 92%, var(--bg));
+	}
+
+	.meta-index-item strong,
+	.meta-index-item time {
+		justify-self: end;
+		text-align: right;
+		font-size: 1rem;
+		line-height: 1.35;
+		color: var(--text);
 	}
 
 	.article-grid {
@@ -380,21 +448,11 @@ const articleStructuredData = canonicalPath
 		align-items: start;
 	}
 
-	.article-grid.has-toc {
-		grid-template-columns: minmax(0, 16rem) minmax(0, 1fr);
-	}
-
 	.toc-card {
-		position: sticky;
-		top: 20px;
-		--toc-line-x: 6px;
-		--toc-line-width: 2px;
-		--toc-line-opacity: 0.72;
-		--toc-node-size: 6px;
-		--toc-branch-width: 12px;
-		--toc-nested-indent: 22px;
-		--toc-gap: 10px;
-		--toc-active-shift: 4px;
+		padding: 22px 22px 18px;
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.016), rgba(255, 255, 255, 0)),
+			color-mix(in srgb, var(--panel) 94%, var(--bg));
 	}
 
 	.toc-card summary {
@@ -402,8 +460,10 @@ const articleStructuredData = canonicalPath
 		align-items: center;
 		justify-content: space-between;
 		gap: 12px;
-		margin-bottom: 14px;
-		font-size: 1.1rem;
+		margin-bottom: 0;
+		padding-bottom: 14px;
+		border-bottom: 1px solid rgba(153, 176, 255, 0.1);
+		font-size: 0.98rem;
 		font-weight: 700;
 		cursor: pointer;
 		list-style: none;
@@ -416,7 +476,7 @@ const articleStructuredData = canonicalPath
 	.toc-card summary::after {
 		content: '⌄';
 		display: none;
-		color: var(--accent-soft);
+		color: var(--text-soft);
 		transition: transform 160ms ease;
 	}
 
@@ -425,131 +485,116 @@ const articleStructuredData = canonicalPath
 	}
 
 	.toc-count {
-		display: none;
 		padding: 4px 8px;
-		border-radius: var(--radius-pill);
-		background: rgba(110, 195, 255, 0.1);
-		color: var(--accent-soft);
+		border: 1px solid rgba(153, 176, 255, 0.14);
+		background: rgba(255, 255, 255, 0.035);
+		color: var(--text-soft);
 		font-size: 0.78rem;
 	}
 
 	.toc-panel {
+		padding-top: 8px;
 		overflow: visible;
 	}
 
 	.toc-card ul {
-		position: relative;
 		margin-bottom: 0;
 		padding: 0;
 		list-style: none;
 		display: grid;
-		gap: var(--toc-gap);
+		gap: 0;
 	}
 
 	.toc-card ul::before {
-		content: '';
-		position: absolute;
-		top: 0.95rem;
-		bottom: 0.95rem;
-		left: var(--toc-line-x);
-		width: var(--toc-line-width);
-		border-radius: var(--radius-pill);
-		background: linear-gradient(
-			180deg,
-			transparent,
-			rgba(110, 195, 255, var(--toc-line-opacity)),
-			rgba(157, 140, 255, calc(var(--toc-line-opacity) * 0.72)),
-			transparent
-		);
-		pointer-events: none;
+		content: none;
 	}
 
 	.toc-card li {
-		position: relative;
-		padding-left: calc(var(--toc-line-x) + var(--toc-branch-width));
+		padding: 0;
+		border-top: 1px solid rgba(153, 176, 255, 0.1);
+	}
+
+	.toc-card li:first-child {
+		border-top: 0;
 	}
 
 	.toc-card li::before {
-		content: '';
-		position: absolute;
-		top: 50%;
-		left: var(--toc-line-x);
-		width: var(--toc-branch-width);
-		height: var(--toc-line-width);
-		background: rgba(110, 195, 255, var(--toc-line-opacity));
-		transform: translateY(-50%);
-		pointer-events: none;
+		content: none;
 	}
 
 	.toc-card li::after {
-		content: '';
-		position: absolute;
-		top: 50%;
-		left: calc(var(--toc-line-x) - var(--toc-node-size) / 2 + var(--toc-line-width) / 2);
-		width: var(--toc-node-size);
-		height: var(--toc-node-size);
-		border-radius: var(--radius-pill);
-		background: rgba(110, 195, 255, 0.78);
-		box-shadow: 0 0 12px rgba(110, 195, 255, 0.28);
-		transform: translateY(-50%);
-		pointer-events: none;
+		content: none;
 	}
 
 	.toc-card li.nested {
-		margin-left: var(--toc-nested-indent);
+		margin-left: 12px;
+		padding-left: 12px;
+		border-left: 1px solid rgba(153, 176, 255, 0.14);
 	}
 
 	.toc-card li.nested::after {
-		background: rgba(157, 140, 255, 0.68);
-		box-shadow: 0 0 10px rgba(157, 140, 255, 0.22);
+		content: none;
 	}
 
 	.toc-card a {
 		display: block;
-		padding: 6px 10px;
-		border-radius: 12px;
+		padding: 10px 12px;
+		border-radius: 14px;
 		color: var(--text-soft);
 		text-decoration: none;
 		transition:
 			background 160ms ease,
-			color 160ms ease,
-			transform 160ms ease;
+			color 160ms ease;
 	}
 
-	.toc-card a:hover,
-	.toc-card a.is-active {
-		background: rgba(110, 195, 255, 0.1);
+	.toc-card a:is(:hover, .is-active) {
+		background: rgba(255, 255, 255, 0.04);
 		color: var(--text);
 	}
 
 	.toc-card a.is-active {
-		transform: translateX(var(--toc-active-shift));
+		box-shadow: inset 0 0 0 1px rgba(153, 176, 255, 0.12);
 	}
 
-	.article-main {
-		display: grid;
-		gap: 18px;
+	@container article-shell (min-width: 60rem) {
+		.article-grid.has-toc {
+			grid-template-columns: minmax(0, 17rem) minmax(0, 1fr);
+			gap: 20px;
+		}
+
+		.article-grid.has-toc .toc-card {
+			position: sticky;
+			top: 20px;
+		}
 	}
 
 	.article-body {
+		padding: clamp(28px, 3.8vw, 40px);
 		font-size: 1.03rem;
-		line-height: 1.95;
-		color: #d8e0f8;
+		line-height: 1.9;
+		color: var(--text);
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.014), rgba(255, 255, 255, 0)),
+			color-mix(in srgb, var(--panel-strong) 86%, var(--bg));
+		box-shadow:
+			0 12px 28px rgba(0, 0, 0, 0.18),
+			inset 0 1px 0 rgba(255, 255, 255, 0.02);
 	}
 
 	.article-body :global(h2),
 	.article-body :global(h3) {
-		margin: 40px 0 16px;
-		line-height: 1.24;
-		scroll-margin-top: 24px;
+		line-height: 1.22;
+		scroll-margin-top: 28px;
 	}
 
 	.article-body :global(h2) {
-		font-size: clamp(1.5rem, 3vw, 2rem);
+		margin: 40px 0 14px;
+		font-size: clamp(1.45rem, 3vw, 1.92rem);
 	}
 
 	.article-body :global(h3) {
-		font-size: clamp(1.2rem, 2.2vw, 1.45rem);
+		margin: 30px 0 12px;
+		font-size: clamp(1.18rem, 2.2vw, 1.4rem);
 	}
 
 	.article-body :global(p),
@@ -557,7 +602,7 @@ const articleStructuredData = canonicalPath
 	.article-body :global(ol),
 	.article-body :global(pre),
 	.article-body :global(blockquote) {
-		margin: 0 0 20px;
+		margin: 0 0 18px;
 	}
 
 	.article-body :global(ul),
@@ -576,22 +621,22 @@ const articleStructuredData = canonicalPath
 
 	.article-body :global(a) {
 		color: var(--accent-soft);
-		text-decoration-color: rgba(110, 195, 255, 0.5);
+		text-decoration-color: rgba(110, 195, 255, 0.36);
 		text-underline-offset: 0.18em;
 	}
 
 	.article-body :global(blockquote) {
 		padding: 18px 20px;
-		border-left: 3px solid rgba(157, 140, 255, 0.7);
+		border-left: 3px solid rgba(153, 176, 255, 0.28);
 		border-radius: 18px;
-		background: rgba(157, 140, 255, 0.08);
+		background: color-mix(in srgb, var(--panel) 90%, var(--bg));
 		color: var(--text);
 	}
 
 	.article-body :global(code) {
 		padding: 2px 7px;
 		border-radius: 8px;
-		background: rgba(153, 176, 255, 0.12);
+		background: rgba(153, 176, 255, 0.08);
 		color: #f3f6ff;
 		font-size: 0.94em;
 	}
@@ -601,7 +646,8 @@ const articleStructuredData = canonicalPath
 		padding: 20px;
 		border: 1px solid rgba(153, 176, 255, 0.14);
 		border-radius: 20px;
-		background: rgba(8, 10, 18, 0.88);
+		background: color-mix(in srgb, var(--panel-strong) 82%, var(--bg));
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
 		overflow-x: auto;
 	}
 
@@ -615,12 +661,23 @@ const articleStructuredData = canonicalPath
 
 	.back-to-top,
 	:global(.copy-code-btn) {
-		border: 1px solid rgba(153, 176, 255, 0.18);
-		border-radius: var(--radius-pill);
-		background: rgba(153, 176, 255, 0.08);
-		color: var(--text);
-		font: inherit;
+		border: 1px solid rgba(153, 176, 255, 0.16);
+		background: rgba(255, 255, 255, 0.035);
+		color: var(--text-soft);
 		cursor: pointer;
+		transition:
+			transform 0.18s ease,
+			border-color 0.2s ease,
+			background 0.2s ease,
+			color 0.2s ease;
+	}
+
+	.back-to-top:is(:hover, :focus-visible),
+	:global(.copy-code-btn:is(:hover, :focus-visible)) {
+		transform: translateY(-1px);
+		border-color: var(--hover-border);
+		background: rgba(157, 140, 255, 0.12);
+		color: var(--text);
 	}
 
 	.back-to-top {
@@ -635,34 +692,38 @@ const articleStructuredData = canonicalPath
 		padding: 7px 12px;
 	}
 
-	@media (max-width: 900px) {
-		.article-grid {
-			grid-template-columns: 1fr;
-		}
-
-		.toc-card {
-			position: static;
-		}
-	}
-
 	@media (max-width: 720px) {
-		.article-header,
-		.article-body {
-			padding: 24px;
-		}
-
-		.article-shell,
-		.article-main {
+		.article-shell {
 			gap: 14px;
 		}
 
+		.article-shell :where(.article-header, .article-body) {
+			padding: 22px;
+		}
+
+		.article-heading,
+		.article-meta {
+			grid-template-columns: 1fr;
+		}
+
+		.article-meta {
+			padding-left: 0;
+			padding-top: 10px;
+			border-left: 0;
+			border-top: 1px solid rgba(153, 176, 255, 0.12);
+		}
+
+		.meta-index-item {
+			grid-template-columns: 1fr;
+		}
+
+		.meta-index-item strong,
+		.meta-index-item time {
+			justify-self: start;
+			text-align: left;
+		}
+
 		.toc-card {
-			--toc-line-x: 7px;
-			--toc-line-opacity: 0.58;
-			--toc-node-size: 7px;
-			--toc-branch-width: 11px;
-			--toc-nested-indent: 18px;
-			--toc-gap: 8px;
 			padding: 0;
 			overflow: hidden;
 		}
@@ -676,30 +737,25 @@ const articleStructuredData = canonicalPath
 			display: inline-block;
 		}
 
-		.toc-count {
-			display: inline-flex;
-		}
-
 		.toc-panel {
-			max-height: 210px;
-			padding: 0 22px 18px;
+			max-height: 240px;
+			padding: 8px 20px 16px;
 			overflow: auto;
 			-webkit-overflow-scrolling: touch;
 		}
 
-		.toc-card ul {
-			padding: 2px 0;
-		}
-
 		.article-body {
 			font-size: 1.01rem;
-			line-height: 1.9;
+			line-height: 1.88;
 			overflow-wrap: anywhere;
 		}
 
-		.article-body :global(h2),
+		.article-body :global(h2) {
+			margin-top: 34px;
+		}
+
 		.article-body :global(h3) {
-			margin-top: 32px;
+			margin-top: 26px;
 		}
 	}
 </style>
