@@ -1,0 +1,60 @@
+---
+import { withBase } from '../../utils/paths';
+import ContentTypeLabel from './ContentTypeLabel.astro';
+import EntryLog from './EntryLog.astro';
+import SectionLabel from './SectionLabel.astro';
+import { articleEntry, fieldEntries, fieldTopics } from './mock-data';
+
+const base = import.meta.env.BASE_URL;
+const recentEntries = fieldEntries.slice(0, 4);
+---
+
+<header class="field-notebook__landing-intro">
+	<div>
+		<p class="field-notebook__meta">FIELD NOTEBOOK / NO. 06</p>
+		<h1>把知识写成可以返回的路径</h1>
+	</div>
+	<p>一个只使用虚构资料的研究手册样页。记录按问题、证据与结论组织，而不是被卡片包裹。</p>
+</header>
+
+<section class="field-notebook__current-entry" aria-labelledby="current-entry-title">
+	<div class="field-notebook__current-meta">
+		<ContentTypeLabel type={articleEntry.type} />
+		<time datetime={articleEntry.date}>{articleEntry.date}</time>
+		<span>{articleEntry.readTime}</span>
+	</div>
+	<div class="field-notebook__current-copy">
+		<p class="field-notebook__meta">CURRENT ENTRY / 018</p>
+		<h2 id="current-entry-title"><a href={withBase(base, articleEntry.href)}>{articleEntry.title}</a></h2>
+		<p>{articleEntry.summary}</p>
+		<a class="field-notebook__text-link" href={withBase(base, articleEntry.href)}>阅读这篇虚构长文</a>
+	</div>
+</section>
+
+<section class="field-notebook__log-section" aria-labelledby="recent-notes-title">
+	<div id="recent-notes-title">
+		<SectionLabel label="Recent field notes" count="2026 / 04 entries" />
+	</div>
+	<EntryLog entries={recentEntries} />
+</section>
+
+<div class="field-notebook__lower-grid">
+	<section aria-labelledby="topic-index-title">
+		<div id="topic-index-title">
+			<SectionLabel label="Topic index" count="04" />
+		</div>
+		<ul class="field-notebook__topic-list">
+			{fieldTopics.map((topic) => (
+				<li>
+					<a href={withBase(base, '/lab/field-notebook/categories/')}>{topic.name}</a>
+					<span>{topic.count}</span>
+				</li>
+			))}
+		</ul>
+	</section>
+	<aside class="field-notebook__method-note">
+		<p class="field-notebook__meta">WORKING METHOD</p>
+		<p>记录现象，保存证据，标注假设，再把结论写成下一次可以复用的入口。</p>
+		<a class="field-notebook__text-link" href={withBase(base, '/lab/field-notebook/archive/')}>查看完整归档</a>
+	</aside>
+</div>

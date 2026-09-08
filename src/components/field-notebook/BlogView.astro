@@ -1,0 +1,33 @@
+---
+import { withBase } from '../../utils/paths';
+import EntryLog from './EntryLog.astro';
+import PageHeader from './PageHeader.astro';
+import SectionLabel from './SectionLabel.astro';
+import { fieldEntries, fieldYears } from './mock-data';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<PageHeader
+	eyebrow="MASTER INDEX / 28 FICTIONAL ENTRIES"
+	title="文章索引"
+	intro="按年份与问题领域浏览。标题是主入口，摘要只在资料确实存在时出现。"
+/>
+
+<div class="field-notebook__index-grid">
+	<aside class="field-notebook__year-index">
+		<SectionLabel label="Years" count="04" />
+		{fieldYears.map((year) => (
+			<a href={withBase(base, '/lab/field-notebook/archive/')}>
+				<span>{year.year}</span>
+				<span>{year.count}</span>
+			</a>
+		))}
+	</aside>
+	<section aria-labelledby="all-entries-title">
+		<div id="all-entries-title">
+			<SectionLabel label="All entries" count="Newest first" />
+		</div>
+		<EntryLog entries={fieldEntries} />
+	</section>
+</div>
