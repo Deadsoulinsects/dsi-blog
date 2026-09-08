@@ -1,183 +1,275 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { formatDate, formatDateTime, getAllDocCategories, getSortedDocs } from '../utils/content';
+import { formatDate, formatDateTime, getSortedDocs } from '../utils/content';
 import { withBase } from '../utils/paths';
 
 const docs = await getSortedDocs();
-const categories = await getAllDocCategories();
 const base = import.meta.env.BASE_URL;
 ---
 
 <Layout title="文档 | Dead Soul Insects" description="Dead Soul Insects 的文档列表页，整理分享文档、学习资料与配置说明。" canonicalPath="/docs/">
-	<section class="page-card intro-card">
-		<header class="page-intro">
-			<p class="kicker">文档</p>
-			<h1>把零散记录收紧成可复用的说明</h1>
-			<p class="lead">
-				博客偏向持续写下来的过程，文档页更偏向整理后的结果。这里直接列出当前可读的说明页，方便查阅，也方便在需要时重新打开。
-			</p>
-			{categories.length > 0 && (
-				<ul class="category-entry-list" aria-label="文档分类入口">
-					{categories.map((category) => (
-						<li>
-							<a href={withBase(base, `/categories/${category.slug}/`)}>
-								<span>{category.name}</span>
-								<span>{category.count}</span>
-							</a>
-						</li>
-					))}
-				</ul>
-			)}
-		</header>
-	</section>
+	<div class="page-shell">
+		<section class="page-card intro-card">
+			<header class="page-intro">
+				<div class="intro-copy">
+					<p class="kicker">文档</p>
+					<h1>把零散记录收紧成可复用的说明</h1>
+					<p class="lead">
+						博客偏向持续写下来的过程，文档页更偏向整理后的结果。这里直接列出当前可读的说明页，方便查阅，也方便在需要时重新打开。
+					</p>
+				</div>
 
-	<section class="doc-list" aria-label="文档列表">
-		{
-			docs.map((doc) => (
-				<a class="doc-card" href={withBase(base, `/docs/${doc.id}/`)}>
-					<div class="doc-card-top">
-						<time class="doc-date" datetime={formatDateTime(doc.data.pubDate)}>{formatDate(doc.data.pubDate)}</time>
+				<div class="intro-index" aria-label="文档概览">
+					<div class="intro-index-item">
+						<span class="index-label">公开文档</span>
+						<strong>{docs.length}</strong>
 					</div>
-					<div class="doc-card-body">
-						<h2>{doc.data.title}</h2>
-						<p class="doc-description">{doc.data.description}</p>
+					<div class="intro-index-item muted">
+						<span class="index-label">浏览方式</span>
+						<strong>按清单</strong>
 					</div>
-					<span class="doc-link">打开文档 →</span>
-				</a>
-			))
-		}
-	</section>
+				</div>
+			</header>
+
+			<div class="intro-note">
+				<p>这里优先保留已经整理成说明的页面，适合在需要时直接重新打开，不必再从博客过程里回找。</p>
+			</div>
+		</section>
+
+		<section class="page-card section-card" aria-label="文档列表">
+			<div class="section-heading">
+				<div class="section-copy">
+					<p class="kicker">索引</p>
+					<h2>按整理后的说明进入</h2>
+				</div>
+				<p class="section-note">每条文档保留标题、摘要与更新时间，先缩小目标，再进入具体页面。</p>
+			</div>
+
+			<div class="doc-list">
+				{docs.map((doc) => (
+					<a class="doc-card" href={withBase(base, `/docs/${doc.id}/`)}>
+						<div class="doc-card-body">
+							<h3>{doc.data.title}</h3>
+							<p class="doc-description">{doc.data.description}</p>
+						</div>
+						<div class="doc-meta">
+							<time class="doc-date" datetime={formatDateTime(doc.data.pubDate)}>{formatDate(doc.data.pubDate)}</time>
+							<span class="meta-index-label">打开文档</span>
+						</div>
+					</a>
+				))}
+			</div>
+		</section>
+	</div>
 </Layout>
 
 <style>
+	.page-shell {
+		display: grid;
+		gap: clamp(22px, 2.8vw, 30px);
+	}
+
 	.page-card,
-	.doc-card {
+		.doc-card {
 		border: 1px solid var(--line);
-		border-radius: var(--radius-panel);
 		backdrop-filter: var(--glass-blur);
-		box-shadow: var(--shadow);
+		box-sizing: border-box;
 	}
 
 	.page-card {
-		padding: 32px;
+		padding: clamp(24px, 3.4vw, 34px);
+		border-radius: var(--radius-panel);
 		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0)),
 			var(--panel);
+		box-shadow: 0 18px 42px rgba(0, 0, 0, 0.22);
+		overflow: clip;
 	}
 
-	.intro-card {
-		margin-bottom: 22px;
+	.page-intro,
+		.intro-card,
+		.section-card,
+		.intro-copy,
+		.section-copy,
+		.doc-card-body {
+		display: grid;
+		gap: 12px;
 	}
 
 	.page-intro {
-		max-width: none;
+		grid-template-columns: minmax(0, 1.35fr) minmax(14rem, 0.7fr);
+		align-items: start;
+		gap: 24px;
+	}
+
+	.intro-card,
+	.section-card {
+		gap: 20px;
+	}
+
+	.intro-copy {
+		max-width: 40rem;
+	}
+
+	.intro-index {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 12px;
+		align-content: start;
+	}
+
+	.intro-index-item {
+		display: grid;
+		gap: 8px;
+		padding: 16px 18px;
+		border: 1px solid rgba(153, 176, 255, 0.14);
+		border-radius: 20px;
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.022), rgba(255, 255, 255, 0)),
+			color-mix(in srgb, var(--panel-strong) 84%, transparent);
+		box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+	}
+
+	.intro-index-item.muted {
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0)),
+			color-mix(in srgb, var(--panel) 88%, transparent);
+	}
+
+	.intro-index-item strong {
+		font-size: 1.05rem;
+		line-height: 1;
+		color: var(--text);
+	}
+
+	.intro-note {
+		padding-top: 2px;
+		border-top: 1px solid rgba(153, 176, 255, 0.12);
+	}
+
+	.section-heading {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.8fr);
+		gap: 14px;
+		align-items: end;
+	}
+
+	.section-copy {
+		gap: 8px;
+	}
+
+	.section-note {
+		max-width: 36rem;
+		align-self: end;
 	}
 
 	.kicker {
-		margin: 0 0 12px;
-		font-size: 0.88rem;
-		letter-spacing: 0.12em;
+		margin: 0;
+		font-size: 0.82rem;
+		letter-spacing: 0.14em;
 		text-transform: uppercase;
 		color: var(--accent-soft);
 	}
 
-	h1,
-	p {
-		margin-top: 0;
-	}
-
-	h1 {
-		margin-bottom: 18px;
-		font-size: clamp(2rem, 4vw, 3rem);
-		line-height: 1.1;
-	}
-
-	p {
-		margin-bottom: 0;
-		line-height: 1.8;
+	.index-label,
+	.meta-index-label {
+		margin: 0;
+		font-size: 0.78rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
 		color: var(--text-soft);
+	}
+
+	h1,
+	h2,
+	h3,
+	p,
+	time,
+	strong,
+		span {
+		margin: 0;
 		overflow-wrap: anywhere;
 	}
 
+	h1 {
+		font-size: clamp(2rem, 4vw, 3rem);
+		line-height: 1.08;
+	}
+
+	h2 {
+		font-size: clamp(1.35rem, 2.5vw, 1.8rem);
+		line-height: 1.16;
+	}
+
+	h3 {
+		font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+		line-height: 1.24;
+	}
+
+	p,
+	time {
+		color: var(--text-soft);
+		line-height: 1.78;
+	}
+
 	.lead {
-		margin-bottom: 0;
 		font-size: 1.02rem;
-	}
-
-	.category-entry-list {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 10px;
-		margin: 18px 0 0;
-		padding: 0;
-		list-style: none;
-	}
-
-	.category-entry-list a {
-		display: inline-flex;
-		gap: 8px;
-		align-items: center;
-		padding: 7px 12px;
-		border: 1px solid rgba(110, 195, 255, 0.18);
-		border-radius: var(--radius-pill);
-		background: var(--tag-bg);
-		color: var(--text);
-		text-decoration: none;
-		transition:
-			border-color 0.2s ease,
-			background 0.2s ease,
-			transform 0.2s ease;
-	}
-
-	.category-entry-list a:hover,
-	.category-entry-list a:focus-visible {
-		transform: translateY(-1px);
-		border-color: var(--hover-border);
-		background: rgba(157, 140, 255, 0.14);
 	}
 
 	.doc-list {
 		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 18px;
-		align-items: stretch;
+		gap: 14px;
 	}
 
 	.doc-card {
-		position: relative;
-		display: grid;
-		grid-template-rows: auto 1fr auto;
-		gap: 20px;
-		height: 100%;
-		padding: 24px;
+		padding: 20px 22px;
+		border-radius: 20px;
 		background:
-			radial-gradient(circle at top right, rgba(110, 195, 255, 0.1), transparent 34%),
-			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
-			var(--panel);
-		box-sizing: border-box;
+			linear-gradient(180deg, rgba(255, 255, 255, 0.024), rgba(255, 255, 255, 0)),
+			color-mix(in srgb, var(--panel) 90%, var(--bg));
+		box-shadow: 0 8px 18px rgba(0, 0, 0, 0.14);
+		color: inherit;
 		text-decoration: none;
+		display: flex;
+		justify-content: space-between;
+		align-items: start;
+		gap: 20px;
 		transition:
-			transform 0.2s ease,
+			transform 0.18s ease,
 			border-color 0.2s ease,
 			background 0.2s ease,
 			box-shadow 0.2s ease;
 	}
 
 	.doc-card-body {
-		display: grid;
-		align-content: start;
-		gap: 12px;
+		min-width: 0;
 	}
 
-	.doc-card:hover,
-	.doc-card:focus-visible {
-		transform: translateY(-2px);
+	.doc-meta {
+		display: grid;
+		gap: 8px;
+		justify-items: end;
+		text-align: right;
+		flex-shrink: 0;
+	}
+
+	.doc-date {
+		font-size: 0.9rem;
+		color: var(--text);
+		line-height: 1.5;
+	}
+
+	.doc-description {
+		max-width: 34rem;
+	}
+
+	.doc-card:is(:hover, :focus-visible) {
+		transform: translateY(-1px);
 		border-color: var(--hover-border);
 		background:
-			radial-gradient(circle at top right, rgba(110, 195, 255, 0.14), transparent 36%),
 			linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
-			var(--panel-strong);
-		box-shadow: var(--shadow-hover);
+			color-mix(in srgb, var(--panel-strong) 90%, var(--bg));
+		box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
 	}
 
 	.doc-card:focus-visible {
@@ -185,59 +277,31 @@ const base = import.meta.env.BASE_URL;
 		outline-offset: var(--focus-offset);
 	}
 
-	.doc-date {
-		margin: 0;
-		font-size: 0.9rem;
-		color: var(--accent-soft);
-	}
-
-	.doc-description {
-		max-width: 34rem;
-	}
-
-	.doc-link {
-		display: inline-flex;
-		align-items: center;
-		align-self: flex-start;
-		padding: 8px 12px;
-		border: 1px solid rgba(153, 176, 255, 0.18);
-		border-radius: var(--radius-pill);
-		background: rgba(153, 176, 255, 0.08);
-		color: var(--text);
-		font-size: 0.95rem;
-		font-weight: 600;
-		line-height: 1.2;
-		transition:
-			border-color 0.2s ease,
-			background 0.2s ease,
-			color 0.2s ease;
-	}
-
-	.doc-card:hover .doc-link,
-	.doc-card:focus-visible .doc-link {
-		border-color: rgba(157, 140, 255, 0.28);
-		background: rgba(157, 140, 255, 0.14);
-		color: #f3f6ff;
-	}
-
-	@media (max-width: 900px) {
-		.doc-list {
+	@media (max-width: 960px) {
+		.page-intro,
+		.section-heading,
+		.doc-card,
+		.intro-index {
 			grid-template-columns: 1fr;
+		}
+
+		.doc-card {
+			display: grid;
+		}
+
+		.doc-meta {
+			justify-items: start;
+			text-align: left;
 		}
 	}
 
 	@media (max-width: 640px) {
-		.page-card,
-		.doc-card {
-			padding: 24px;
+		.page-card {
+			padding: 20px;
 		}
 
 		.doc-card {
-			gap: 18px;
-		}
-
-		.lead {
-			margin-bottom: 24px;
+			padding: 18px;
 		}
 	}
 </style>

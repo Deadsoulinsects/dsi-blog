@@ -8,66 +8,267 @@ const base = import.meta.env.BASE_URL;
 ---
 
 <Layout title="分类 | Dead Soul Insects" description="查看 Dead Soul Insects 文档分类入口。" canonicalPath="/categories/">
-	<section class="page-card">
-		<p class="kicker">分类</p>
-		<h1>按分类浏览文档</h1>
-		<ul class="entry-list">
-			{categories.map((category) => (
-				<li>
-					<a href={withBase(base, `/categories/${category.slug}/`)}>
-						<span>{category.name}</span>
-						<span>{category.count}</span>
+	<div class="page-shell">
+		<section class="page-card intro-card">
+			<header class="page-intro">
+				<div class="intro-copy">
+					<p class="kicker">分类</p>
+					<h1>按分类浏览文档</h1>
+					<p class="lead">这里先给出文档分类入口，适合在知道方向、但还没确定具体页面时先缩小查找范围。</p>
+				</div>
+
+				<div class="intro-index" aria-label="分类概览">
+					<div class="intro-index-item">
+						<span class="index-label">分类总数</span>
+						<strong>{categories.length}</strong>
+					</div>
+				</div>
+			</header>
+
+			<div class="intro-note">
+				<p>先用分类缩小方向，再进入具体页面，会比直接在整站里搜索更稳定。</p>
+			</div>
+		</section>
+
+		<section class="page-card section-card" aria-label="文档分类入口列表">
+			<div class="section-heading">
+				<div class="section-copy">
+					<p class="kicker">索引</p>
+					<h2>先进入明确的分类</h2>
+				</div>
+				<p class="section-note">每个分类都像一个稳定入口，适合先缩小范围，再继续往下看具体文档。</p>
+			</div>
+
+			<div class="entry-list">
+				{categories.map((category) => (
+					<a class="entry-card" href={withBase(base, `/categories/${category.slug}/`)}>
+						<div class="entry-copy">
+							<p class="entry-kicker">文档分类</p>
+							<h3>{category.name}</h3>
+						</div>
+						<div class="entry-index" aria-hidden="true">
+							<span class="index-label">页面</span>
+							<strong>{category.count}</strong>
+						</div>
 					</a>
-				</li>
-			))}
-		</ul>
-	</section>
+				))}
+			</div>
+		</section>
+	</div>
 </Layout>
 
 <style>
-	.page-card {
-		padding: 32px;
+	.page-shell {
+		display: grid;
+		gap: clamp(22px, 2.8vw, 30px);
+	}
+
+	.page-card,
+	.entry-card {
 		border: 1px solid var(--line);
+		backdrop-filter: var(--glass-blur);
+		box-sizing: border-box;
+	}
+
+	.page-card {
+		padding: clamp(24px, 3.4vw, 34px);
 		border-radius: var(--radius-panel);
 		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0)),
 			var(--panel);
-		backdrop-filter: var(--glass-blur);
-		box-shadow: var(--shadow);
+		box-shadow: 0 18px 42px rgba(0, 0, 0, 0.22);
+		overflow: clip;
+	}
+
+	.page-intro,
+	.intro-card,
+	.section-card,
+	.intro-copy,
+	.section-copy,
+	.entry-copy {
+		display: grid;
+		gap: 12px;
+	}
+
+	.page-intro,
+	.intro-card,
+	.section-card {
+		gap: 20px;
+	}
+
+	.page-intro {
+		grid-template-columns: minmax(0, 1.35fr) minmax(14rem, 0.7fr);
+		align-items: start;
+		gap: 24px;
+	}
+
+	.intro-copy {
+		max-width: 40rem;
+	}
+
+	.intro-index {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 12px;
+		align-content: start;
+	}
+
+	.intro-index-item {
+		display: grid;
+		gap: 8px;
+		padding: 16px 18px;
+		border: 1px solid rgba(153, 176, 255, 0.14);
+		border-radius: 20px;
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.022), rgba(255, 255, 255, 0)),
+			color-mix(in srgb, var(--panel-strong) 84%, transparent);
+		box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+	}
+
+	.intro-index-item strong,
+	.entry-index strong {
+		font-size: 1.05rem;
+		line-height: 1;
+		color: var(--text);
+	}
+
+	.intro-note {
+		padding-top: 2px;
+		border-top: 1px solid rgba(153, 176, 255, 0.12);
+	}
+
+	.section-heading {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.8fr);
+		gap: 14px;
+		align-items: end;
+	}
+
+	.section-copy {
+		gap: 8px;
+	}
+
+	.section-note {
+		max-width: 36rem;
+		align-self: end;
 	}
 
 	.kicker {
-		margin: 0 0 12px;
-		font-size: 0.88rem;
-		letter-spacing: 0.12em;
+		margin: 0;
+		font-size: 0.82rem;
+		letter-spacing: 0.14em;
 		text-transform: uppercase;
 		color: var(--accent-soft);
 	}
 
+	.entry-kicker,
+	.index-label {
+		margin: 0;
+		font-size: 0.78rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--text-soft);
+	}
+
+	h1,
+	h2,
+	h3,
+	strong,
+	p,
+	span {
+		margin: 0;
+		overflow-wrap: anywhere;
+	}
+
 	h1 {
-		margin: 0 0 20px;
 		font-size: clamp(2rem, 4vw, 3rem);
-		line-height: 1.1;
+		line-height: 1.08;
+	}
+
+	h2 {
+		font-size: clamp(1.35rem, 2.5vw, 1.8rem);
+		line-height: 1.16;
+	}
+
+	h3 {
+		font-size: clamp(1.18rem, 2vw, 1.4rem);
+		line-height: 1.22;
+	}
+
+	p {
+		color: var(--text-soft);
+		line-height: 1.78;
+	}
+
+	.lead {
+		font-size: 1.02rem;
 	}
 
 	.entry-list {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 12px;
-		margin: 0;
-		padding: 0;
-		list-style: none;
+		display: grid;
+		gap: 14px;
 	}
 
-	.entry-list a {
-		display: inline-flex;
-		gap: 8px;
-		align-items: center;
-		padding: 10px 14px;
-		border: 1px solid rgba(110, 195, 255, 0.18);
-		border-radius: var(--radius-pill);
-		background: var(--tag-bg);
-		color: var(--text);
+	.entry-card {
+		padding: 20px 22px;
+		border-radius: 20px;
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.024), rgba(255, 255, 255, 0)),
+			color-mix(in srgb, var(--panel) 90%, var(--bg));
+		box-shadow: 0 8px 18px rgba(0, 0, 0, 0.14);
+		color: inherit;
 		text-decoration: none;
+		display: flex;
+		justify-content: space-between;
+		align-items: start;
+		gap: 20px;
+		transition:
+			transform 0.18s ease,
+			border-color 0.2s ease,
+			background 0.2s ease,
+			box-shadow 0.2s ease;
+	}
+
+	.entry-copy {
+		min-width: 0;
+	}
+
+	.entry-index {
+		display: grid;
+		gap: 8px;
+		justify-items: end;
+		text-align: right;
+		flex-shrink: 0;
+	}
+
+	.entry-card:is(:hover, :focus-visible) {
+		transform: translateY(-1px);
+		border-color: var(--hover-border);
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
+			color-mix(in srgb, var(--panel-strong) 90%, var(--bg));
+		box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
+	}
+
+	.entry-card:focus-visible {
+		outline: var(--focus-ring);
+		outline-offset: var(--focus-offset);
+	}
+
+	@media (max-width: 960px) {
+		.page-intro,
+		.section-heading,
+		.entry-card {
+			grid-template-columns: 1fr;
+		}
+
+		.entry-card {
+			display: grid;
+		}
+
+		.entry-index {
+			justify-items: start;
+			text-align: left;
+		}
 	}
 </style>
