@@ -36,6 +36,11 @@ const navItems = [
 		href: '/origin',
 		icon: 'info',
 	},
+	{
+		title: '关于',
+		href: '/about',
+		icon: 'info',
+	},
 ];
 
 const base = import.meta.env.BASE_URL;
@@ -56,7 +61,6 @@ const createSeededRandom = (seed: number) => {
 	};
 };
 
-// Use a fixed seed so the starfield stays visually stable across builds.
 const buildStars = (): Star[] => {
 	const random = createSeededRandom(20260517);
 	const count = 160;
@@ -135,9 +139,7 @@ const stars = buildStars();
 
 			<p class="cover-subtitle">一个在冷色残光里，缓慢展开的个人站点</p>
 
-			<p class="cover-description">
-				收纳技术记录、实践项目与长期整理，让零散想法在暗处缓慢成形
-			</p>
+			<p class="cover-description">收纳技术记录、实践项目与长期整理，让零散想法在暗处缓慢成形</p>
 
 			<nav class="cover-nav" aria-label="首页主要入口">
 				{
@@ -527,7 +529,6 @@ const stars = buildStars();
 		.cover-nav {
 			margin-top: 20px;
 		}
-
 	}
 
 	@media (max-height: 600px) and (min-width: 821px) {
@@ -575,7 +576,6 @@ const stars = buildStars();
 			font-size: 0.98rem;
 			line-height: 1.7;
 		}
-
 	}
 
 	@media (max-width: 430px) {
