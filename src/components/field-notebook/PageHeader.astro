@@ -1,0 +1,15 @@
+---
+interface Props {
+	readonly eyebrow: string;
+	readonly title: string;
+	readonly intro: string;
+}
+
+const { eyebrow, title, intro } = Astro.props;
+---
+
+<header class="field-notebook__page-head">
+	<p class="field-notebook__meta">{eyebrow}</p>
+	<h1>{title}</h1>
+	<p>{intro}</p>
+</header>

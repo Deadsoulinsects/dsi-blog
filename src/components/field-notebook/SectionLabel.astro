@@ -1,0 +1,13 @@
+---
+interface Props {
+	readonly label: string;
+	readonly count: string;
+}
+
+const { label, count } = Astro.props;
+---
+
+<div class="field-notebook__section-label">
+	<h2>{label}</h2>
+	<span>{count}</span>
+</div>

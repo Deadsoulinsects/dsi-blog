@@ -1,0 +1,38 @@
+---
+import { withBase } from '../../utils/paths';
+import ContentTypeLabel from './ContentTypeLabel.astro';
+import type { FieldEntry } from './types';
+
+interface Props {
+	readonly entries: readonly FieldEntry[];
+}
+
+const { entries } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+
+<ol class="field-notebook__log">
+	{entries.map((entry, index) => (
+		<li class="field-notebook__log-row">
+			<span class="field-notebook__row-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+			<article>
+				<p class="field-notebook__entry-meta">
+					<time datetime={entry.date}>{entry.date}</time>
+					<span aria-hidden="true">/</span>
+					<ContentTypeLabel type={entry.type} />
+					<span aria-hidden="true">/</span>
+					<span>{entry.category}</span>
+					<span aria-hidden="true">/</span>
+					<span>{entry.readTime}</span>
+				</p>
+				<h3><a href={withBase(base, entry.href)}>{entry.title}</a></h3>
+				{entry.summary && <p class="field-notebook__entry-summary">{entry.summary}</p>}
+				{entry.tags.length > 0 && (
+					<ul class="field-notebook__tags" aria-label="标签">
+						{entry.tags.map((tag) => <li>{tag}</li>)}
+					</ul>
+				)}
+			</article>
+		</li>
+	))}
+</ol>

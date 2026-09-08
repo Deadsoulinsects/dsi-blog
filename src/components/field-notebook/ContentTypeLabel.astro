@@ -1,0 +1,16 @@
+---
+import type { FieldContentType } from './types';
+
+interface Props {
+	readonly type: FieldContentType;
+}
+
+const { type } = Astro.props;
+const labels = {
+	note: '札记',
+	essay: '长文',
+	reference: '参考',
+} as const satisfies Record<FieldContentType, string>;
+---
+
+<span class="field-notebook__type">{labels[type]}</span>
