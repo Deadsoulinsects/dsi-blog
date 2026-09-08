@@ -1,0 +1,69 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import ListExplorationView from '../../../components/ListExplorationView.astro';
+import { listExplorationVariants, listExplorationVariantMap } from '../../../data/listExplorationVariants';
+import { formatDate, formatDateTime, getAllDocCategories, getArchiveGroups, getSortedPosts } from '../../../utils/content';
+import { getTopicGroups } from '../../../utils/topics';
+
+export async function getStaticPaths() {
+	return listExplorationVariants.map((variant) => ({
+		params: { variant: variant.slug },
+		props: { variantSlug: variant.slug },
+	}));
+}
+
+const { variantSlug } = Astro.props;
+const variant = listExplorationVariantMap.get(variantSlug);
+
+if (!variant) {
+	throw new Error(`Unknown exploration variant: ${variantSlug}`);
+}
+
+const posts = await getSortedPosts();
+const topicGroups = getTopicGroups(posts)
+	.slice(0, 3)
+	.map((topic) => ({
+		name: topic.name,
+		slug: topic.slug,
+		description: topic.description,
+		count: topic.posts.length,
+		href: `/blog/topics/${topic.slug}/`,
+	}));
+
+const postPreviews = posts.slice(0, 6).map((post) => ({
+	id: post.id,
+	title: post.data.title,
+	description: post.data.description,
+	dateLabel: formatDate(post.data.pubDate),
+	dateTime: formatDateTime(post.data.pubDate),
+	topic: post.data.topic.trim() || undefined,
+	href: `/blog/${post.id}/`,
+}));
+
+const categories = (await getAllDocCategories()).slice(0, 8).map((category) => ({
+	...category,
+	href: `/categories/${category.slug}/`,
+}));
+
+const archiveGroups = (await getArchiveGroups()).slice(0, 3).map((group) => ({
+	year: group.year,
+	items: group.items.slice(0, 4).map((post) => ({
+		title: post.data.title,
+		id: post.id,
+		dateLabel: formatDate(post.data.pubDate),
+		dateTime: formatDateTime(post.data.pubDate),
+		href: `/blog/${post.id}/`,
+	})),
+}));
+
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout
+	title={`${variant.name} | 列表页探索 | Dead Soul Insects`}
+	description={variant.summary}
+	canonicalPath={`/lab/list-exploration/${variant.slug}/`}
+	hideChrome={true}
+>
+	<ListExplorationView variant={variant} topics={topicGroups} posts={postPreviews} categories={categories} archiveGroups={archiveGroups} base={base} />
+</Layout>

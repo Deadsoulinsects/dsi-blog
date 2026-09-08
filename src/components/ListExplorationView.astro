@@ -1,0 +1,853 @@
+---
+import type { ListExplorationVariant } from '../data/listExplorationVariants';
+import { withBase } from '../utils/paths';
+
+interface TopicPreview {
+	name: string;
+	slug: string;
+	description?: string;
+	count: number;
+	href: string;
+}
+
+interface PostPreview {
+	id: string;
+	title: string;
+	description: string;
+	dateLabel: string;
+	dateTime: string;
+	topic?: string;
+	href: string;
+}
+
+interface CategoryPreview {
+	name: string;
+	slug: string;
+	count: number;
+	href: string;
+}
+
+interface ArchivePreview {
+	year: string;
+	items: Array<{
+		title: string;
+		id: string;
+		dateLabel: string;
+		dateTime: string;
+		href: string;
+	}>;
+}
+
+interface Props {
+	variant: ListExplorationVariant;
+	topics: TopicPreview[];
+	posts: PostPreview[];
+	categories: CategoryPreview[];
+	archiveGroups: ArchivePreview[];
+	base: string;
+	previousHref?: string;
+	previousLabel?: string;
+}
+
+const { variant, topics, posts, categories, archiveGroups, base, previousHref = '/lab/list-exploration/', previousLabel = '返回探索总览' } = Astro.props;
+
+const styleVars = Object.entries(variant.tokens)
+	.map(([key, value]) => `${key}: ${value}`)
+	.join('; ');
+
+const variantClass = `mode-${variant.cardMode}`;
+---
+
+<section class:list={['lab-shell', variantClass]} style={styleVars} data-variant={variant.slug}>
+	<div class="lab-ambient" aria-hidden="true"></div>
+
+	<section class="lab-hero panel-surface">
+		<a class="back-link" href={withBase(base, previousHref)}>{previousLabel}</a>
+		<div class="hero-grid">
+			<div class="hero-copy">
+				<p class="eyebrow">{variant.groupLabel}</p>
+				<h1>{variant.name}</h1>
+				<p class="hero-summary">{variant.summary}</p>
+			</div>
+
+			<div class="hero-side">
+				<p class="route-label">{variant.routeLabel}</p>
+				<p class="accent-title">{variant.accentTitle}</p>
+				<div class="keyword-row" aria-label="路线关键词">
+					{variant.keywords.map((keyword) => <span class="keyword-pill">{keyword}</span>)}
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="guide-band panel-surface">
+		<div>
+			<p class="guide-kicker">观看重点</p>
+			<p class="guide-copy">{variant.guideLabel}</p>
+		</div>
+		<div>
+			<p class="guide-kicker">判断标准</p>
+			<p class="guide-copy">{variant.keyJudgement}</p>
+		</div>
+		<div>
+			<p class="guide-kicker">建议</p>
+			<p class="guide-copy">{variant.recommendation}</p>
+		</div>
+	</section>
+
+	<section class="section-block guide-layer">
+		<div class="section-heading">
+			<div>
+				<p class="eyebrow">轻导览层</p>
+				<h2>先知道这组页面怎么看</h2>
+			</div>
+			<p class="section-note">这里模拟列表页标题区后的轻量引导层：既有一点开场气质，也顺手告诉你这页的阅读方式。</p>
+		</div>
+
+		<div class="guide-cards" aria-hidden="true">
+			<article class="guide-card panel-surface subtle-surface">
+				<h3>阅读顺序</h3>
+				<p>先看专题入口，再扫主列表，最后用归档区回看较早内容。</p>
+			</article>
+			<article class="guide-card panel-surface subtle-surface">
+				<h3>结构提示</h3>
+				<p>分类、专题、时间与归档都保留，但每种方案会用不同节奏重新组织它们。</p>
+			</article>
+			<article class="guide-card panel-surface subtle-surface">
+				<h3>体验重点</h3>
+				<p>观察卡片边界、分组标题、元信息展签和背景层怎么一起工作。</p>
+			</article>
+		</div>
+	</section>
+
+	<section class="section-block topic-layer">
+		<div class="section-heading">
+			<div>
+				<p class="eyebrow">专题入口</p>
+				<h2>先按线索进入</h2>
+			</div>
+			<p class="section-note">专题入口页更适合测试“分组标题、导语和内容入口”的关系。</p>
+		</div>
+
+		<div class="topic-grid">
+			{topics.map((topic) => (
+				<a class="topic-card panel-surface interactive-card interactive-link" href={withBase(base, topic.href)}>
+					<div class="topic-head">
+						<p class="topic-name">{topic.name}</p>
+						<span class="meta-pill">{topic.count} 篇</span>
+					</div>
+					<p class="topic-description">{topic.description ?? '还在继续整理的主题线索。'}</p>
+					<span class="card-link">进入专题 →</span>
+				</a>
+			))}
+		</div>
+	</section>
+
+	<section class="section-block category-layer">
+		<div class="section-heading">
+			<div>
+				<p class="eyebrow">分类入口</p>
+				<h2>用展签而不是小标签说话</h2>
+			</div>
+			<p class="section-note">这一层模拟分类页和专题索引的入口密度，重点看元信息的存在感是否刚好。</p>
+		</div>
+
+		<div class="category-grid">
+			{categories.map((category) => (
+				<a class="category-card panel-surface interactive-card interactive-link" href={withBase(base, category.href)}>
+					<div class="category-copy">
+						<p class="category-name">{category.name}</p>
+						<p class="category-note">适合先缩小方向，再继续进入具体页面。</p>
+					</div>
+					<span class="meta-pill">{category.count}</span>
+				</a>
+			))}
+		</div>
+	</section>
+
+	<section class="section-block post-layer">
+		<div class="section-heading">
+			<div>
+				<p class="eyebrow">文章列表</p>
+				<h2>卡片语言是这次比较的中心</h2>
+			</div>
+			<p class="section-note">标题、摘要、元信息和边界感都在这里同时接受检验。</p>
+		</div>
+
+		<div class="post-grid">
+			{posts.map((post) => (
+				<a class="post-card panel-surface interactive-card interactive-link" href={withBase(base, post.href)}>
+					<div class="post-top">
+						<div class="meta-rack">
+							<time class="meta-pill meta-pill-ghost" datetime={post.dateTime}>{post.dateLabel}</time>
+							{post.topic && <span class="meta-pill">{post.topic}</span>}
+						</div>
+						<span class="card-link">阅读全文 →</span>
+					</div>
+					<div class="post-copy">
+						<h3>{post.title}</h3>
+						<p>{post.description}</p>
+					</div>
+				</a>
+			))}
+		</div>
+	</section>
+
+	<section class="section-block archive-section archive-layer">
+		<div class="section-heading">
+			<div>
+				<p class="eyebrow">归档视角</p>
+				<h2>回看更早的记录</h2>
+			</div>
+			<p class="section-note">归档区用来测试“强分组感”会不会破坏整体连贯性。</p>
+		</div>
+
+		<div class="archive-grid">
+			{archiveGroups.map((group) => (
+				<section class="archive-card panel-surface subtle-surface">
+					<div class="archive-header">
+						<h3>{group.year}</h3>
+						<span class="meta-pill">{group.items.length} 条</span>
+					</div>
+					<ul class="archive-list">
+						{group.items.map((item) => (
+							<li>
+								<time datetime={item.dateTime}>{item.dateLabel}</time>
+								<a class="archive-link" href={withBase(base, item.href)}>{item.title}</a>
+							</li>
+						))}
+					</ul>
+				</section>
+			))}
+		</div>
+	</section>
+</section>
+
+<style>
+	.lab-shell {
+		position: relative;
+		display: grid;
+		gap: clamp(20px, 3vw, 30px);
+		color: var(--lab-text);
+	}
+
+	.lab-ambient {
+		position: fixed;
+		inset: 0;
+		z-index: -1;
+		pointer-events: none;
+		background:
+			radial-gradient(circle at 8% 10%, var(--lab-glow-a), transparent 24%),
+			radial-gradient(circle at 90% 16%, var(--lab-glow-b), transparent 26%),
+			radial-gradient(circle at 50% 92%, color-mix(in srgb, var(--lab-accent) 18%, transparent), transparent 34%),
+			linear-gradient(180deg, color-mix(in srgb, var(--lab-bg-strong) 85%, black) 0%, var(--lab-bg) 100%);
+	}
+
+	.panel-surface {
+		position: relative;
+		border: 1px solid var(--surface-line, var(--lab-line));
+		border-radius: 28px;
+		background:
+			linear-gradient(180deg, var(--surface-highlight, rgba(255, 255, 255, 0.04)), rgba(255, 255, 255, 0)),
+			var(--surface-bg, var(--lab-panel));
+		box-shadow: var(--lab-shadow);
+		backdrop-filter: blur(18px);
+		overflow: clip;
+	}
+
+	.subtle-surface {
+		background:
+			linear-gradient(180deg, var(--subtle-highlight, rgba(255, 255, 255, 0.025)), rgba(255, 255, 255, 0)),
+			var(--subtle-bg, color-mix(in srgb, var(--lab-panel) 85%, var(--lab-bg-strong)));
+	}
+
+	.interactive-card {
+		color: inherit;
+		text-decoration: none;
+		transition:
+			transform 0.24s ease,
+			border-color 0.24s ease,
+			box-shadow 0.24s ease,
+			background 0.24s ease;
+	}
+
+	.interactive-card:is(:hover, :focus-within) {
+		transform: translateY(-4px);
+		border-color: var(--lab-line-strong);
+		box-shadow: 0 28px 90px rgba(0, 0, 0, 0.32);
+	}
+
+	.interactive-link:focus-visible,
+	.archive-link:focus-visible,
+	.back-link:focus-visible {
+		outline: 2px solid var(--lab-accent-soft);
+		outline-offset: 3px;
+	}
+
+	.lab-hero,
+	.guide-band,
+	.guide-card,
+	.topic-card,
+	.category-card,
+	.post-card,
+	.archive-card {
+		padding: clamp(20px, 3vw, 30px);
+	}
+
+	.hero-grid,
+	.section-heading,
+	.topic-head,
+	.category-card,
+	.post-top,
+	.archive-header,
+	.archive-list li {
+		display: flex;
+		gap: 14px;
+		justify-content: space-between;
+	}
+
+	.hero-grid {
+		align-items: start;
+		flex-wrap: wrap;
+	}
+
+	.hero-copy,
+	.hero-side,
+	.post-copy,
+	.category-copy,
+	.guide-card,
+	.archive-card,
+	.section-block {
+		display: grid;
+		gap: 12px;
+	}
+
+	.section-block {
+		gap: 16px;
+	}
+
+	.guide-layer,
+	.topic-layer,
+	.category-layer,
+	.post-layer,
+	.archive-layer {
+		padding: clamp(18px, 2.4vw, 24px);
+		border: 1px solid var(--zone-line, transparent);
+		border-radius: 28px;
+		background:
+			linear-gradient(135deg, var(--zone-wash, transparent), transparent 58%),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+			var(--zone-bg, transparent);
+		box-shadow: var(--zone-shadow, none);
+	}
+
+	.guide-layer {
+		--zone-bg: var(--guide-zone-bg, transparent);
+		--zone-line: var(--guide-zone-line, transparent);
+		--zone-wash: var(--guide-zone-wash, transparent);
+		--zone-shadow: var(--guide-zone-shadow, none);
+	}
+
+	.topic-layer {
+		--zone-bg: var(--topic-zone-bg, transparent);
+		--zone-line: var(--topic-zone-line, transparent);
+		--zone-wash: var(--topic-zone-wash, transparent);
+		--zone-shadow: var(--topic-zone-shadow, none);
+	}
+
+	.category-layer {
+		--zone-bg: var(--category-zone-bg, transparent);
+		--zone-line: var(--category-zone-line, transparent);
+		--zone-wash: var(--category-zone-wash, transparent);
+		--zone-shadow: var(--category-zone-shadow, none);
+	}
+
+	.post-layer {
+		--zone-bg: var(--post-zone-bg, transparent);
+		--zone-line: var(--post-zone-line, transparent);
+		--zone-wash: var(--post-zone-wash, transparent);
+		--zone-shadow: var(--post-zone-shadow, none);
+	}
+
+	.archive-layer {
+		--zone-bg: var(--archive-zone-bg, transparent);
+		--zone-line: var(--archive-zone-line, transparent);
+		--zone-wash: var(--archive-zone-wash, transparent);
+		--zone-shadow: var(--archive-zone-shadow, none);
+	}
+
+	[data-variant='swarm-lantern'] .lab-hero {
+		border-color: rgba(186, 244, 231, 0.3);
+		background:
+			radial-gradient(circle at 16% 18%, rgba(175, 244, 220, 0.3), transparent 24%),
+			radial-gradient(circle at 82% 20%, rgba(125, 188, 255, 0.24), transparent 24%),
+			radial-gradient(circle at 52% 82%, rgba(150, 233, 215, 0.16), transparent 28%),
+			linear-gradient(180deg, rgba(222, 255, 248, 0.07), rgba(255, 255, 255, 0)),
+			linear-gradient(135deg, rgba(78, 155, 146, 0.18), rgba(0, 0, 0, 0) 58%),
+			var(--hero-panel, var(--lab-panel));
+		box-shadow:
+			0 0 0 1px rgba(176, 243, 226, 0.06),
+			0 30px 96px rgba(0, 0, 0, 0.42);
+	}
+
+	[data-variant='swarm-lantern'] .guide-layer {
+		background:
+			linear-gradient(90deg, rgba(94, 175, 166, 0.16), rgba(0, 0, 0, 0) 22%, rgba(110, 170, 241, 0.12) 76%, rgba(0, 0, 0, 0)),
+			linear-gradient(180deg, rgba(225, 255, 247, 0.03), rgba(255, 255, 255, 0)),
+			var(--guide-zone-bg, transparent);
+		border-color: rgba(157, 219, 206, 0.14);
+	}
+
+	[data-variant='swarm-lantern'] .guide-band {
+		border-color: rgba(173, 235, 222, 0.2);
+		background:
+			linear-gradient(135deg, rgba(113, 214, 194, 0.18), rgba(0, 0, 0, 0) 42%),
+			linear-gradient(180deg, rgba(219, 255, 243, 0.04), rgba(255, 255, 255, 0)),
+			var(--guide-panel, var(--lab-panel));
+	}
+
+	[data-variant='swarm-lantern'] .guide-card {
+		background:
+			linear-gradient(180deg, rgba(203, 255, 238, 0.04), rgba(255, 255, 255, 0)),
+			var(--guide-card-panel, var(--lab-panel));
+	}
+
+	[data-variant='swarm-lantern'] .topic-layer {
+		background:
+			radial-gradient(circle at 18% 18%, rgba(174, 243, 223, 0.1), transparent 24%),
+			linear-gradient(180deg, rgba(220, 255, 246, 0.03), rgba(255, 255, 255, 0)),
+			var(--topic-zone-bg, transparent);
+	}
+
+	[data-variant='swarm-lantern'] .topic-card {
+		border-color: rgba(184, 239, 227, 0.22);
+		background:
+			radial-gradient(circle at 100% 0%, rgba(180, 242, 223, 0.18), rgba(0, 0, 0, 0) 38%),
+			linear-gradient(180deg, rgba(227, 255, 247, 0.04), rgba(255, 255, 255, 0)),
+			var(--topic-panel, var(--lab-panel));
+	}
+
+	[data-variant='swarm-lantern'] .category-layer {
+		background:
+			linear-gradient(90deg, rgba(94, 161, 202, 0.08), rgba(0, 0, 0, 0) 18%, rgba(92, 181, 166, 0.08) 82%, rgba(0, 0, 0, 0)),
+			var(--category-zone-bg, transparent);
+	}
+
+	[data-variant='swarm-lantern'] .category-card {
+		border-color: rgba(164, 214, 214, 0.2);
+		background:
+			linear-gradient(135deg, rgba(107, 172, 211, 0.14), rgba(0, 0, 0, 0) 52%),
+			linear-gradient(180deg, rgba(226, 252, 255, 0.03), rgba(255, 255, 255, 0)),
+			var(--category-panel, var(--lab-panel));
+	}
+
+	[data-variant='swarm-lantern'] .post-layer {
+		background:
+			linear-gradient(180deg, rgba(58, 114, 148, 0.08), rgba(0, 0, 0, 0) 24%),
+			var(--post-zone-bg, transparent);
+		border-color: rgba(128, 176, 189, 0.1);
+	}
+
+	[data-variant='swarm-lantern'] .post-card {
+		border-color: rgba(137, 190, 201, 0.18);
+		background:
+			linear-gradient(135deg, rgba(121, 179, 255, 0.12), rgba(0, 0, 0, 0) 58%),
+			linear-gradient(180deg, rgba(210, 250, 255, 0.025), rgba(255, 255, 255, 0)),
+			var(--post-panel, var(--lab-panel));
+	}
+
+	[data-variant='swarm-lantern'] .archive-layer {
+		background:
+			linear-gradient(90deg, rgba(86, 154, 219, 0.08), rgba(0, 0, 0, 0) 20%, rgba(115, 208, 186, 0.08) 78%, rgba(0, 0, 0, 0)),
+			var(--archive-zone-bg, transparent);
+	}
+
+	[data-variant='swarm-lantern'] .archive-card {
+		border-color: rgba(168, 212, 203, 0.18);
+		background:
+			linear-gradient(135deg, rgba(170, 242, 223, 0.1), rgba(0, 0, 0, 0) 58%),
+			linear-gradient(180deg, rgba(214, 255, 247, 0.02), rgba(255, 255, 255, 0)),
+			var(--archive-panel, color-mix(in srgb, var(--lab-panel) 85%, var(--lab-bg-strong)));
+	}
+
+	[data-variant='swarm-lantern'] .meta-pill {
+		box-shadow: inset 0 0 0 1px rgba(218, 255, 247, 0.04);
+	}
+
+	[data-variant='swarm-lantern'] .card-link,
+	[data-variant='swarm-lantern'] .back-link {
+		background:
+			linear-gradient(135deg, rgba(106, 176, 239, 0.16), rgba(0, 0, 0, 0) 58%),
+			rgba(117, 186, 248, 0.08);
+	}
+
+	.eyebrow,
+	.guide-kicker,
+	.route-label {
+		margin: 0;
+		font-size: 0.8rem;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--lab-accent-soft);
+	}
+
+	h1,
+	h2,
+	h3,
+	p,
+	span,
+	time,
+	ul {
+		margin: 0;
+		overflow-wrap: anywhere;
+	}
+
+	h1 {
+		font-size: clamp(2.2rem, 5vw, 4.2rem);
+		line-height: 0.98;
+		max-width: 12ch;
+	}
+
+	h2 {
+		font-size: clamp(1.45rem, 2.8vw, 2.1rem);
+		line-height: 1.12;
+	}
+
+	h3,
+	.topic-name,
+	.category-name {
+		font-size: clamp(1.08rem, 2vw, 1.35rem);
+		line-height: 1.24;
+	}
+
+	p,
+	time,
+	span,
+	li {
+		line-height: 1.7;
+		color: var(--lab-text-soft);
+	}
+
+	.hero-summary,
+	.accent-title {
+		max-width: 34rem;
+		font-size: 1.02rem;
+	}
+
+	.accent-title {
+		color: var(--lab-text);
+	}
+
+	.keyword-row,
+	.meta-rack {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+	}
+
+	.keyword-pill,
+	.meta-pill,
+	.card-link,
+	.back-link {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		min-height: 30px;
+		padding: 6px 11px;
+		border-radius: 999px;
+		font-size: 0.82rem;
+	}
+
+	.keyword-pill,
+	.meta-pill {
+		border: 1px solid var(--meta-border, color-mix(in srgb, var(--lab-accent) 22%, transparent));
+		background: var(--meta-bg, var(--lab-accent-ghost));
+		color: var(--meta-text, var(--lab-accent-soft));
+	}
+
+	.meta-pill-ghost,
+	.card-link,
+	.back-link {
+		border: 1px solid var(--action-border, var(--lab-line));
+		background: var(--action-bg, rgba(255, 255, 255, 0.04));
+		color: var(--action-text, var(--lab-text-soft));
+	}
+
+	.lab-hero {
+		--surface-bg: var(--hero-panel, var(--lab-panel));
+		--surface-line: var(--hero-line, var(--lab-line));
+		--surface-highlight: var(--hero-highlight, rgba(255, 255, 255, 0.05));
+		background:
+			radial-gradient(circle at 18% 14%, var(--hero-glow-a, transparent), transparent 30%),
+			radial-gradient(circle at 82% 22%, var(--hero-glow-b, transparent), transparent 28%),
+			linear-gradient(180deg, var(--hero-highlight, rgba(255, 255, 255, 0.05)), rgba(255, 255, 255, 0)),
+			var(--hero-panel, var(--lab-panel));
+	}
+
+	.guide-band {
+		--surface-bg: var(--guide-panel, var(--lab-panel));
+		--surface-line: var(--guide-line, var(--lab-line));
+		--surface-highlight: var(--guide-highlight, rgba(255, 255, 255, 0.035));
+		background:
+			linear-gradient(135deg, var(--guide-wash, transparent), transparent 52%),
+			linear-gradient(180deg, var(--guide-highlight, rgba(255, 255, 255, 0.035)), rgba(255, 255, 255, 0)),
+			var(--guide-panel, var(--lab-panel));
+	}
+
+	.guide-card {
+		--surface-bg: var(--guide-card-panel, var(--lab-panel));
+		--subtle-bg: var(--guide-card-panel, color-mix(in srgb, var(--lab-panel) 85%, var(--lab-bg-strong)));
+		--surface-line: var(--guide-card-line, var(--lab-line));
+		--section-overlay: var(--guide-card-wash, transparent);
+	}
+
+	.topic-card {
+		--surface-bg: var(--topic-panel, var(--lab-panel));
+		--surface-line: var(--topic-line, var(--lab-line));
+		--section-overlay: var(--topic-wash, transparent);
+		background:
+			linear-gradient(135deg, var(--topic-wash, transparent), transparent 55%),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0)),
+			var(--topic-panel, var(--lab-panel));
+	}
+
+	.category-card {
+		--surface-bg: var(--category-panel, var(--lab-panel));
+		--surface-line: var(--category-line, var(--lab-line));
+		--section-overlay: var(--category-wash, transparent);
+		background:
+			linear-gradient(135deg, var(--category-wash, transparent), transparent 56%),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0)),
+			var(--category-panel, var(--lab-panel));
+	}
+
+	.post-card {
+		--surface-bg: var(--post-panel, var(--lab-panel));
+		--surface-line: var(--post-line, var(--lab-line));
+		--section-overlay: var(--post-wash, transparent);
+		background:
+			linear-gradient(135deg, var(--post-wash, transparent), transparent 58%),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0)),
+			var(--post-panel, var(--lab-panel));
+	}
+
+	.archive-card {
+		--surface-bg: var(--archive-panel, var(--lab-panel));
+		--subtle-bg: var(--archive-panel, color-mix(in srgb, var(--lab-panel) 85%, var(--lab-bg-strong)));
+		--surface-line: var(--archive-line, var(--lab-line));
+		--section-overlay: var(--archive-wash, transparent);
+		background:
+			linear-gradient(135deg, var(--archive-wash, transparent), transparent 60%),
+			linear-gradient(180deg, var(--subtle-highlight, rgba(255, 255, 255, 0.025)), rgba(255, 255, 255, 0)),
+			var(--archive-panel, color-mix(in srgb, var(--lab-panel) 85%, var(--lab-bg-strong)));
+	}
+
+	.back-link {
+		justify-self: start;
+		text-decoration: none;
+		transition:
+			transform 0.24s ease,
+			border-color 0.24s ease,
+			color 0.24s ease;
+	}
+
+	.back-link:is(:hover, :focus-visible) {
+		transform: translateY(-2px);
+		border-color: var(--lab-line-strong);
+		color: var(--lab-text);
+	}
+
+	.section-heading {
+		align-items: end;
+		flex-wrap: wrap;
+	}
+
+	.section-note {
+		max-width: 34rem;
+	}
+
+	.guide-band {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 14px;
+	}
+
+	.guide-band > div {
+		flex: 1 1 16rem;
+		display: grid;
+		gap: 8px;
+	}
+
+	.guide-cards,
+	.topic-grid,
+	.post-grid,
+	.archive-grid {
+		display: grid;
+		gap: 16px;
+	}
+
+	.guide-cards,
+	.topic-grid,
+	.archive-grid {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	.category-grid {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: 14px;
+	}
+
+	.post-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.topic-card,
+	.post-card {
+		gap: 16px;
+	}
+
+	.topic-description,
+	.category-note,
+	.post-copy p {
+		max-width: 40ch;
+	}
+
+	.card-link {
+		justify-self: start;
+	}
+
+	.archive-link {
+		color: var(--lab-text);
+		text-decoration: none;
+		transition: color 0.24s ease;
+	}
+
+	.archive-link:is(:hover, :focus-visible) {
+		color: var(--lab-accent-soft);
+	}
+
+	.archive-list {
+		padding: 0;
+		list-style: none;
+		display: grid;
+		gap: 10px;
+	}
+
+	.archive-list li {
+		padding-top: 10px;
+		border-top: 1px solid color-mix(in srgb, var(--lab-line) 75%, transparent);
+		align-items: start;
+	}
+
+	.archive-list li:first-child {
+		padding-top: 0;
+		border-top: 0;
+	}
+
+	.mode-drift .interactive-card::before,
+	.mode-glow .interactive-card::before,
+	.mode-frame .interactive-card::before,
+	.mode-ritual .interactive-card::before {
+		content: '';
+		position: absolute;
+		inset: auto 18px 0;
+		height: 1px;
+		background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--lab-accent) 48%, transparent), transparent);
+		opacity: 0.6;
+	}
+
+	.mode-drift .interactive-card {
+		background:
+			radial-gradient(circle at top right, color-mix(in srgb, var(--lab-glow-a) 75%, transparent), transparent 40%),
+			linear-gradient(135deg, var(--section-overlay, transparent), transparent 58%),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0)),
+			var(--surface-bg, var(--lab-panel));
+	}
+
+	.mode-glow .panel-surface {
+		background:
+			radial-gradient(circle at top right, color-mix(in srgb, var(--lab-glow-b) 70%, transparent), transparent 34%),
+			linear-gradient(135deg, var(--section-overlay, transparent), transparent 58%),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0)),
+			var(--surface-bg, var(--lab-panel));
+	}
+
+	.mode-frame .panel-surface,
+	.mode-ritual .panel-surface {
+		border-radius: 20px;
+	}
+
+	.mode-frame .interactive-card,
+	.mode-ritual .interactive-card {
+		background:
+			linear-gradient(135deg, var(--section-overlay, transparent), transparent 60%),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
+			var(--surface-bg, var(--lab-panel));
+	}
+
+	.mode-frame .section-heading,
+	.mode-ritual .section-heading {
+		padding-bottom: 10px;
+		border-bottom: 1px solid color-mix(in srgb, var(--lab-line-strong) 60%, transparent);
+	}
+
+	.mode-ritual .guide-band,
+	.mode-ritual .archive-card,
+	.mode-ritual .topic-card,
+	.mode-ritual .category-card,
+	.mode-ritual .post-card {
+		box-shadow:
+			inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+			var(--lab-shadow);
+	}
+
+	.mode-ritual .meta-pill,
+	.mode-frame .meta-pill {
+		border-radius: 12px;
+	}
+
+	@media (max-width: 900px) {
+		.panel-surface {
+			box-shadow: 0 16px 36px rgba(0, 0, 0, 0.24);
+		}
+
+		.section-block {
+			gap: 14px;
+		}
+
+		.guide-band,
+		.guide-cards,
+		.topic-grid,
+		.archive-grid,
+		.category-grid,
+		.post-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.lab-hero,
+		.guide-band,
+		.guide-card,
+		.topic-card,
+		.category-card,
+		.post-card,
+		.archive-card {
+			padding: 18px;
+		}
+
+		.section-heading,
+		.post-top,
+		.category-card,
+		.archive-list li,
+		.archive-header {
+			flex-direction: column;
+		}
+
+		.archive-link {
+			display: inline-flex;
+			align-items: center;
+			min-height: 28px;
+		}
+	}
+</style>

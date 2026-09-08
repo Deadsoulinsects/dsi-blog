@@ -1,0 +1,245 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import { listExplorationVariants } from '../../../data/listExplorationVariants';
+import { withBase } from '../../../utils/paths';
+
+const base = import.meta.env.BASE_URL;
+const totalVariants = listExplorationVariants.length;
+const routeVariantCount = totalVariants - 3;
+const imageryVariantCount = 3;
+---
+
+<Layout
+	title="列表页风格探索 | Dead Soul Insects"
+	description={`用于比较内容列表体系的 ${totalVariants} 条视觉探索页，其中新增 ${imageryVariantCount} 条为 Dead Soul Insects 意象导向方案。`}
+	canonicalPath="/lab/list-exploration/"
+	hideChrome={true}
+>
+	<div class="exploration-shell">
+		<section class="hero-card">
+			<p class="eyebrow">内容页风格探索</p>
+			<h1>列表体系的 {totalVariants} 条探索页</h1>
+			<p class="lead">
+				这一组页面不直接改正式路由，而是先把博客列表、分类、专题、归档这一整组内容页投射到同一家族里的多种视觉语言中。前 {routeVariantCount} 条保留原来的路线比较，新增 {imageryVariantCount} 条则专门把 Dead Soul Insects 的残魂、虫群、回魂意象压进颜色和气氛层，看它们能不能真正拉开陌生感，同时仍然属于这个站点。
+			</p>
+			<div class="hero-meta">
+				<span class="meta-pill">{totalVariants} 条探索页</span>
+				<span class="meta-pill subtle">前 {routeVariantCount} 条 = 路线比较</span>
+				<span class="meta-pill subtle">新增 {imageryVariantCount} 条 = 意象加压</span>
+				<span class="meta-pill subtle">桌面 / 手机同时考虑</span>
+			</div>
+		</section>
+
+		<section class="note-card">
+			<div>
+				<p class="note-kicker">比较方式</p>
+				<p>先看前五条路线如何从基线、过渡走到更远新路，再对照后三条意象方案是否终于把残光、微光、夜色和群体漂浮感真正拉开。</p>
+			</div>
+			<div>
+				<p class="note-kicker">新增三页的角色</p>
+				<p>它们不是新家族，也不是正式同步稿，而是挂在同一套 preview 数据和同一个视图组件里的意象加压测试，只比较色氛围、残光感和页面气息。</p>
+			</div>
+			<div>
+				<p class="note-kicker">推荐起点</p>
+				<p>优先打开 <strong>虫群浮光</strong>，它最直接测试死魂虫式的白绿微体、淡蓝魂迹和缓慢聚散感能否真正进入列表页。</p>
+			</div>
+		</section>
+
+		<section class="card-grid" aria-label="探索路线列表">
+			{listExplorationVariants.map((variant, index) => (
+				<a class:list={['variant-card', { featured: variant.slug === 'swarm-lantern' }]} href={withBase(base, `/lab/list-exploration/${variant.slug}/`)}>
+					<div class="card-top">
+						<p class="card-index">0{index + 1}</p>
+						<span class="card-route">{variant.routeLabel}</span>
+					</div>
+					<div class="card-copy">
+						<h2>{variant.name}</h2>
+						<p>{variant.summary}</p>
+					</div>
+					<div class="keyword-row">
+						{variant.keywords.map((keyword) => <span class="keyword-pill">{keyword}</span>)}
+					</div>
+					<p class="card-judge">{variant.keyJudgement}</p>
+					<span class="card-link">进入这条路线 →</span>
+				</a>
+			))}
+		</section>
+	</div>
+</Layout>
+
+<style>
+	.exploration-shell {
+		display: grid;
+		gap: 22px;
+	}
+
+	.hero-card,
+	.note-card,
+	.variant-card {
+		position: relative;
+		isolation: isolate;
+		overflow: clip;
+		border: 1px solid var(--line);
+		border-radius: var(--radius-panel);
+		background:
+			radial-gradient(circle at top right, rgba(110, 195, 255, 0.08), transparent 36%),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0)),
+			var(--panel);
+		box-shadow: var(--shadow);
+		backdrop-filter: var(--glass-blur);
+	}
+
+	.hero-card,
+	.note-card {
+		padding: clamp(24px, 4vw, 38px);
+	}
+
+	.hero-card,
+	.note-card,
+	.variant-card,
+	.card-copy {
+		display: grid;
+		gap: 14px;
+	}
+
+	.hero-card {
+		max-width: 70rem;
+	}
+
+	.note-card {
+		grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+		gap: 18px;
+	}
+
+	.eyebrow,
+	.note-kicker,
+	.card-index,
+	.card-route {
+		margin: 0;
+		font-size: 0.82rem;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--accent-soft);
+	}
+
+	h1,
+	h2,
+	p,
+	span {
+		margin: 0;
+		overflow-wrap: anywhere;
+	}
+
+	h1 {
+		font-size: clamp(2.2rem, 4.6vw, 3.8rem);
+		line-height: 1.02;
+	}
+
+	h2 {
+		font-size: clamp(1.35rem, 2.3vw, 1.8rem);
+		line-height: 1.14;
+	}
+
+	p,
+	span {
+		line-height: 1.72;
+		color: var(--text-soft);
+	}
+
+	.lead {
+		max-width: 56rem;
+		font-size: 1.04rem;
+	}
+
+	.hero-meta,
+	.keyword-row,
+	.card-top {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+		align-items: center;
+	}
+
+	.meta-pill,
+	.keyword-pill,
+	.card-link,
+	.card-route {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 6px 11px;
+		min-height: 30px;
+		border-radius: 999px;
+		font-size: 0.82rem;
+	}
+
+	.meta-pill,
+	.keyword-pill {
+		border: 1px solid var(--tag-border);
+		background: var(--tag-bg);
+		color: var(--accent-soft);
+	}
+
+	.meta-pill.subtle,
+	.card-link,
+	.card-route {
+		border: 1px solid rgba(153, 176, 255, 0.16);
+		background: rgba(255, 255, 255, 0.045);
+		color: var(--text-soft);
+	}
+
+	.card-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 18px;
+	}
+
+	.variant-card {
+		padding: 22px;
+		text-decoration: none;
+		color: inherit;
+		transition:
+			transform 0.22s ease,
+			border-color 0.22s ease,
+			background 0.22s ease,
+			box-shadow 0.22s ease;
+	}
+
+	.variant-card:is(:hover, :focus-visible) {
+		transform: translateY(-3px);
+		border-color: var(--hover-border);
+		background:
+			radial-gradient(circle at top right, rgba(110, 195, 255, 0.14), transparent 36%),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
+			var(--panel-strong);
+		box-shadow: var(--shadow-hover);
+	}
+
+	.variant-card.featured {
+		border-color: rgba(110, 195, 255, 0.32);
+		box-shadow:
+			0 0 0 1px rgba(110, 195, 255, 0.08),
+			var(--shadow);
+	}
+
+	.card-judge {
+		color: var(--text);
+	}
+
+	.card-link {
+		justify-self: start;
+	}
+
+	@media (max-width: 900px) {
+		.hero-card,
+		.note-card,
+		.variant-card {
+			box-shadow: 0 16px 36px rgba(0, 0, 0, 0.24);
+		}
+
+		.note-card,
+		.card-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>
