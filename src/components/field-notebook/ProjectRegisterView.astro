@@ -1,0 +1,33 @@
+---
+import { withBase } from '../../utils/paths';
+import PageHeader from './PageHeader.astro';
+import SectionLabel from './SectionLabel.astro';
+import { fieldProjects } from './mock-data';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<PageHeader
+	eyebrow="WORKSHOP REGISTER / MOCK DATA"
+	title="项目记录"
+	intro="像实验室账簿一样保留编号、文本状态、目的和入口。所有项目均为虚构样本。"
+/>
+
+<section class="field-notebook__project-register" aria-labelledby="project-register-title">
+	<div id="project-register-title">
+		<SectionLabel label="Active and archived" count="04 records" />
+	</div>
+	<ol>
+		{fieldProjects.map((project) => (
+			<li>
+				<span class="field-notebook__row-number">{project.code}</span>
+				<article>
+					<p class="field-notebook__meta">STATUS / {project.status}</p>
+					<h3>{project.title}</h3>
+					<p>{project.note}</p>
+				</article>
+				<a class="field-notebook__text-link" href={withBase(base, project.href)}>查看虚构记录</a>
+			</li>
+		))}
+	</ol>
+</section>

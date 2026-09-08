@@ -1,0 +1,42 @@
+---
+import { withBase } from '../../utils/paths';
+import ContentTypeLabel from './ContentTypeLabel.astro';
+import PageHeader from './PageHeader.astro';
+import SectionLabel from './SectionLabel.astro';
+import { fieldEntries, referenceCollections } from './mock-data';
+
+const base = import.meta.env.BASE_URL;
+const references = fieldEntries.slice(2, 5);
+---
+
+<PageHeader
+	eyebrow="REFERENCE SHELF / MOCK DATA"
+	title="文档与参考"
+	intro="窄索引与开放式参考条目并置。这里展示的集合、标题和说明全部为虚构内容。"
+/>
+
+<div class="field-notebook__reference-shelf">
+	<aside>
+		<SectionLabel label="Collections" count="03" />
+		<nav class="field-notebook__collection-index" aria-label="参考集合">
+			{referenceCollections.map((collection) => <a href={`#${collection.target}`}>{collection.label}</a>)}
+		</nav>
+	</aside>
+	<section aria-labelledby="reference-entries-title">
+		<div id="reference-entries-title">
+			<SectionLabel label="Reference entries" count="Updated" />
+		</div>
+		<ol class="field-notebook__reference-rows">
+			{references.map((entry, index) => (
+				<li id={`reference-${String(index + 1).padStart(2, '0')}`}>
+					<span class="field-notebook__row-number" aria-hidden="true">R.{String(index + 1).padStart(2, '0')}</span>
+					<article>
+						<div class="field-notebook__entry-meta"><ContentTypeLabel type={entry.type} /><time datetime={entry.date}>{entry.date}</time></div>
+						<h2><a href={withBase(base, entry.href)}>{entry.title}</a></h2>
+						{entry.summary && <p>{entry.summary}</p>}
+					</article>
+				</li>
+			))}
+		</ol>
+	</section>
+</div>
