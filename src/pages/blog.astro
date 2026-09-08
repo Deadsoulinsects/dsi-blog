@@ -1,391 +1,369 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { formatDate, formatDateTime, getAllBlogTags, getSortedPosts } from '../utils/content';
+import { formatDate, formatDateTime, getSortedPosts } from '../utils/content';
 import { withBase } from '../utils/paths';
 import { getTopicGroups } from '../utils/topics';
 
 const posts = await getSortedPosts();
-const tags = await getAllBlogTags();
 const topicGroups = getTopicGroups(posts);
 const standalonePosts = posts.filter((post) => post.data.topic.trim() === '');
 const base = import.meta.env.BASE_URL;
 ---
 
 <Layout title="博客 | Dead Soul Insects" description="Dead Soul Insects 的博客列表页。" canonicalPath="/blog/">
-	<section class="page-card intro-card">
-		<p class="kicker">博客</p>
-		<h1>持续写下来的记录。</h1>
-		<p>
-			这里收纳 Dead Soul Insects 的文章记录。内容以技术、建站、工具实践与阶段性思考为主，按时间安静展开。
-		</p>
-		{tags.length > 0 && (
-			<ul class="tag-entry-list" aria-label="博客标签入口">
-				{tags.map((tag) => (
-					<li>
-						<a href={withBase(base, `/tags/${tag.slug}/`)}>
-							<span>{tag.name}</span>
-							<span>{tag.count}</span>
-						</a>
-					</li>
-				))}
-			</ul>
-		)}
-	</section>
-
-	{topicGroups.length > 0 && (
-		<section class="topic-section" aria-label="内容专题">
-			<div class="section-heading">
-				<div>
-					<p class="kicker">专题</p>
+	<div class="page-shell">
+		<section class="page-card intro-card">
+			<header class="page-intro">
+				<div class="intro-copy">
+					<p class="kicker">博客</p>
+					<h1>持续写下来的记录</h1>
+					<p class="lead">这里优先按已经成形的专题进入，其余文章继续按时间向下展开。</p>
 				</div>
-				<p class="section-note">按主题整理的文章入口。</p>
-			</div>
 
-			<div class="topic-grid">
-				{topicGroups.map((topicGroup) => (
-					<a class="topic-card" href={withBase(base, `/blog/topics/${topicGroup.slug}/`)}>
-						<div class="topic-main">
-							<h2>{topicGroup.name}</h2>
-							<span class="topic-count">{topicGroup.posts.length} 篇文章</span>
+				<div class="intro-index" aria-label="博客概览">
+					<div class="intro-index-item">
+						<span class="index-label">公开文章</span>
+						<strong>{posts.length}</strong>
+					</div>
+					{topicGroups.length > 0 && (
+						<div class="intro-index-item">
+							<span class="index-label">专题入口</span>
+							<strong>{topicGroups.length}</strong>
 						</div>
-					</a>
-				))}
+					)}
+					{standalonePosts.length > 0 && (
+						<div class="intro-index-item muted">
+							<span class="index-label">时间浏览</span>
+							<strong>{standalonePosts.length}</strong>
+						</div>
+					)}
+				</div>
+			</header>
+
+			<div class="intro-note">
+				<p>先看专题，再继续按时间浏览，会比把所有文章一次摊平更容易形成稳定的阅读路径。</p>
 			</div>
 		</section>
-	)}
 
-	<section class="post-list" aria-label="文章列表">
-		{
-			standalonePosts.map((post) => (
-				<a class="post-card" href={withBase(base, `/blog/${post.id}/`)}>
-					<div class="post-card-top">
-						<time class="post-date" datetime={formatDateTime(post.data.pubDate)}>{formatDate(post.data.pubDate)}</time>
-						{post.data.tags.length > 0 && (
-							<ul class="tag-list" aria-label="文章标签">
-								{post.data.tags.map((tag) => (
-									<li>{tag}</li>
-								))}
-							</ul>
-						)}
+		{topicGroups.length > 0 && (
+			<section class="page-card section-card" aria-label="内容专题">
+				<div class="section-heading">
+					<div class="section-copy">
+						<p class="kicker">专题</p>
+						<h2>先按主题进入</h2>
 					</div>
-					<div class="post-card-body">
-						<h2>{post.data.title}</h2>
-						<p class="post-description">{post.data.description}</p>
+					<p class="section-note">已经形成线索的内容会先收进专题，方便顺着一条线继续看下去。</p>
+				</div>
+
+				<div class="topic-list">
+					{topicGroups.map((topicGroup) => (
+						<a class="topic-card" href={withBase(base, `/blog/topics/${topicGroup.slug}/`)}>
+							<div class="topic-copy">
+								<p class="entry-kicker">专题入口</p>
+								<h3>{topicGroup.name}</h3>
+								<p>{topicGroup.description ?? '继续沿着同一条内容线索往下读。'}</p>
+							</div>
+							<div class="entry-index" aria-hidden="true">
+								<span class="index-label">文章</span>
+								<strong>{topicGroup.posts.length}</strong>
+							</div>
+						</a>
+					))}
+				</div>
+			</section>
+		)}
+
+		{standalonePosts.length > 0 && (
+			<section class="page-card section-card" aria-label="文章列表">
+				<div class="section-heading">
+					<div class="section-copy">
+						<p class="kicker">文章</p>
+						<h2>继续按时间浏览</h2>
 					</div>
-				</a>
-			))
-		}
-	</section>
+					<p class="section-note">没有进入专题的文章会继续按时间展开。</p>
+				</div>
+
+				<div class="post-list">
+					{standalonePosts.map((post) => (
+						<a class="post-card" href={withBase(base, `/blog/${post.id}/`)}>
+							<div class="post-meta">
+								<time class="post-date" datetime={formatDateTime(post.data.pubDate)}>{formatDate(post.data.pubDate)}</time>
+								<span class="meta-index-label">时间浏览</span>
+							</div>
+							<div class="post-card-body">
+								<h3>{post.data.title}</h3>
+								<p class="post-description">{post.data.description}</p>
+							</div>
+						</a>
+					))}
+				</div>
+			</section>
+		)}
+	</div>
 </Layout>
 
 <style>
-	.page-card {
-		padding: 32px;
-		border: 1px solid var(--line);
-		border-radius: var(--radius-panel);
-		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
-			var(--panel);
-		backdrop-filter: var(--glass-blur);
-		box-shadow: var(--shadow);
+	.page-shell {
+		display: grid;
+		gap: clamp(22px, 2.8vw, 30px);
 	}
 
-	.intro-card {
-		margin-bottom: 22px;
+	.page-card,
+		.topic-card,
+		.post-card {
+		border: 1px solid var(--line);
+		backdrop-filter: var(--glass-blur);
+		box-sizing: border-box;
+	}
+
+	.page-card {
+		padding: clamp(24px, 3.4vw, 34px);
+		border-radius: var(--radius-panel);
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0)),
+			var(--panel);
+		box-shadow: 0 18px 42px rgba(0, 0, 0, 0.22);
+		overflow: clip;
+	}
+
+	.page-intro,
+	.section-copy,
+	.intro-copy,
+	.topic-copy,
+	.post-card-body {
+		display: grid;
+		gap: 12px;
+	}
+
+	.page-intro,
+	.intro-card,
+	.section-card {
+		display: grid;
+		gap: 20px;
+	}
+
+	.page-intro {
+		grid-template-columns: minmax(0, 1.35fr) minmax(15rem, 0.8fr);
+		align-items: start;
+		gap: 24px;
+	}
+
+	.intro-copy {
+		max-width: 40rem;
+	}
+
+	.section-heading {
+		display: grid;
+		gap: 14px;
+	}
+
+	.intro-index {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 12px;
+		align-content: start;
+	}
+
+	.intro-index-item {
+		display: grid;
+		gap: 8px;
+		padding: 16px 18px;
+		border: 1px solid rgba(153, 176, 255, 0.14);
+		border-radius: 20px;
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.022), rgba(255, 255, 255, 0)),
+			color-mix(in srgb, var(--panel-strong) 84%, transparent);
+		box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+	}
+
+	.intro-index-item.muted {
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0)),
+			color-mix(in srgb, var(--panel) 88%, transparent);
+	}
+
+	.intro-index-item strong,
+	.entry-index strong {
+		font-size: 1.05rem;
+		line-height: 1;
+		color: var(--text);
+	}
+
+	.intro-note {
+		padding-top: 2px;
+		border-top: 1px solid rgba(153, 176, 255, 0.12);
+	}
+
+	.section-heading {
+		grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.8fr);
+		align-items: end;
+	}
+
+	.section-copy {
+		gap: 8px;
+	}
+
+	.section-note {
+		max-width: 36rem;
+		align-self: end;
 	}
 
 	.kicker {
-		margin: 0 0 12px;
-		font-size: 0.88rem;
-		letter-spacing: 0.12em;
+		margin: 0;
+		font-size: 0.82rem;
+		letter-spacing: 0.14em;
 		text-transform: uppercase;
 		color: var(--accent-soft);
 	}
 
+	.entry-kicker,
+	.index-label,
+	.meta-index-label {
+		margin: 0;
+		font-size: 0.78rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--text-soft);
+	}
+
+	h1,
+	h2,
+	h3,
+		strong,
+	p,
+	time,
+	span {
+		margin: 0;
+		overflow-wrap: anywhere;
+	}
+
 	h1 {
-		margin: 0 0 16px;
 		font-size: clamp(2rem, 4vw, 3rem);
 		line-height: 1.08;
 	}
 
 	h2 {
-		margin: 0;
-		font-size: clamp(1.3rem, 2.4vw, 1.65rem);
-		line-height: 1.25;
-		overflow-wrap: anywhere;
+		font-size: clamp(1.35rem, 2.5vw, 1.8rem);
+		line-height: 1.16;
 	}
 
 	h3 {
-		margin: 0;
-		font-size: clamp(1.3rem, 2.3vw, 1.6rem);
-		line-height: 1.25;
-		overflow-wrap: anywhere;
+		font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+		line-height: 1.24;
 	}
 
-	p {
-		margin: 0;
-		line-height: 1.8;
+	p,
+	time {
 		color: var(--text-soft);
+		line-height: 1.78;
 	}
 
-	.tag-entry-list {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 10px;
-		margin: 18px 0 0;
-		padding: 0;
-		list-style: none;
+	.lead {
+		font-size: 1.02rem;
 	}
 
-	.tag-entry-list a {
-		display: inline-flex;
-		gap: 8px;
-		align-items: center;
-		padding: 7px 12px;
-		border: 1px solid rgba(110, 195, 255, 0.18);
-		border-radius: var(--radius-pill);
-		background: var(--tag-bg);
-		color: var(--text);
-		text-decoration: none;
-		transition:
-			border-color 0.2s ease,
-			background 0.2s ease,
-			transform 0.2s ease;
-	}
-
-	.tag-entry-list a:hover,
-	.tag-entry-list a:focus-visible {
-		transform: translateY(-1px);
-		border-color: var(--hover-border);
-		background: rgba(157, 140, 255, 0.14);
-	}
-
-	.topic-section {
-		margin-bottom: 22px;
-	}
-
-	.section-heading {
-		display: flex;
-		align-items: end;
-		justify-content: space-between;
-		gap: 18px;
-		margin-bottom: 14px;
-	}
-
-	.section-note {
-		max-width: 30rem;
-		line-height: 1.7;
-		text-align: right;
-	}
-
-	.topic-grid {
+	.topic-list,
+	.post-list {
 		display: grid;
+		gap: 14px;
+	}
+
+	.topic-list {
 		grid-template-columns: 1fr;
-		align-items: start;
-		gap: 18px;
-	}
-
-	.topic-card {
-		position: relative;
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) auto;
-		gap: 22px;
-		align-items: center;
-		padding: 24px 28px;
-		border: 1px solid var(--line);
-		border-radius: var(--radius-panel);
-		background:
-			linear-gradient(135deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0)),
-			var(--panel);
-		box-shadow: 0 24px 80px rgba(0, 0, 0, 0.26);
-		color: inherit;
-		text-decoration: none;
-		overflow: hidden;
-		transition:
-			transform 0.22s ease,
-			border-color 0.22s ease,
-			background 0.22s ease;
-	}
-
-	.topic-card::before {
-		content: "";
-		position: absolute;
-		inset: -80% -10% auto auto;
-		width: 22rem;
-		height: 22rem;
-		border-radius: var(--radius-pill);
-		background: radial-gradient(circle, rgba(110, 195, 255, 0.14), transparent 68%);
-		pointer-events: none;
-	}
-
-	.topic-main {
-		position: relative;
-		z-index: 1;
-		display: contents;
-	}
-
-	.topic-card h2 {
-		font-size: clamp(1.45rem, 3vw, 2.2rem);
-		line-height: 1.05;
-		letter-spacing: -0.04em;
-	}
-
-	.topic-card:hover,
-	.topic-card:focus-visible {
-		transform: translateY(-2px);
-		border-color: rgba(157, 140, 255, 0.34);
-		background:
-			radial-gradient(circle at top right, rgba(110, 195, 255, 0.12), transparent 36%),
-			var(--panel-strong);
-	}
-
-	.topic-card:focus-visible {
-		outline: var(--focus-ring);
-		outline-offset: var(--focus-offset);
-	}
-
-	.topic-count {
-		display: inline-flex;
-		position: relative;
-		z-index: 1;
-		justify-self: end;
-		padding: 6px 10px;
-		border: 1px solid var(--tag-border);
-		border-radius: var(--radius-pill);
-		background: var(--tag-bg);
-		color: var(--accent-soft);
-		font-size: 0.82rem;
 	}
 
 	.post-list {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 18px;
-		align-items: stretch;
+		grid-template-columns: 1fr;
 	}
 
+	.topic-card,
 	.post-card {
-		position: relative;
-		display: grid;
-		grid-template-rows: auto 1fr;
-		gap: 20px;
-		height: 100%;
-		padding: 24px;
-		border: 1px solid var(--line);
-		border-radius: var(--radius-card);
+		padding: 20px 22px;
+		border-radius: 20px;
 		background:
-			radial-gradient(circle at top right, rgba(110, 195, 255, 0.1), transparent 34%),
-			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
-			var(--panel);
-		backdrop-filter: var(--glass-blur);
-		box-shadow: var(--shadow-soft);
-		box-sizing: border-box;
+			linear-gradient(180deg, rgba(255, 255, 255, 0.024), rgba(255, 255, 255, 0)),
+			color-mix(in srgb, var(--panel) 90%, var(--bg));
+		box-shadow: 0 8px 18px rgba(0, 0, 0, 0.14);
+		color: inherit;
 		text-decoration: none;
+		display: flex;
+		justify-content: space-between;
+		align-items: start;
+		gap: 20px;
 		transition:
-			transform 0.2s ease,
+			transform 0.18s ease,
 			border-color 0.2s ease,
 			background 0.2s ease,
 			box-shadow 0.2s ease;
 	}
 
-	.post-card-top,
-	.tag-list {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 10px;
-	}
-
+	.topic-copy,
 	.post-card-body {
+		min-width: 0;
+	}
+
+	.entry-index,
+	.post-meta {
 		display: grid;
-		align-content: start;
-		gap: 12px;
-	}
-
-	.post-card:hover {
-		transform: translateY(-2px);
-		border-color: var(--hover-border);
-		background:
-			radial-gradient(circle at top right, rgba(110, 195, 255, 0.14), transparent 36%),
-			linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
-			var(--panel-strong);
-		box-shadow: var(--shadow-hover);
-	}
-
-	.post-card:focus-visible {
-		transform: translateY(-2px);
-		border-color: var(--hover-border);
-		background:
-			radial-gradient(circle at top right, rgba(110, 195, 255, 0.14), transparent 36%),
-			linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
-			var(--panel-strong);
-		box-shadow: var(--shadow-hover);
-		outline: var(--focus-ring);
-		outline-offset: var(--focus-offset);
+		gap: 8px;
+		justify-items: end;
+		text-align: right;
+		flex-shrink: 0;
 	}
 
 	.post-date {
-		margin: 0;
 		font-size: 0.9rem;
-		color: var(--accent-soft);
+		color: var(--text);
+		line-height: 1.5;
 	}
 
 	.post-description {
 		max-width: 34rem;
-		overflow-wrap: anywhere;
 	}
 
-	.tag-list {
-		margin: 0;
-		padding: 0;
-		list-style: none;
+	:is(.topic-card, .post-card):is(:hover, :focus-visible) {
+		transform: translateY(-1px);
+		border-color: var(--hover-border);
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
+			color-mix(in srgb, var(--panel-strong) 90%, var(--bg));
+		box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
 	}
 
-	.tag-list li {
-		padding: 6px 10px;
-		border: 1px solid var(--tag-border);
-		border-radius: var(--radius-pill);
-		background: var(--tag-bg);
-		color: var(--text);
-		font-size: 0.82rem;
-		line-height: 1.2;
-		overflow-wrap: anywhere;
+	:is(.topic-card, .post-card):focus-visible {
+		outline: var(--focus-ring);
+		outline-offset: var(--focus-offset);
 	}
 
-	@media (max-width: 900px) {
-		.topic-grid,
-		.post-list {
+	@media (max-width: 960px) {
+		.page-intro,
+		.section-heading,
+		.topic-card,
+		.post-card,
+		.intro-index {
 			grid-template-columns: 1fr;
+		}
+
+		.topic-card,
+		.post-card {
+			display: grid;
+		}
+
+		.entry-index,
+		.post-meta {
+			justify-items: start;
+			text-align: left;
 		}
 	}
 
 	@media (max-width: 640px) {
-		.section-heading {
-			display: grid;
-			align-items: start;
+		.page-card {
+			padding: 20px;
 		}
 
-		.section-note {
-			text-align: left;
-		}
-
-		.page-card,
 		.topic-card,
 		.post-card {
-			padding: 24px;
-		}
-
-		.topic-card {
-			grid-template-columns: 1fr;
-			gap: 16px;
-		}
-
-		.topic-count {
-			justify-self: start;
-		}
-
-		.post-card {
-			gap: 18px;
+			padding: 18px;
 		}
 	}
 </style>

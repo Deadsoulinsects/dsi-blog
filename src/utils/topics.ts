@@ -1,4 +1,5 @@
 import type { CollectionEntry } from 'astro:content';
+import { getTopicMeta } from '../data/topics';
 import { toParamSlug } from './paths';
 
 type BlogPost = CollectionEntry<'blog'>;
@@ -6,12 +7,13 @@ type BlogPost = CollectionEntry<'blog'>;
 export interface TopicGroup {
 	name: string;
 	slug: string;
+	description?: string;
 	posts: BlogPost[];
 }
 
 export const normalizeTopic = (topic?: string) => (topic ?? '').trim();
 
-export const getTopicGroups = (posts: BlogPost[]) => {
+export const getTopicGroups = (posts: BlogPost[]): TopicGroup[] => {
 	const groups = new Map<string, BlogPost[]>();
 
 	for (const post of posts) {
@@ -31,6 +33,7 @@ export const getTopicGroups = (posts: BlogPost[]) => {
 		.map(([name, topicPosts]) => ({
 			name,
 			slug: toParamSlug(name),
+			description: getTopicMeta(name)?.description,
 			posts: topicPosts,
 		}))
 		.sort((a, b) => a.name.localeCompare(b.name, 'zh-CN'));
