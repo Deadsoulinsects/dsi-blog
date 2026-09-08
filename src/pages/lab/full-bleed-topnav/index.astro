@@ -1,0 +1,108 @@
+---
+import FullBleedTopnavLayout from '../../../experiments/full-bleed-topnav/FullBleedTopnavLayout.astro';
+import { formatDate, formatDateTime, getSortedPosts } from '../../../utils/content';
+import { withBase } from '../../../utils/paths';
+import { getTopicGroups } from '../../../utils/topics';
+
+const posts = await getSortedPosts();
+const topicGroups = getTopicGroups(posts);
+const standalonePosts = posts.filter((post) => post.data.topic.trim() === '');
+---
+
+<FullBleedTopnavLayout title="博客 | Dead Soul Insects" description="Dead Soul Insects 的博客列表页。">
+	<section class="fb-band fb-hero-band" aria-labelledby="fb-blog-title">
+		<div class="fb-inner fb-hero-grid">
+			<div class="fb-hero-copy">
+				<p class="fb-kicker">博客</p>
+				<h1 id="fb-blog-title"><span class="fb-title-line">持续写下来的</span><span class="fb-title-line">记录</span></h1>
+				<p class="fb-lead">这里优先按已经成形的专题进入，其余文章<span class="fb-keep">继续按时间</span>向下展开。</p>
+			</div>
+
+			<div class="fb-hero-index">
+				<dl class="fb-count-list" aria-label="博客概览">
+					<div class="fb-count-row">
+						<dt>公开文章</dt>
+						<dd>{posts.length}</dd>
+					</div>
+					{topicGroups.length > 0 && (
+						<div class="fb-count-row">
+							<dt>专题入口</dt>
+							<dd>{topicGroups.length}</dd>
+						</div>
+					)}
+					{standalonePosts.length > 0 && (
+						<div class="fb-count-row">
+							<dt>时间浏览</dt>
+							<dd>{standalonePosts.length}</dd>
+						</div>
+					)}
+				</dl>
+				<p class="fb-hero-note">先看专题，再继续按时间浏览，会比把<span class="fb-keep">所有文章</span>一次摊平更容易形成稳定的<span class="fb-keep">阅读路径。</span></p>
+			</div>
+		</div>
+	</section>
+
+	{topicGroups.length > 0 && (
+		<section class="fb-band fb-topic-band" aria-labelledby="fb-topic-title">
+			<div class="fb-inner fb-section-heading">
+				<div class="fb-section-copy">
+					<p class="fb-kicker">专题</p>
+					<h2 id="fb-topic-title">先按主题进入</h2>
+				</div>
+				<p class="fb-section-note">已经形成线索的内容会先收进专题，<span class="fb-keep">方便顺着一条线</span><span class="fb-keep">继续看下去。</span></p>
+			</div>
+
+			<ul class="fb-rule-list">
+				{topicGroups.map((topicGroup) => (
+					<li class="fb-rule-row">
+						<a class="fb-row-link" href={withBase(import.meta.env.BASE_URL, `/blog/topics/${topicGroup.slug}/`)}>
+							<div class="fb-inner">
+								<div class="fb-row-grid fb-topic-row">
+									<span class="fb-row-label">专题入口</span>
+									<div class="fb-row-copy">
+										<h3 class="fb-row-title">{topicGroup.name}</h3>
+										<p class="fb-row-description">{topicGroup.description ?? '继续沿着同一条内容线索往下读。'}</p>
+									</div>
+									<div class="fb-row-count">
+										<span>文章</span>
+										<strong>{topicGroup.posts.length}</strong>
+									</div>
+								</div>
+							</div>
+						</a>
+					</li>
+				))}
+			</ul>
+		</section>
+	)}
+
+	{standalonePosts.length > 0 && (
+		<section class="fb-band fb-chronology-band" aria-labelledby="fb-chronology-title">
+			<div class="fb-inner fb-section-heading">
+				<div class="fb-section-copy">
+					<p class="fb-kicker">文章</p>
+					<h2 id="fb-chronology-title">继续按时间浏览</h2>
+				</div>
+				<p class="fb-section-note">没有进入专题的文章会继续按时间展开。</p>
+			</div>
+
+			<ol class="fb-rule-list">
+				{standalonePosts.map((post) => (
+					<li class="fb-rule-row">
+						<a class="fb-row-link" href={withBase(import.meta.env.BASE_URL, `/blog/${post.id}/`)}>
+							<div class="fb-inner">
+								<div class="fb-row-grid fb-article-row">
+									<time class="fb-row-date" datetime={formatDateTime(post.data.pubDate)}>{formatDate(post.data.pubDate)}</time>
+									<div class="fb-row-copy">
+										<h3 class="fb-row-title">{post.data.title}</h3>
+										<p class="fb-row-description">{post.data.description}</p>
+									</div>
+								</div>
+							</div>
+						</a>
+					</li>
+				))}
+			</ol>
+		</section>
+	)}
+</FullBleedTopnavLayout>

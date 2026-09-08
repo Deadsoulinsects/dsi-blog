@@ -1,0 +1,70 @@
+---
+import './full-bleed-topnav.css';
+import { withBase } from '../../utils/paths';
+
+interface Props {
+	readonly title: string;
+	readonly description: string;
+}
+
+const { title, description } = Astro.props;
+const navigation = [
+	{ href: '/blog', label: '博客' },
+	{ href: '/projects', label: '项目' },
+	{ href: '/docs', label: '文档' },
+	{ href: '/origin', label: '起源' },
+	{ href: '/about', label: '关于' },
+] as const;
+
+const normalizePath = (path: string) => (path === '/' ? path : path.replace(/\/+$/, ''));
+const currentPath = normalizePath(Astro.url.pathname);
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="color-scheme" content="dark" />
+		<meta name="description" content={description} />
+		<meta name="robots" content="noindex,nofollow" />
+		<link rel="icon" type="image/svg+xml" href={withBase(import.meta.env.BASE_URL, '/favicon.svg')} />
+		<link rel="icon" href={withBase(import.meta.env.BASE_URL, '/favicon.ico')} />
+		<title>{title}</title>
+	</head>
+	<body class="full-bleed-topnav-page">
+		<a class="fb-skip-link" href="#main-content">跳到主要内容</a>
+		<header class="fb-topnav-band">
+			<div class="fb-inner">
+				<a class="fb-brand" href={withBase(import.meta.env.BASE_URL, '/')}>
+					<span class="fb-brand-name">Dead Soul Insects</span>
+					<span class="fb-brand-tag">个人博客 / 笔记 / 项目</span>
+				</a>
+
+				<nav class="fb-navigation" aria-label="主导航">
+					{
+						navigation.map((item) => {
+							const isActive = currentPath === normalizePath(withBase(import.meta.env.BASE_URL, item.href));
+
+							return (
+								<a aria-current={isActive ? 'page' : undefined} href={withBase(import.meta.env.BASE_URL, item.href)}>
+									{item.label}
+								</a>
+							);
+						})
+					}
+				</nav>
+			</div>
+		</header>
+
+		<main id="main-content" tabindex="-1">
+			<slot />
+		</main>
+
+		<footer class="fb-footer-band">
+			<div class="fb-inner">
+				<p>Where Dead Souls Still Glow</p>
+			</div>
+		</footer>
+	</body>
+</html>
