@@ -157,10 +157,11 @@ const currentPath = normalizePath(Astro.url.pathname);
 
 	.site-shell {
 		position: relative;
+		container-type: inline-size;
 		min-height: 100vh;
-		max-width: 1120px;
+		max-width: 1160px;
 		margin: 0 auto;
-		padding: 24px 20px 40px;
+		padding: 24px 20px 44px;
 		box-sizing: border-box;
 	}
 
@@ -193,14 +194,15 @@ const currentPath = normalizePath(Astro.url.pathname);
 		background: rgba(78, 186, 255, 0.22);
 	}
 
-	.site-header,
-	.page-content,
-	.site-footer {
+	.site-shell > :where(.site-header, .page-content, .site-footer) {
 		position: relative;
 		z-index: 1;
 	}
 
 	.site-header {
+		position: sticky;
+		top: 16px;
+		z-index: 4;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
@@ -208,9 +210,11 @@ const currentPath = normalizePath(Astro.url.pathname);
 		padding: 18px 20px;
 		border: 1px solid var(--line);
 		border-radius: var(--radius-card);
-		background: var(--bg-soft);
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
+			rgba(18, 23, 37, 0.82);
 		backdrop-filter: var(--glass-blur);
-		box-shadow: var(--shadow);
+		box-shadow: var(--shadow-soft);
 	}
 
 	.brand {
@@ -221,7 +225,7 @@ const currentPath = normalizePath(Astro.url.pathname);
 	}
 
 	.brand-name {
-		font-size: 1.05rem;
+		font-size: 1.08rem;
 		font-weight: 700;
 		letter-spacing: 0.06em;
 	}
@@ -235,15 +239,18 @@ const currentPath = normalizePath(Astro.url.pathname);
 		display: flex;
 		flex-wrap: wrap;
 		justify-content: flex-end;
-		gap: 10px;
+		gap: 8px;
 	}
 
 	.site-nav a {
+		display: inline-flex;
+		align-items: center;
 		padding: 10px 14px;
 		border: 1px solid transparent;
 		border-radius: var(--radius-pill);
 		text-decoration: none;
 		color: var(--text-soft);
+		background: rgba(255, 255, 255, 0.02);
 		transition:
 			border-color 0.2s ease,
 			background 0.2s ease,
@@ -251,23 +258,20 @@ const currentPath = normalizePath(Astro.url.pathname);
 			transform 0.2s ease;
 	}
 
-	.site-nav a:hover,
-	.site-nav a:focus-visible,
-	.site-nav a.active {
+	.site-nav a:is(:hover, :focus-visible, .active) {
 		color: var(--text);
 		border-color: var(--hover-border);
 		background: rgba(157, 140, 255, 0.12);
 		transform: translateY(-1px);
 	}
 
-	.site-nav a:focus-visible,
-	.brand:focus-visible {
+	:is(.site-nav a, .brand):focus-visible {
 		outline: var(--focus-ring);
 		outline-offset: var(--focus-offset);
 	}
 
 	.page-content {
-		padding: 28px 0 20px;
+		padding: 30px 0 22px;
 	}
 
 	.page-content.full-bleed {
@@ -276,21 +280,13 @@ const currentPath = normalizePath(Astro.url.pathname);
 	}
 
 	.site-footer {
-		padding-top: 8px;
+		padding-top: 12px;
 		color: var(--text-soft);
 		font-size: 0.88rem;
 		text-align: center;
 	}
 
-	@media (max-width: 720px) {
-		.site-shell {
-			padding: 16px 14px 32px;
-		}
-
-		.site-shell.full-bleed {
-			padding: 0;
-		}
-
+	@container (max-width: 44rem) {
 		.site-header {
 			align-items: flex-start;
 			flex-direction: column;
@@ -303,6 +299,16 @@ const currentPath = normalizePath(Astro.url.pathname);
 
 		.site-nav a {
 			padding: 8px 12px;
+		}
+	}
+
+	@media (max-width: 720px) {
+		.site-shell {
+			padding: 16px 14px 32px;
+		}
+
+		.site-shell.full-bleed {
+			padding: 0;
 		}
 	}
 </style>
