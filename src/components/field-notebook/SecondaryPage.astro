@@ -1,0 +1,41 @@
+---
+import ArchiveView from './ArchiveView.astro';
+import FieldNotebookLayout from './FieldNotebookLayout.astro';
+import NotFoundView from './NotFoundView.astro';
+import ProjectRegisterView from './ProjectRegisterView.astro';
+import ReferenceShelfView from './ReferenceShelfView.astro';
+import SubjectIndexView from './SubjectIndexView.astro';
+import type { FieldNavKey, SecondaryView } from './types';
+
+interface Props {
+	readonly view: SecondaryView;
+}
+
+type PageMeta = {
+	readonly title: string;
+	readonly description: string;
+	readonly active: FieldNavKey | null;
+};
+
+const { view } = Astro.props;
+const pageMeta = {
+	docs: { title: '文档与参考', description: 'Field Notebook 虚构参考书架与长标题实验。', active: 'docs' },
+	projects: { title: '项目记录', description: 'Field Notebook 虚构项目账簿与文本状态实验。', active: 'projects' },
+	archive: { title: '时间归档', description: 'Field Notebook 虚构时间索引与年份编排实验。', active: 'archive' },
+	categories: { title: '主题分类', description: 'Field Notebook 虚构主题编号与条目索引实验。', active: 'categories' },
+	'not-found': { title: '缺页记录', description: 'Field Notebook 独立的虚构缺页状态。', active: null },
+} as const satisfies Record<SecondaryView, PageMeta>;
+const views = {
+	docs: ReferenceShelfView,
+	projects: ProjectRegisterView,
+	archive: ArchiveView,
+	categories: SubjectIndexView,
+	'not-found': NotFoundView,
+} as const;
+const meta = pageMeta[view];
+const View = views[view];
+---
+
+<FieldNotebookLayout title={meta.title} description={meta.description} active={meta.active}>
+	<View />
+</FieldNotebookLayout>

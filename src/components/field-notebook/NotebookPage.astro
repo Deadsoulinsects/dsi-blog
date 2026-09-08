@@ -1,0 +1,31 @@
+---
+import ArticleView from './ArticleView.astro';
+import BlogView from './BlogView.astro';
+import FieldNotebookLayout from './FieldNotebookLayout.astro';
+import HomeView from './HomeView.astro';
+import type { FieldNavKey, NotebookView } from './types';
+
+interface Props {
+	readonly view: NotebookView;
+}
+
+type PageMeta = {
+	readonly title: string;
+	readonly description: string;
+	readonly active: FieldNavKey;
+};
+
+const { view } = Astro.props;
+const pageMeta = {
+	home: { title: '研究日志', description: 'Field Notebook 虚构研究日志与当前条目视觉实验。', active: 'home' },
+	blog: { title: '文章索引', description: 'Field Notebook 虚构文章编号索引与边界内容实验。', active: 'blog' },
+	article: { title: '排错地图虚构样章', description: 'Field Notebook 长文、目录、代码与宽表格阅读实验。', active: 'blog' },
+} as const satisfies Record<NotebookView, PageMeta>;
+const views = { home: HomeView, blog: BlogView, article: ArticleView } as const;
+const meta = pageMeta[view];
+const View = views[view];
+---
+
+<FieldNotebookLayout title={meta.title} description={meta.description} active={meta.active}>
+	<View />
+</FieldNotebookLayout>

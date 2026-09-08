@@ -1,0 +1,51 @@
+---
+import '../../styles/field-notebook.css';
+import { withBase } from '../../utils/paths';
+import type { FieldNavKey } from './types';
+
+interface Props {
+	readonly title: string;
+	readonly description: string;
+	readonly active: FieldNavKey | null;
+}
+
+const { title, description, active } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const navigation = [
+	{ key: 'home', label: '日志', href: '/lab/field-notebook/' },
+	{ key: 'blog', label: '文章', href: '/lab/field-notebook/blog/' },
+	{ key: 'docs', label: '参考', href: '/lab/field-notebook/docs/' },
+	{ key: 'projects', label: '项目', href: '/lab/field-notebook/projects/' },
+	{ key: 'archive', label: '归档', href: '/lab/field-notebook/archive/' },
+	{ key: 'categories', label: '主题', href: '/lab/field-notebook/categories/' },
+] as const satisfies readonly { readonly key: FieldNavKey; readonly label: string; readonly href: string }[];
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="description" content={description} />
+		<meta name="robots" content="noindex,nofollow" />
+		<link rel="icon" type="image/svg+xml" href={withBase(base, '/favicon.svg')} />
+		<title>{title} | Field Notebook | Dead Soul Insects</title>
+	</head>
+	<body class="field-notebook">
+		<a class="skip-link field-notebook__skip-link" href="#main-content">跳到主要内容</a>
+		<div class="field-notebook__shell">
+			<aside class="field-notebook__rail">
+				<a class="field-notebook__brand" href={withBase(base, '/lab/field-notebook/')}>DSI / FIELD 26</a>
+				<nav class="field-notebook__nav" aria-label="Field Notebook 导航">
+					{navigation.map((item) => (
+						<a href={withBase(base, item.href)} aria-current={active === item.key ? 'page' : undefined}>{item.label}</a>
+					))}
+				</nav>
+				<p class="field-notebook__rail-note">Fictional research notes<br />for an isolated visual lab.</p>
+			</aside>
+			<main id="main-content" class="field-notebook__main" tabindex="-1">
+				<slot />
+			</main>
+		</div>
+	</body>
+</html>
