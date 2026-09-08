@@ -1,0 +1,35 @@
+---
+import { withBase } from '../../utils/paths';
+import PageHeader from './PageHeader.astro';
+import { fieldEntries, fieldYears } from './mock-data';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<PageHeader
+	eyebrow="CHRONOLOGICAL INDEX / MOCK DATA"
+	title="时间归档"
+	intro="年份作为纸面锚点，日期与标题组成可快速回看的时间记录。条目全部为虚构资料。"
+/>
+
+<div class="field-notebook__year-archive">
+	{fieldYears.map((year, yearIndex) => (
+		<section aria-labelledby={`archive-year-${year.year}`}>
+			<header>
+				<h2 id={`archive-year-${year.year}`}>{year.year}</h2>
+				<span class="field-notebook__meta">{year.count} ENTRIES</span>
+			</header>
+			<ol>
+				{fieldEntries.slice(yearIndex, yearIndex + 3).map((entry) => (
+					<li>
+						<a href={withBase(base, entry.href)}>
+							<time datetime={entry.date}>{entry.date.slice(5)}</time>
+							<strong>{entry.title}</strong>
+							<span>{entry.category}</span>
+						</a>
+					</li>
+				))}
+			</ol>
+		</section>
+	))}
+</div>
