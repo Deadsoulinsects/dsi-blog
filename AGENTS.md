@@ -170,6 +170,34 @@ Preserve the current visual direction: dark background, cool colors, translucent
 
 For visual or interaction effects such as reading progress bars, table-of-contents highlight states, hover effects, click transitions, scroll feedback, glows, gradients, or animation tuning, create a sandbox/playground first under `D:\ai-output` and sync to production only after the user confirms the direction. Do not place playground files in the repository root.
 
+When referring to "modern CSS" in this project, treat it as a concrete coding style rather than a vague label. Use the following rules by default:
+
+* Prefer existing design tokens such as color, shadow, radius, blur, spacing, and tag styles before introducing new hard-coded visual values.
+
+* Prefer shared rules for repeated styles instead of copy-pasting similar CSS across multiple selectors.
+
+* Use `:is()` to merge similar interaction states such as `:hover`, `:focus-visible`, and active-state selectors when this improves clarity.
+
+* Use `:where()` only for low-specificity base rules. Do not rely on `:where()` for rules that must override existing styles.
+
+* Prefer container queries for component-level responsive behavior when the layout depends on the width of a section, card, or content area rather than the whole viewport.
+
+* Prefer viewport media queries for page-level changes only, such as overall shell padding or global mobile breakpoints.
+
+* On mobile, prefer flow layout over fixed-height or absolute-positioned arrangements. Avoid relying on `overflow: hidden`, fixed viewport height, or absolute positioning to force content into place unless there is a clear reason.
+
+* Prefer CSS-first solutions for presentation and visual state changes. Do not add JavaScript for effects that can be handled cleanly by CSS.
+
+* After CSS changes, always check mobile readability, spacing, overflow, and stacking relationships, not just desktop appearance.
+
+* For browser-based visual QA on exploratory or style-heavy pages, do not rely on screenshots alone. Use a two-pass workflow by default: first verify DOM/layout geometry such as overflow, clipping, sticky/fixed overlap, and unsafe element spacing; then inspect screenshots for visual quality, rhythm, and atmosphere.
+
+* For visual exploration pages, do not deliver pages to the user based only on successful build or basic route access. Before asking the user to review, verify at least: no obvious card-boundary collisions, no sticky or floating overlays obscuring content, acceptable mobile readability, and that the variation changes structure or component language rather than only color.
+
+* When using Playwright for visual QA, prefer clean and repeatable capture conditions: stable viewport, stable page state, and minimal interfering chrome. If a sticky header, dev toolbar, floating helper, or browser overlay can affect the screenshot, test the content area separately from the site chrome and avoid drawing conclusions from polluted captures.
+
+* For local visual QA artifacts such as screenshots, DOM geometry dumps, and temporary browser inspection files, write them under `D:\ai-output` by default and delete unneeded ones before finishing. Do not leave them in the repository root.
+
 
 
 Do not introduce new UI frameworks, Tailwind, React, or large dependencies by default. If there is a long-term benefit, explain the purpose, alternatives, necessity, and impact before adding them.
