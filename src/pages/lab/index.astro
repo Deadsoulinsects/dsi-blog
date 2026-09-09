@@ -1,0 +1,146 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { withBase } from '../../utils/paths';
+import { listExplorationVariants } from '../../data/listExplorationVariants';
+import { listMasterVariants } from '../../data/listMasterVariants';
+import { listRouteSchemes } from '../../data/listRouteSchemes';
+import '../../experiments/lab-overview/lab-overview.css';
+
+// Field Notebook: 8 fixed routes.
+const fieldNotebookCount = 8;
+// Full-Bleed Topnav: 1 fixed route.
+const fullBleedTopnavCount = 1;
+const explorationCount = listExplorationVariants.length;
+const masterCount = listMasterVariants.length;
+const routeSchemeCount = listRouteSchemes.length;
+const familyCount = 5;
+const totalCount = fieldNotebookCount + fullBleedTopnavCount + explorationCount + masterCount + routeSchemeCount;
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout
+	title="LAB / 实验总览 | Dead Soul Insects"
+	description="Dead Soul Insects Lab 五组既有实验家族的路线总览。"
+	hideChrome={true}
+	fullBleed={true}
+	noindex={true}
+	mainId="lab-directory"
+	skipLinkLabel="跳到实验路线"
+>
+	<div class="lab-overview">
+		<div class="lab-shell">
+			<header class="lab-header">
+				<div class="lab-header-copy">
+					<p class="lab-kicker" lang="en">Internal Route Directory</p>
+					<h1>LAB / 实验总览</h1>
+					<p class="lab-purpose">统一查看五组既有 Lab 实验的入口、规模与<span class="lab-keep">派生关系</span>，不改变任何实验页面。</p>
+				</div>
+
+				<dl class="lab-totals" aria-label="Lab 实验统计">
+					<div>
+						<dt>实验家族</dt>
+						<dd><strong>{familyCount}</strong><span>个实验家族</span></dd>
+					</div>
+					<div>
+						<dt>页面 / 方案</dt>
+						<dd><strong>{totalCount}</strong><span>个页面 / 方案</span></dd>
+					</div>
+				</dl>
+			</header>
+
+			<p class="lab-scope-note"><strong>范围</strong><span>每条路线保留自己的视觉语言；这里仅<span class="lab-keep">统一入口与关系</span>。</span></p>
+
+			<div class="lab-route-directory">
+				<nav class="lab-route-map" aria-label="Lab 实验家族路线">
+					<section aria-labelledby="independent-title">
+						<header class="lab-section-head">
+							<p class="lab-section-index">01</p>
+							<div class="lab-section-copy">
+								<h2 id="independent-title">独立页面系统</h2>
+								<p class="lab-section-description">两组并行实验，互不构成前后版本。</p>
+							</div>
+						</header>
+
+						<ul class="lab-route-list">
+							<li>
+								<a class="lab-route-row" href={withBase(base, '/lab/field-notebook/')}>
+									<span class="lab-route-id"><span>独立</span><span>01</span></span>
+									<span class="lab-route-copy">
+										<span class="lab-route-name" lang="en">Field Notebook</span>
+										<span class="lab-route-description" lang="en">isolated research-log/editorial system</span>
+									</span>
+									<span class="lab-route-count">{fieldNotebookCount} 个页面</span>
+									<span class="lab-route-destination"><code>/lab/field-notebook/</code><span class="lab-route-action">进入</span></span>
+								</a>
+							</li>
+							<li>
+								<a class="lab-route-row" href={withBase(base, '/lab/full-bleed-topnav/')}>
+									<span class="lab-route-id"><span>独立</span><span>02</span></span>
+									<span class="lab-route-copy">
+										<span class="lab-route-name" lang="en">Full-Bleed Topnav</span>
+										<span class="lab-route-description" lang="en">full-width blog skeleton retaining top navigation</span>
+									</span>
+									<span class="lab-route-count">{fullBleedTopnavCount} 个页面</span>
+									<span class="lab-route-destination"><code>/lab/full-bleed-topnav/</code><span class="lab-route-action">进入</span></span>
+								</a>
+							</li>
+						</ul>
+					</section>
+
+					<section aria-labelledby="lineage-title">
+						<header class="lab-section-head">
+							<p class="lab-section-index">02</p>
+							<div class="lab-section-copy">
+								<h2 id="lineage-title">列表页演化链</h2>
+								<p class="lab-section-description">第一轮发散，第二轮先改空间，随后<span class="lab-keep">形成五条路线</span>。</p>
+							</div>
+						</header>
+
+						<ol class="lab-chain-list" aria-label="列表页实验的演化顺序">
+							<li class="lab-chain-step">
+								<span class="lab-chain-guide" aria-hidden="true"><span class="lab-chain-index">01</span></span>
+								<a class="lab-route-row" href={withBase(base, '/lab/list-exploration/')}>
+									<span class="lab-route-id"><span>第一轮</span><span>发散</span></span>
+									<span class="lab-route-copy">
+										<span class="lab-route-name" lang="en">List Exploration</span>
+										<span class="lab-route-description" lang="en">first-round divergent list-page visual explorations</span>
+									</span>
+									<span class="lab-route-count">{explorationCount} 个方案</span>
+									<span class="lab-route-destination"><code>/lab/list-exploration/</code><span class="lab-route-action">进入</span></span>
+								</a>
+							</li>
+							<li class="lab-chain-step">
+								<span class="lab-chain-guide" aria-hidden="true"><span class="lab-chain-index">02</span></span>
+								<a class="lab-route-row" href={withBase(base, '/lab/list-masters/')}>
+									<span class="lab-route-id"><span>第二轮</span><span>结构</span></span>
+									<span class="lab-route-copy">
+										<span class="lab-route-name" lang="en">List Masters</span>
+										<span class="lab-route-description" lang="en">second-round structural masters that change space before color</span>
+									</span>
+									<span class="lab-route-count">{masterCount} 个母版</span>
+									<span class="lab-route-destination"><code>/lab/list-masters/</code><span class="lab-route-action">进入</span></span>
+								</a>
+							</li>
+							<li class="lab-chain-step">
+								<span class="lab-chain-guide" aria-hidden="true"><span class="lab-chain-index">03</span></span>
+								<a class="lab-route-row" href={withBase(base, '/lab/list-route-schemes/')}>
+									<span class="lab-route-id"><span>后续</span><span>派生</span></span>
+									<span class="lab-route-copy">
+										<span class="lab-route-name" lang="en">List Route Schemes</span>
+										<span class="lab-route-description" lang="en">route tree derived from the chosen A/B/C directions</span>
+									</span>
+									<span class="lab-route-count">{routeSchemeCount} 条路线</span>
+									<span class="lab-route-destination"><code>/lab/list-route-schemes/</code><span class="lab-route-action">进入</span></span>
+								</a>
+							</li>
+						</ol>
+					</section>
+				</nav>
+			</div>
+
+			<footer class="lab-footer">
+				<p><span lang="en">Internal route directory</span> / Lab 实验索引</p>
+			</footer>
+		</div>
+	</div>
+</Layout>
