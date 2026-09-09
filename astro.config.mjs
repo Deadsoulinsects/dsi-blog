@@ -8,8 +8,13 @@ export default defineConfig({
 		sitemap({
 			filter: (page) => {
 				const pathname = new URL(page).pathname;
+				const normalizedPath = pathname.replace(/\/+$/, '');
 
-				return !pathname.includes('/lab/field-notebook/') && !pathname.replace(/\/+$/, '').endsWith('/lab/full-bleed-topnav');
+				return (
+					!pathname.includes('/lab/field-notebook/') &&
+					!normalizedPath.endsWith('/lab/full-bleed-topnav') &&
+					!normalizedPath.endsWith('/lab')
+				);
 			},
 		}),
 	],

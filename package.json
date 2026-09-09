@@ -23,6 +23,7 @@
     "build:astro": "astro build",
     "verify:field-notebook": "node scripts/verify-field-notebook.mjs",
     "verify:full-bleed-topnav": "node scripts/verify-full-bleed-topnav.mjs",
+    "verify:lab-overview": "node scripts/verify-lab-overview.mjs",
     "build": "astro build",
     "publish": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/publish.ps1",
     "preview": "astro preview",
