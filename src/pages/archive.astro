@@ -1,6 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { formatDate, formatDateTime, getArchiveGroups } from '../utils/content';
+import { formatDateTime, getArchiveGroups } from '../utils/content';
 import { withBase } from '../utils/paths';
 
 const groups = await getArchiveGroups();
@@ -9,279 +9,138 @@ const base = import.meta.env.BASE_URL;
 ---
 
 <Layout title="归档 | Dead Soul Insects" description="按时间查看 Dead Soul Insects 的博客文章归档。" canonicalPath="/archive/">
-	<div class="page-shell">
-		<section class="page-card intro-card">
-			<header class="page-intro">
-				<div class="intro-copy">
+	<div class="editorial-page archive-page">
+		<section class="intro">
+			<div class="intro-grid">
+				<div>
 					<p class="kicker">归档</p>
 					<h1>按时间回看留下来的记录</h1>
+				</div>
+
+				<div class="intro-side">
 					<p class="lead">这里按年份整理博客文章，方便先定位时间段，再继续进入具体记录。</p>
-				</div>
 
-				<div class="intro-index" aria-label="归档概览">
-					<div class="intro-index-item">
-						<span class="index-label">年份分组</span>
-						<strong>{groups.length}</strong>
+					<div class="intro-index" aria-label="归档概览">
+						<div class="intro-stat">
+							<span>年份分组</span>
+							<strong>{groups.length}</strong>
+						</div>
+						<div class="intro-stat">
+							<span>归档文章</span>
+							<strong>{totalPosts}</strong>
+						</div>
 					</div>
-					<div class="intro-index-item muted">
-						<span class="index-label">归档文章</span>
-						<strong>{totalPosts}</strong>
-					</div>
-				</div>
-			</header>
 
-			<div class="intro-note">
-				<p>先按年份缩小范围，再顺着标题回看，会比把所有文章直接摊平更适合归档检索。</p>
+					<p class="intro-note">先按年份缩小范围，再顺着标题回看，会比把所有文章直接摊平更适合归档检索。</p>
+				</div>
 			</div>
 		</section>
 
-		<div class="archive-stack" aria-label="文章归档列表">
-			{groups.map((group) => (
-				<section class="archive-group">
-					<div class="archive-group-header">
-						<div class="archive-group-copy">
-							<p class="group-kicker">年份</p>
-							<h2>{group.year}</h2>
-						</div>
-						<div class="archive-group-index" aria-hidden="true">
-							<span class="index-label">文章</span>
-							<strong>{group.items.length}</strong>
-						</div>
-					</div>
+		<section class="section" aria-label="文章归档列表">
+			<div class="archive-stack">
+				{groups.map((group) => (
+					<section class="archive-frame" aria-labelledby={`archive-year-${group.year}`}>
+						<header>
+							<h2 class="archive-year" id={`archive-year-${group.year}`}>{group.year}</h2>
+							<p class="archive-year-meta">文章 · {group.items.length}</p>
+						</header>
 
-					<ul class="archive-list">
-						{group.items.map((post) => (
-							<li>
-								<time class="archive-date" datetime={formatDateTime(post.data.pubDate)}>{formatDate(post.data.pubDate)}</time>
-								<a class="archive-link" href={withBase(base, `/blog/${post.id}/`)}>{post.data.title}</a>
-							</li>
-						))}
-					</ul>
-				</section>
-			))}
-		</div>
+						<ul class="archive-list">
+							{group.items.map((post) => {
+								const dateTime = formatDateTime(post.data.pubDate);
+
+								return (
+									<li>
+										<time class="archive-date" datetime={dateTime}>{dateTime.slice(5).replace('-', '.')}</time>
+										<a class="archive-link" href={withBase(base, `/blog/${post.id}/`)}>{post.data.title}</a>
+									</li>
+								);
+							})}
+						</ul>
+					</section>
+				))}
+			</div>
+		</section>
 	</div>
 </Layout>
 
 <style>
-	.page-shell {
-		display: grid;
-		gap: clamp(22px, 2.8vw, 30px);
-	}
-
-	.page-card,
-	.archive-group {
-		padding: clamp(24px, 3.4vw, 34px);
-		border: 1px solid var(--line);
-		border-radius: var(--radius-panel);
-		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0)),
-			var(--panel);
-		backdrop-filter: var(--glass-blur);
-		box-shadow: 0 18px 42px rgba(0, 0, 0, 0.22);
-		box-sizing: border-box;
-		overflow: clip;
-	}
-
-	.page-intro,
-	.intro-copy,
-	.archive-group,
-	.archive-group-copy,
-	.archive-group-index {
-		display: grid;
-		gap: 12px;
-	}
-
-	.intro-card {
-		display: grid;
-		gap: 20px;
-	}
-
-	.page-intro {
-		grid-template-columns: minmax(0, 1.35fr) minmax(15rem, 0.8fr);
-		align-items: start;
-		gap: 24px;
-	}
-
-	.intro-copy {
-		max-width: 40rem;
-	}
-
-	.intro-index {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 12px;
-		align-content: start;
-	}
-
-	.intro-index-item,
-	.archive-group-index {
-		display: grid;
-		gap: 8px;
-		padding: 16px 18px;
-		border: 1px solid rgba(153, 176, 255, 0.14);
-		border-radius: 20px;
-		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.022), rgba(255, 255, 255, 0)),
-			color-mix(in srgb, var(--panel-strong) 84%, transparent);
-		box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
-	}
-
-	.intro-index-item.muted {
-		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0)),
-			color-mix(in srgb, var(--panel) 88%, transparent);
-	}
-
-	.intro-note {
-		padding-top: 2px;
-		border-top: 1px solid rgba(153, 176, 255, 0.12);
-	}
-
-	.archive-group-header {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) auto;
-		align-items: end;
-		gap: 14px;
-	}
-
-	.archive-group {
-		gap: 18px;
-	}
-
 	.archive-stack {
 		display: grid;
-		gap: 16px;
+		gap: var(--space-8);
 	}
 
-	.kicker {
-		margin: 0;
-		font-size: 0.82rem;
-		letter-spacing: 0.14em;
-		text-transform: uppercase;
-		color: var(--accent-soft);
+	.archive-frame {
+		display: grid;
+		grid-template-columns: var(--column-archive-year) minmax(0, 1fr);
+		gap: var(--space-6);
+		min-width: 0;
 	}
 
-	.group-kicker,
-	.index-label {
-		margin: 0;
-		font-size: 0.78rem;
-		letter-spacing: 0.12em;
-		text-transform: uppercase;
+	.archive-year {
+		font-family: var(--font-ui);
+		font-size: var(--text-year);
+		font-weight: 500;
+		line-height: 0.9;
+		letter-spacing: var(--tracking-tight);
+		font-variant-numeric: lining-nums tabular-nums;
+		white-space: nowrap;
+	}
+
+	.archive-year-meta {
+		margin-top: var(--space-3);
 		color: var(--text-soft);
-	}
-
-	h1,
-	h2,
-	strong,
-	p,
-	time,
-	a,
-	span,
-	ul {
-		margin: 0;
-		overflow-wrap: anywhere;
-	}
-
-	h1 {
-		font-size: clamp(2rem, 4vw, 3rem);
-		line-height: 1.08;
-	}
-
-	h2 {
-		font-size: clamp(1.3rem, 2.4vw, 1.7rem);
-		line-height: 1.18;
-	}
-
-	p,
-	time {
-		color: var(--text-soft);
-		line-height: 1.78;
-	}
-
-	.lead {
-		font-size: 1.02rem;
-	}
-
-	.intro-index-item strong,
-	.archive-group-index strong {
-		font-size: 1.05rem;
-		line-height: 1;
-		color: var(--text);
+		font-family: var(--font-meta);
+		font-size: var(--text-meta);
+		letter-spacing: var(--tracking-date);
 	}
 
 	.archive-list {
-		padding-top: 4px;
 		padding: 0;
 		list-style: none;
-		border-top: 1px solid rgba(153, 176, 255, 0.1);
+		border-top: var(--rule-strong) solid var(--text);
 	}
 
 	.archive-list li {
 		display: grid;
-		grid-template-columns: minmax(8.4rem, auto) minmax(0, 1fr);
-		gap: 16px;
-		padding: 15px 0;
-		border-top: 1px solid rgba(153, 176, 255, 0.1);
-	}
-
-	.archive-list li:first-child {
-		padding-top: 12px;
-		border-top: 0;
+		grid-template-columns: var(--column-archive-date) minmax(0, 1fr);
+		gap: var(--space-4);
+		padding: var(--space-4) 0;
+		border-bottom: var(--rule-thin) solid var(--line);
 	}
 
 	.archive-date {
-		font-size: 0.9rem;
-		color: var(--text);
-		line-height: 1.5;
+		color: var(--text-soft);
+		font-family: var(--font-meta);
+		font-size: var(--text-kicker);
+		letter-spacing: var(--tracking-meta);
+		font-variant-numeric: tabular-nums lining-nums;
 	}
 
 	.archive-link {
-		color: var(--text);
+		min-width: 0;
+		font-family: var(--font-reading);
+		font-size: var(--text-body);
+		line-height: 1.45;
 		text-decoration: none;
-		line-height: 1.7;
-		transition:
-			color 0.2s ease,
-			transform 0.2s ease;
+		transition: color var(--duration-fast) ease;
 	}
 
 	.archive-link:is(:hover, :focus-visible) {
 		color: var(--accent-soft);
-		transform: translateX(1px);
 	}
 
-	.archive-link:focus-visible {
-		outline: var(--focus-ring);
-		outline-offset: var(--focus-offset);
-	}
-
-	@media (max-width: 960px) {
-		.page-intro,
-		.intro-index,
-		.archive-group-header {
-			grid-template-columns: 1fr;
-		}
-
-		.archive-group-index {
-			justify-items: start;
+	@media (max-width: 760px) {
+		.archive-frame {
+			grid-template-columns: minmax(0, 1fr);
+			gap: var(--space-5);
 		}
 	}
 
-	@media (max-width: 640px) {
-		.page-card,
-		.archive-group {
-			padding: 20px;
-		}
-
+	@media (max-width: 460px) {
 		.archive-list li {
-			grid-template-columns: 1fr;
-			gap: 6px;
-		}
-
-		.archive-link {
-			display: inline-flex;
-			align-items: center;
-			min-height: 28px;
+			grid-template-columns: minmax(0, 1fr);
+			gap: var(--space-1);
 		}
 	}
 </style>

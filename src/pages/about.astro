@@ -17,85 +17,78 @@ const aboutSections = [
 		description:
 			'这一页只补充必要的信息：这里是谁在写、内容大致覆盖什么、如果需要该怎样联系。',
 	},
-];
+] as const;
 
 const contacts = [
 	{
-		type: 'email',
 		label: '邮箱',
 		value: '3178381848@qq.com',
 		copyValue: '3178381848@qq.com',
-		icon: '/icons/email.svg',
 	},
 	{
-		type: 'qq',
 		label: 'QQ',
 		value: '3178381848',
 		copyValue: '3178381848',
-		icon: '/icons/qq.svg',
 	},
 	{
-		type: 'wechat',
 		label: '微信',
 		value: 'ky3178381848',
 		copyValue: 'ky3178381848',
-		icon: '/icons/wechat.svg',
 	},
-];
+] as const;
 ---
 
 <Layout title="关于 | Dead Soul Insects" description="Dead Soul Insects 的简要站点介绍与写作方向说明。" canonicalPath="/about/">
-	<div class="page-shell">
-		<section class="page-card intro-card">
-			<header class="page-intro">
-				<p class="kicker">关于</p>
-				<h1>简要说明这个站和写它的人</h1>
-				<p class="lead">这里不放完整履历，只把站点用途、写作方向和联系方式说明白。</p>
-			</header>
+	<div class="editorial-page about-page">
+		<section class="intro intro--single">
+			<div class="intro-grid">
+				<div class="intro-copy">
+					<p class="kicker">关于</p>
+					<h1>简要说明<span class="heading-unit">这个站</span>和写它的人</h1>
+					<p class="lead">这里不放完整履历，只把站点用途、写作方向和联系方式说明白。</p>
+				</div>
+			</div>
 		</section>
 
-		<section class="section-block" aria-label="关于页面内容分组">
-			<div class="section-heading">
+		<section class="section" aria-labelledby="about-title">
+			<header class="section-heading">
+				<span class="section-index">01 / ABOUT</span>
 				<div class="section-copy">
 					<p class="kicker">说明</p>
-					<h2>把必要的信息留在这里</h2>
+					<h2 id="about-title">把必要的信息留在这里</h2>
+					<p class="section-note">更多内容会回到博客、项目和文档里展开，这里只保留最必要的说明。</p>
 				</div>
-				<p class="section-note">更多内容会回到博客、项目和文档里展开，这里只保留最必要的说明。</p>
-			</div>
+			</header>
 
-			<div class="section-grid">
-				{aboutSections.map((section) => (
-					<section class="content-card">
-						<h3>{section.title}</h3>
-						<p>{section.description}</p>
-					</section>
+			<div class="editorial-stack">
+				{aboutSections.map((section, index) => (
+					<article class="editorial-row">
+						<span class="editorial-row-index">{String(index + 1).padStart(2, '0')}</span>
+						<div>
+							<h3>{section.title}</h3>
+							<p>{section.description}</p>
+						</div>
+					</article>
 				))}
 			</div>
 		</section>
 
-		<section class="contact-card" aria-labelledby="contact-title">
-			<div class="section-heading compact">
+		<section class="section" aria-labelledby="contact-title">
+			<header class="section-heading">
+				<span class="section-index">02 / CONTACT</span>
 				<div class="section-copy">
 					<p class="kicker">CONTACT</p>
 					<h2 id="contact-title">联系方式</h2>
 				</div>
-			</div>
+			</header>
 
 			<ul class="contact-list">
 				{contacts.map((contact) => (
-					<li class="contact-item">
-						<div class="contact-main">
-							<span class="contact-icon" aria-hidden="true">
-								<img src={contact.icon} alt="" loading="lazy" />
-							</span>
-							<div class="contact-text">
-								<span class="contact-label">{contact.label}</span>
-								<span class="contact-value">{contact.value}</span>
-							</div>
-						</div>
+					<li class="contact-row">
+						<span class="contact-label">{contact.label}</span>
+						<span class="contact-value">{contact.value}</span>
 						<button class="copy-btn" type="button" data-copy-value={contact.copyValue}>
-							<img src="/icons/copy.svg" alt="" aria-hidden="true" />
-							<span>复制</span>
+							<span data-copy-label aria-live="polite">复制</span>
 						</button>
 					</li>
 				))}
@@ -108,27 +101,29 @@ const contacts = [
 	const copyButtons = document.querySelectorAll<HTMLButtonElement>('.copy-btn');
 
 	copyButtons.forEach((button) => {
+		let resetTimer: number | undefined;
+
 		button.addEventListener('click', async () => {
 			const copyValue = button.dataset.copyValue;
+			const label = button.querySelector<HTMLSpanElement>('[data-copy-label]');
+			const clipboard = navigator.clipboard;
 
-			if (!copyValue) {
+			if (!copyValue || !label || !clipboard) {
 				return;
 			}
 
-			await navigator.clipboard.writeText(copyValue);
-			const label = button.querySelector('span');
-
-			if (label) {
-				label.textContent = '已复制';
+			try {
+				await clipboard.writeText(copyValue);
+			} catch {
+				return;
 			}
 
+			window.clearTimeout(resetTimer);
+			label.textContent = '已复制';
 			button.classList.add('copied');
 
-			window.setTimeout(() => {
-				if (label) {
-					label.textContent = '复制';
-				}
-
+			resetTimer = window.setTimeout(() => {
+				label.textContent = '复制';
 				button.classList.remove('copied');
 			}, 1200);
 		});
@@ -136,260 +131,67 @@ const contacts = [
 </script>
 
 <style>
-	.page-shell {
-		display: grid;
-		gap: 20px;
-	}
-
-	.page-card,
-	.content-card,
-	.contact-card {
-		border: 1px solid var(--line);
-		backdrop-filter: var(--glass-blur);
-	}
-
-	.page-card,
-	.contact-card {
-		padding: clamp(24px, 3.8vw, 36px);
-		border-radius: var(--radius-panel);
-		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0)),
-			var(--panel);
-		box-shadow: var(--shadow);
-	}
-
-	.page-intro,
-	.section-copy,
-	.contact-text {
-		display: grid;
-		gap: 12px;
-	}
-
-	.page-intro {
-		max-width: 52rem;
-	}
-
-	.section-heading {
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: space-between;
-		gap: 14px 18px;
-	}
-
-	.section-heading {
-		align-items: end;
-		margin-bottom: 12px;
-	}
-
-	.section-heading.compact {
-		margin-bottom: 16px;
-	}
-
-	.section-copy {
-		gap: 8px;
-	}
-
-	.section-note {
-		max-width: 36rem;
-		align-self: end;
-	}
-
-	.kicker {
-		margin: 0;
-		font-size: 0.88rem;
-		letter-spacing: 0.12em;
-		text-transform: uppercase;
-		color: var(--accent-soft);
-	}
-
-	h1,
-	h2,
-	h3,
-	p,
-	span {
-		margin: 0;
-		overflow-wrap: anywhere;
-	}
-
-	h1 {
-		font-size: clamp(2rem, 4vw, 3rem);
-		line-height: 1.08;
-	}
-
-	h2 {
-		font-size: clamp(1.35rem, 2.5vw, 1.8rem);
-		line-height: 1.16;
-	}
-
-	h3 {
-		font-size: clamp(1.16rem, 2vw, 1.4rem);
-		line-height: 1.24;
-	}
-
-	p {
-		color: var(--text-soft);
-		line-height: 1.78;
-	}
-
-	.lead {
-		font-size: 1.02rem;
-	}
-
-	.copy-btn {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		min-height: 28px;
-		padding: 5px 10px;
-		border-radius: var(--radius-pill);
-		font-size: 0.82rem;
-	}
-
-	.section-grid {
-		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-		gap: 16px;
-	}
-
-	.content-card {
-		display: grid;
-		gap: 10px;
-		padding: 20px;
-		border-radius: var(--radius-card);
-		background:
-			radial-gradient(circle at top right, rgba(110, 195, 255, 0.08), transparent 34%),
-			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
-			var(--panel);
-		box-shadow: var(--shadow-soft);
-	}
-
-	.contact-card {
-		background:
-			radial-gradient(circle at top right, rgba(157, 140, 255, 0.08), transparent 34%),
-			linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0)),
-			var(--panel);
+	.heading-unit {
+		white-space: nowrap;
 	}
 
 	.contact-list {
-		display: grid;
-		gap: 12px;
-		margin: 0;
 		padding: 0;
 		list-style: none;
+		border-top: var(--rule-strong) solid var(--text);
 	}
 
-	.contact-item {
-		display: flex;
-		gap: 16px;
+	.contact-row {
+		display: grid;
+		grid-template-columns: var(--column-contact-label) minmax(0, 1fr) var(--column-contact-action);
+		gap: var(--space-5);
 		align-items: center;
-		justify-content: space-between;
-		padding: 14px;
-		border: 1px solid rgba(153, 176, 255, 0.14);
-		border-radius: 18px;
-		background: rgba(8, 10, 18, 0.35);
-	}
-
-	.contact-main {
-		display: flex;
-		gap: 14px;
-		align-items: center;
-		min-width: 0;
-	}
-
-	.contact-icon {
-		display: inline-flex;
-		flex: 0 0 auto;
-		align-items: center;
-		justify-content: center;
-		width: 42px;
-		height: 42px;
-		border: 1px solid rgba(153, 210, 255, 0.38);
-		border-radius: 16px;
-		background:
-			radial-gradient(circle at 32% 18%, rgba(178, 225, 255, 0.34), transparent 58%),
-			linear-gradient(135deg, rgba(110, 195, 255, 0.2), rgba(157, 140, 255, 0.16)),
-			rgba(14, 27, 48, 0.82);
-		box-shadow:
-			0 0 18px rgba(110, 195, 255, 0.12),
-			0 10px 24px rgba(0, 0, 0, 0.18),
-			inset 0 1px 0 rgba(255, 255, 255, 0.14);
-	}
-
-	.contact-icon img {
-		width: 22px;
-		height: 22px;
-		filter: brightness(1.22) contrast(1.08) drop-shadow(0 0 5px rgba(110, 195, 255, 0.18));
-	}
-
-	.contact-text {
-		min-width: 0;
-		gap: 2px;
+		padding: var(--space-4) 0;
+		border-bottom: var(--rule-thin) solid var(--line);
 	}
 
 	.contact-label {
 		color: var(--accent-soft);
-		font-size: 0.86rem;
-		font-weight: 700;
+		font-size: var(--text-meta);
+		letter-spacing: var(--tracking-meta);
 	}
 
 	.contact-value {
+		min-width: 0;
 		color: var(--text);
+		overflow-wrap: anywhere;
 	}
 
 	.copy-btn {
-		gap: 7px;
-		border: 1px solid rgba(153, 210, 255, 0.38);
-		background:
-			radial-gradient(circle at 24% 18%, rgba(178, 225, 255, 0.28), transparent 58%),
-			linear-gradient(135deg, rgba(110, 195, 255, 0.2), rgba(157, 140, 255, 0.16)),
-			rgba(14, 27, 48, 0.82);
-		color: var(--text);
+		justify-self: end;
+		padding: var(--space-2) var(--space-3);
+		border: var(--rule-thin) solid var(--line);
+		border-radius: var(--radius-pill);
+		background: transparent;
+		color: var(--text-soft);
+		font-size: 0.76rem;
 		cursor: pointer;
 		transition:
-			transform 0.2s ease,
-			border-color 0.2s ease,
-			background 0.2s ease;
+			border-color var(--duration-fast) ease,
+			background var(--duration-fast) ease,
+			color var(--duration-fast) ease;
 	}
 
-	.copy-btn img {
-		width: 16px;
-		height: 16px;
-		filter: brightness(1.2);
+	.copy-btn:is(:hover, :focus-visible, .copied) {
+		border-color: color-mix(in srgb, var(--accent-soft) 28%, var(--line));
+		background: color-mix(in srgb, var(--accent-soft) 8%, transparent);
+		color: var(--text);
 	}
 
-	.copy-btn:is(:hover, :focus-visible) {
-		transform: translateY(-1px);
-		border-color: var(--hover-border);
-		background:
-			radial-gradient(circle at 24% 18%, rgba(178, 225, 255, 0.34), transparent 58%),
-			linear-gradient(135deg, rgba(110, 195, 255, 0.24), rgba(157, 140, 255, 0.18)),
-			rgba(22, 31, 52, 0.88);
-	}
-
-	.copy-btn:focus-visible {
-		outline: var(--focus-ring);
-		outline-offset: var(--focus-offset);
-	}
-
-	.copy-btn.copied {
-		border-color: rgba(110, 195, 255, 0.34);
-	}
-
-	@media (max-width: 900px) {
-		.section-grid {
-			grid-template-columns: 1fr;
-		}
-	}
-
-	@media (max-width: 640px) {
-		.contact-item,
-		.section-heading {
-			flex-direction: column;
-			align-items: flex-start;
+	@media (max-width: 760px) {
+		.contact-row {
+			grid-template-columns: 5rem minmax(0, 1fr);
+			gap: var(--space-3);
 		}
 
 		.copy-btn {
-			align-self: stretch;
+			grid-column: 2;
+			justify-self: start;
 		}
 	}
 </style>

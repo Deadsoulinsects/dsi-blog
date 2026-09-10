@@ -1,23 +1,24 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { withBase } from '../utils/paths';
 
 type ProjectStatus = '已完成' | '进行中' | '实验' | '暂停';
 
 interface ProjectLink {
-	label: string;
-	href: string;
-	external?: boolean;
+	readonly label: string;
+	readonly href: string;
+	readonly external?: boolean;
 }
 
 interface ProjectItem {
-	name: string;
-	purpose: string;
-	status: ProjectStatus;
-	type: string;
-	links?: ProjectLink[];
+	readonly name: string;
+	readonly purpose: string;
+	readonly status: ProjectStatus;
+	readonly type: string;
+	readonly links?: readonly ProjectLink[];
 }
 
-const projects: ProjectItem[] = [
+const projects: readonly ProjectItem[] = [
 	{
 		name: 'Dead Soul Insects 站点',
 		purpose: '把博客、项目记录、说明文档与起源页收进同一个 Astro 静态站点里，作为长期维护中的公开入口。',
@@ -63,50 +64,39 @@ const projects: ProjectItem[] = [
 	},
 ];
 
-const typeDescriptions: Record<string, string> = {
+const typeDescriptions = {
 	站点项目: '围绕站点本体、页面入口和公开结构的持续维护。',
 	自动化脚本: '服务于内容准备、同步与构建检查的实际流程工具。',
 	'AI 项目': '已经做出可演示结果，或已经留下阶段记录的 AI 实践。',
-};
+} as const;
 
-const typeOrder = ['站点项目', '自动化脚本', 'AI 项目'];
-const statusOrder: ProjectStatus[] = ['已完成', '进行中', '实验', '暂停'];
-const statusClassMap: Record<ProjectStatus, string> = {
+const typeOrder = ['站点项目', '自动化脚本', 'AI 项目'] as const;
+const statusOrder = ['已完成', '进行中', '实验', '暂停'] as const satisfies readonly ProjectStatus[];
+const statusClassMap = {
 	已完成: 'done',
 	进行中: 'active',
 	实验: 'experimental',
 	暂停: 'paused',
-};
+} as const satisfies Record<ProjectStatus, string>;
 
 const groupedProjects = typeOrder
-	.map((type) => {
-		const items = projects.filter((project) => project.type === type);
-
-		return {
+	.map((type) => ({
 		type,
 		description: typeDescriptions[type],
-		items,
-		previewNames: items.slice(0, 2).map((project) => project.name),
-		statusBreakdown: statusOrder
-			.map((status) => ({
-				status,
-				count: items.filter((project) => project.status === status).length,
-			}))
-			.filter((item) => item.count > 0),
-		};
-	})
+		items: projects.filter((project) => project.type === type),
+	}))
 	.filter((group) => group.items.length > 0);
 
-const statusCounts = statusOrder.map((status) => ({
-	status,
-	count: projects.filter((project) => project.status === status).length,
-}));
-
-const topCardStatusSummary = statusCounts
+const statusSummary = statusOrder
+	.map((status) => ({
+		status,
+		count: projects.filter((project) => project.status === status).length,
+	}))
 	.filter((item) => item.count > 0)
 	.map((item) => `${item.status} ${item.count}`)
 	.join('、');
 
+const base = import.meta.env.BASE_URL;
 ---
 
 <Layout
@@ -114,75 +104,79 @@ const topCardStatusSummary = statusCounts
 	description="Dead Soul Insects 的真实项目入口页，按类型整理站点项目、自动化脚本与 AI 实践。"
 	canonicalPath="/projects/"
 >
-	<div class="page-shell">
-		<section class="page-card intro-card">
-			<header class="page-intro">
-				<div class="intro-copy">
+	<div class="editorial-page projects-page">
+		<section class="intro">
+			<div class="intro-grid">
+				<div>
 					<p class="kicker">项目</p>
-					<h1>只把真实做过的项目，压成清楚入口</h1>
+					<h1>只把真实做过的<span class="heading-unit">项目</span>，压成清楚入口</h1>
+				</div>
+
+				<div class="intro-side">
 					<p class="lead">
 						这一页现在只整理已经有依据的项目条目：要么已经做出来，要么正在维护，要么至少已经留下了可继续追踪的实验记录。状态说明成熟度，类型负责说明它属于哪一类实践。
 					</p>
-				</div>
 
-				<div class="intro-index" aria-label="项目概览">
-					<div class="intro-index-item">
-						<span class="index-label">项目条目</span>
-						<strong>{projects.length}</strong>
+					<div class="intro-index" aria-label="项目概览">
+						<div class="intro-stat">
+							<span>项目条目</span>
+							<strong>{projects.length}</strong>
+						</div>
+						<div class="intro-stat">
+							<span>类型分区</span>
+							<strong>{groupedProjects.length}</strong>
+						</div>
 					</div>
-					<div class="intro-index-item muted">
-						<span class="index-label">类型分区</span>
-						<strong>{groupedProjects.length}</strong>
-					</div>
-				</div>
-			</header>
 
-			<div class="intro-note">
-				<p>当前收录的项目以 {topCardStatusSummary} 为主，先按类型缩小范围，会比把所有项目一次摊平更适合继续维护和回看。</p>
+					<p class="intro-note">当前收录的项目以 {statusSummary} 为主，先按类型缩小范围，会比把所有项目一次摊平更适合继续维护和回看。</p>
+				</div>
 			</div>
 		</section>
 
-		<section class="page-card section-card" aria-label="项目类型入口">
-			<div class="section-heading">
+		<section class="section" aria-labelledby="project-types-title">
+			<header class="section-heading">
+				<span class="section-index">01 / TYPES</span>
 				<div class="section-copy">
 					<p class="kicker">类型</p>
-					<h2>先按实践类别进入</h2>
+					<h2 id="project-types-title">先按实践类别进入</h2>
+					<p class="section-note">保留类型说明、状态分布和真实条目，先判断属于哪一类实践，再继续进入相关页面或专题。</p>
 				</div>
-				<p class="section-note">保留类型说明、状态分布和条目预览，先判断属于哪一类实践，再继续进入相关页面或专题。</p>
-			</div>
+			</header>
 
-			<div class="type-list">
+			<div class="project-groups">
 				{groupedProjects.map((group) => (
-					<article class="entry-card type-entry-card">
-						<div class="entry-main">
-							<div class="entry-header">
-								<div class="entry-copy">
-									<p class="entry-kicker">项目类型</p>
-									<h3>{group.type}</h3>
-									<p>{group.description}</p>
-								</div>
+					<section class="project-group" aria-labelledby={`project-type-${group.type}`}>
+						<header class="project-group-head">
+							<p class="type-label">PROJECT TYPE · {String(group.items.length).padStart(2, '0')}</p>
+							<h3 id={`project-type-${group.type}`}>{group.type}</h3>
+							<p class="project-group-description">{group.description}</p>
+						</header>
 
-								<div class="entry-index" aria-hidden="true">
-									<span class="index-label">条目</span>
-									<strong>{group.items.length}</strong>
-								</div>
-							</div>
-
-							<div class="entry-badges" aria-label={`${group.type} 状态提示`}>
-								{group.statusBreakdown.map((item) => (
-									<span class:list={['badge', 'status-badge', statusClassMap[item.status]]}>{item.status} {item.count}</span>
-								))}
-							</div>
-
-							<div class="entry-preview" aria-label={`${group.type} 项目预览`}>
-								<span class="preview-label">条目预览</span>
-								<p>
-									{group.previewNames.join(' / ')}
-									{group.items.length > group.previewNames.length ? ' 等' : ''}
-								</p>
-							</div>
+						<div class="project-list">
+							{group.items.map((project) => (
+								<article class="project-row">
+									<div>
+										<h4 class="project-name">{project.name}</h4>
+										<p class="project-purpose">{project.purpose}</p>
+										{project.links && (
+											<div class="project-links">
+												{project.links.map((link) => (
+													<a
+														href={link.external ? link.href : withBase(base, link.href)}
+														target={link.external ? '_blank' : undefined}
+														rel={link.external ? 'noreferrer' : undefined}
+													>
+														{link.label}
+													</a>
+												))}
+											</div>
+										)}
+									</div>
+									<span class:list={['status', statusClassMap[project.status]]}>{project.status}</span>
+								</article>
+							))}
 						</div>
-					</article>
+					</section>
 				))}
 			</div>
 		</section>
@@ -190,294 +184,131 @@ const topCardStatusSummary = statusCounts
 </Layout>
 
 <style>
-	.page-shell {
+	.heading-unit {
+		white-space: nowrap;
+	}
+
+	.project-groups {
 		display: grid;
-		gap: clamp(22px, 2.8vw, 30px);
+		gap: var(--space-7);
 	}
 
-	.page-card,
-		.entry-card {
-		border: 1px solid var(--line);
-		backdrop-filter: var(--glass-blur);
-		box-sizing: border-box;
-	}
-
-	.page-card {
-		padding: clamp(24px, 3.4vw, 34px);
-		border-radius: var(--radius-panel);
-		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0)),
-			var(--panel);
-		box-shadow: 0 18px 42px rgba(0, 0, 0, 0.22);
-		overflow: clip;
-	}
-
-	.page-card {
-		gap: 20px;
-	}
-
-	.page-intro {
+	.project-group {
 		display: grid;
-		grid-template-columns: minmax(0, 1.35fr) minmax(14rem, 0.7fr);
-		align-items: start;
-		gap: 24px;
-	}
-
-	.intro-card,
-	.section-card,
-	.intro-copy,
-	.section-copy,
-	.entry-copy,
-	.entry-main {
-		display: grid;
-		gap: 12px;
-	}
-
-	.intro-copy {
-		max-width: 40rem;
-	}
-
-	.intro-index {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 12px;
-		align-content: start;
-	}
-
-	.intro-index-item,
-	.entry-index {
-		display: grid;
-		gap: 8px;
-		padding: 16px 18px;
-		border: 1px solid rgba(153, 176, 255, 0.14);
-		border-radius: 20px;
-		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.022), rgba(255, 255, 255, 0)),
-			color-mix(in srgb, var(--panel-strong) 84%, transparent);
-		box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
-	}
-
-	.intro-index-item.muted {
-		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0)),
-			color-mix(in srgb, var(--panel) 88%, transparent);
-	}
-
-	.intro-index-item strong,
-	.entry-index strong {
-		font-size: 1.05rem;
-		line-height: 1;
-		color: var(--text);
-	}
-
-	.intro-note {
-		padding-top: 2px;
-		border-top: 1px solid rgba(153, 176, 255, 0.12);
-	}
-
-	.section-heading {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.8fr);
-		gap: 14px;
-		align-items: end;
-	}
-
-	.section-copy {
-		gap: 8px;
-	}
-
-	.section-note {
-		max-width: 36rem;
-		align-self: end;
-	}
-
-	.kicker {
-		margin: 0;
-		font-size: 0.82rem;
-		letter-spacing: 0.14em;
-		text-transform: uppercase;
-		color: var(--accent-soft);
-	}
-
-	.entry-kicker,
-	.index-label,
-	.preview-label {
-		margin: 0;
-		font-size: 0.78rem;
-		letter-spacing: 0.12em;
-		text-transform: uppercase;
-		color: var(--text-soft);
-	}
-
-	h1,
-	h2,
-	h3,
-	p,
-	span,
-	strong {
-		margin: 0;
-		overflow-wrap: anywhere;
-	}
-
-	h1 {
-		font-size: clamp(2rem, 4vw, 3rem);
-		line-height: 1.08;
-	}
-
-	h2 {
-		font-size: clamp(1.35rem, 2.5vw, 1.8rem);
-		line-height: 1.16;
-	}
-
-	h3 {
-		font-size: clamp(1.18rem, 2vw, 1.4rem);
-		line-height: 1.22;
-	}
-
-	p {
-		color: var(--text-soft);
-		line-height: 1.78;
-	}
-
-	.lead {
-		font-size: 1.02rem;
-	}
-
-	.type-list {
-		display: grid;
-		gap: 14px;
-	}
-
-	.entry-card {
-		padding: 20px 22px;
-		border-radius: 20px;
-		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.024), rgba(255, 255, 255, 0)),
-			color-mix(in srgb, var(--panel) 90%, var(--bg));
-		box-shadow: 0 8px 18px rgba(0, 0, 0, 0.14);
-		transition:
-			transform 0.18s ease,
-			border-color 0.2s ease,
-			background 0.2s ease,
-			box-shadow 0.2s ease;
-	}
-
-	.entry-header {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) auto;
-		gap: 20px;
-		align-items: start;
-	}
-
-	.entry-copy {
+		grid-template-columns: var(--column-project-aside) minmax(0, 1fr);
+		gap: var(--space-6);
 		min-width: 0;
 	}
 
-	.entry-index {
-		justify-items: end;
-		text-align: right;
-		min-width: 7.25rem;
+	.project-group-head {
+		align-self: start;
+		min-width: 0;
 	}
 
-	.badge {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		min-height: 28px;
-		padding: 5px 10px;
-		border-radius: var(--radius-pill);
-		font-size: 0.82rem;
-		border: 1px solid rgba(153, 176, 255, 0.16);
-		background: rgba(255, 255, 255, 0.045);
+	.type-label {
+		color: var(--accent-soft);
+		font-size: var(--text-meta);
+		letter-spacing: var(--tracking-meta);
+	}
+
+	.project-group h3 {
+		margin-top: var(--space-2);
+		font-family: var(--font-reading);
+		font-size: var(--text-row);
+		font-weight: 500;
+		line-height: 1.18;
+	}
+
+	.project-group-description {
+		margin-top: var(--space-3);
 		color: var(--text-soft);
+		font-size: var(--text-note);
+		line-height: 1.65;
 	}
 
-	.status-badge.done {
-		border-color: rgba(157, 140, 255, 0.3);
-		background: rgba(157, 140, 255, 0.12);
-		color: #ddd6ff;
+	.project-list {
+		min-width: 0;
+		border-top: var(--rule-strong) solid var(--text);
 	}
 
-	.status-badge.active {
-		border-color: rgba(110, 195, 255, 0.28);
-		background: rgba(110, 195, 255, 0.1);
-		color: #bce9ff;
+	.project-row {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) var(--column-project-status);
+		gap: var(--space-5);
+		padding: var(--space-5) 0;
+		border-bottom: var(--rule-thin) solid var(--line);
 	}
 
-	.status-badge.experimental {
-		border-color: rgba(138, 198, 255, 0.22);
-		background: rgba(138, 198, 255, 0.08);
-		color: #d4edff;
+	.project-row > div {
+		min-width: 0;
 	}
 
-	.status-badge.paused {
-		border-color: rgba(164, 176, 211, 0.22);
-		background: rgba(164, 176, 211, 0.08);
-		color: #cfd7f2;
+	.project-name {
+		font-family: var(--font-reading);
+		font-size: var(--text-row);
+		font-weight: 500;
+		line-height: 1.18;
 	}
 
-	.entry-badges {
+	.project-purpose {
+		max-width: var(--list-measure);
+		margin-top: var(--space-2);
+		color: var(--text-soft);
+		line-height: 1.68;
+	}
+
+	.project-links {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 8px;
+		gap: var(--space-3);
+		margin-top: var(--space-3);
 	}
 
-	.preview-label {
-		display: inline-flex;
-		align-items: center;
-		justify-self: start;
-		padding: 4px 10px;
-		border: 1px solid rgba(153, 176, 255, 0.14);
-		border-radius: var(--radius-pill);
-		background: rgba(255, 255, 255, 0.04);
+	.project-links a {
+		color: var(--accent-soft);
+		font-size: var(--text-small);
+		text-decoration: none;
+	}
+
+	.project-links a:is(:hover, :focus-visible) {
+		text-decoration: underline;
+		text-underline-offset: var(--space-1);
+	}
+
+	.status {
+		justify-self: end;
 		color: var(--text-soft);
-		font-size: 0.78rem;
-		letter-spacing: 0.04em;
+		font-size: var(--text-meta);
+		letter-spacing: var(--tracking-date);
 	}
 
-	.entry-preview {
-		display: grid;
-		gap: 8px;
-		padding-top: 4px;
-		border-top: 1px solid rgba(153, 176, 255, 0.1);
+	.status.done {
+		color: var(--accent-soft);
 	}
 
-	.entry-preview p {
+	.status.active {
 		color: var(--text);
-		line-height: 1.7;
 	}
 
-	.entry-card:is(:hover, :focus-within) {
-		transform: translateY(-1px);
-		border-color: var(--hover-border);
-		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
-			color-mix(in srgb, var(--panel-strong) 90%, var(--bg));
-		box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
-	}
-
-	@media (max-width: 960px) {
-		.page-intro,
-		.section-heading,
-		.intro-index,
-		.entry-header {
-			grid-template-columns: 1fr;
+	@media (max-width: 760px) {
+		.project-group {
+			grid-template-columns: minmax(0, 1fr);
+			gap: var(--space-3);
 		}
 
-		.entry-index {
-			justify-items: start;
-			text-align: left;
-			min-width: 0;
+		.project-groups {
+			gap: var(--space-8);
 		}
 	}
 
-	@media (max-width: 640px) {
-		.page-card {
-			padding: 20px;
+	@media (max-width: 460px) {
+		.project-row {
+			grid-template-columns: minmax(0, 1fr);
+			gap: var(--space-3);
 		}
 
-		.entry-card {
-			padding: 18px;
+		.status {
+			justify-self: start;
 		}
 	}
 </style>

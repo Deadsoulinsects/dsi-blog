@@ -1,7 +1,17 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { withBase } from '../utils/paths';
 
-const originSections = [
+interface OriginSection {
+	readonly title: string;
+	readonly description: string;
+	readonly link?: {
+		readonly href: string;
+		readonly label: string;
+	};
+}
+
+const originSections: readonly OriginSection[] = [
 	{
 		title: 'Dead Soul Insects 名字来源',
 		description:
@@ -17,225 +27,54 @@ const originSections = [
 			'“Dead Soul Insects”更接近一种意象，而不是完整设定。它能把夜色、残光、碎片和缓慢整理中的内容放进同一条语气里。',
 	},
 ];
+
+const base = import.meta.env.BASE_URL;
 ---
 
 <Layout title="起源 | Dead Soul Insects" description="解释 Dead Soul Insects 的名字来源、死魂虫意象与站点视觉选择。" canonicalPath="/origin/">
-	<div class="page-shell">
-		<section class="page-card intro-card">
-			<header class="page-intro">
-				<p class="kicker">起源</p>
-				<h1>这个名字留下了一种冷静的语气</h1>
-				<p class="lead">
-					Dead Soul Insects 不是完整设定，更像给这个站点定下的气息：安静、偏冷，留一点微光。
-				</p>
-			</header>
+	<div class="editorial-page origin-page">
+		<section class="intro intro--single">
+			<div class="intro-grid">
+				<div class="intro-copy">
+					<p class="kicker">起源</p>
+					<h1>这个名字留下了一种冷静的语气</h1>
+					<p class="lead">Dead Soul Insects 不是完整设定，更像给这个站点定下的气息：安静、偏冷，留一点微光。</p>
+				</div>
+			</div>
 		</section>
 
-		<section class="section-block" aria-label="起源说明">
-			<div class="section-heading">
+		<section class="section" aria-labelledby="origin-title">
+			<header class="section-heading">
+				<span class="section-index">01 / ORIGIN</span>
 				<div class="section-copy">
 					<p class="kicker">说明</p>
-					<h2>这一页只解释它为什么合适</h2>
+					<h2 id="origin-title">这一页只解释它为什么合适</h2>
+					<p class="section-note">想知道这个名字从哪里来，可以从这里开始；剩下的部分留给读者自己感受。</p>
 				</div>
-				<p class="section-note">想知道这个名字从哪里来，可以从这里开始；剩下的部分留给读者自己感受。</p>
-			</div>
+			</header>
 
-			<div class="section-stack">
-				{originSections.map((section) => (
-					<section class="content-card">
-						<h3>{section.title}</h3>
-						<p>{section.description}</p>
-						{section.link && (
-							<a class="origin-arrow-link" href={section.link.href}>
-								{section.link.label}
-								<span aria-hidden="true">→</span>
-							</a>
-						)}
-					</section>
+			<div class="editorial-stack">
+				{originSections.map((section, index) => (
+					<article class="editorial-row">
+						<span class="editorial-row-index">{String(index + 1).padStart(2, '0')}</span>
+						<div>
+							<h3>{section.title}</h3>
+							<p>{section.description}</p>
+							{section.link && (
+								<a class="arrow-link" href={withBase(base, section.link.href)}>
+									{section.link.label} <span aria-hidden="true">→</span>
+								</a>
+							)}
+						</div>
+					</article>
 				))}
 			</div>
-		</section>
 
-		<section class="closing-note" aria-labelledby="origin-note-title">
-			<div class="section-heading compact">
-				<div class="section-copy">
-					<p class="kicker">AFTERTONE</p>
-					<h2 id="origin-note-title">保留一点模糊感</h2>
-				</div>
+			<div class="aftertone">
+				<p class="kicker">AFTERTONE</p>
+				<h2>保留一点模糊感</h2>
+				<p>不必把每个意象都说尽。只要它还能让人感到安静、冷调和一点微光，这个名字就成立。</p>
 			</div>
-			<p>
-				不必把每个意象都说尽。只要它还能让人感到安静、冷调和一点微光，这个名字就成立。
-			</p>
 		</section>
 	</div>
 </Layout>
-
-<style>
-	.page-shell {
-		display: grid;
-		gap: 20px;
-	}
-
-	.page-card,
-	.content-card,
-	.closing-note {
-		border: 1px solid var(--line);
-		backdrop-filter: var(--glass-blur);
-	}
-
-	.page-card,
-	.closing-note {
-		padding: clamp(24px, 3.8vw, 36px);
-		border-radius: var(--radius-panel);
-		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0)),
-			var(--panel);
-		box-shadow: var(--shadow);
-	}
-
-	.page-intro,
-	.section-copy,
-	.content-card {
-		display: grid;
-		gap: 12px;
-	}
-
-	.page-intro {
-		max-width: 52rem;
-	}
-
-	.section-heading {
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: space-between;
-		gap: 14px 18px;
-	}
-
-	.section-heading {
-		align-items: end;
-		margin-bottom: 12px;
-	}
-
-	.section-heading.compact {
-		margin-bottom: 16px;
-	}
-
-	.section-copy {
-		gap: 8px;
-	}
-
-	.section-note {
-		max-width: 36rem;
-		align-self: end;
-	}
-
-	.kicker {
-		margin: 0;
-		font-size: 0.88rem;
-		letter-spacing: 0.12em;
-		text-transform: uppercase;
-		color: var(--accent-soft);
-	}
-
-	h1,
-	h2,
-	h3,
-	p,
-	span {
-		margin: 0;
-		overflow-wrap: anywhere;
-	}
-
-	h1 {
-		font-size: clamp(2rem, 4vw, 3rem);
-		line-height: 1.08;
-	}
-
-	h2 {
-		font-size: clamp(1.35rem, 2.5vw, 1.8rem);
-		line-height: 1.16;
-	}
-
-	h3 {
-		font-size: clamp(1.16rem, 2vw, 1.4rem);
-		line-height: 1.24;
-	}
-
-	p {
-		color: var(--text-soft);
-		line-height: 1.78;
-	}
-
-	.lead {
-		font-size: 1.02rem;
-	}
-
-	.origin-arrow-link {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		min-height: 28px;
-		padding: 5px 10px;
-		border-radius: var(--radius-pill);
-		font-size: 0.82rem;
-	}
-
-	.origin-arrow-link {
-		border: 1px solid rgba(153, 176, 255, 0.16);
-		background: rgba(255, 255, 255, 0.045);
-		color: var(--text-soft);
-	}
-
-	.section-stack {
-		display: grid;
-		gap: 16px;
-	}
-
-	.content-card {
-		display: grid;
-		gap: 10px;
-		padding: 20px;
-		border-radius: var(--radius-card);
-		background:
-			radial-gradient(circle at top right, rgba(110, 195, 255, 0.08), transparent 34%),
-			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
-			var(--panel);
-		box-shadow: var(--shadow-soft);
-	}
-
-	.origin-arrow-link {
-		gap: 8px;
-		justify-self: start;
-		text-decoration: none;
-		transition:
-			transform 0.2s ease,
-			border-color 0.2s ease,
-			background 0.2s ease,
-			color 0.2s ease;
-	}
-
-	.origin-arrow-link:is(:hover, :focus-visible) {
-		transform: translateY(-1px);
-		border-color: var(--hover-border);
-		background: rgba(157, 140, 255, 0.14);
-		color: var(--text);
-	}
-
-	.origin-arrow-link:focus-visible {
-		outline: var(--focus-ring);
-		outline-offset: var(--focus-offset);
-	}
-
-	.closing-note {
-		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0)),
-			var(--panel-strong);
-	}
-
-	@media (max-width: 640px) {
-		.section-heading {
-			flex-direction: column;
-			align-items: flex-start;
-		}
-	}
-</style>
