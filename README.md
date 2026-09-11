@@ -2,7 +2,7 @@
 
 Dead Soul Insects 是一个基于 Astro 的个人静态博客仓库，用来整理博客文章、项目记录、说明文档，以及与站点气质相关的起源页面。
 
-当前默认工作方式仍然是 **Astro + Markdown + Obsidian 同步**。这是一套当前的起步架构，不是长期终局；未来升级方向集中记录在 [`升级优化规划.md`](./升级优化规划.md) 中。
+当前默认工作方式是 **Astro + Markdown + Obsidian 同步**。正式站点采用 dark / cool / editorial / archive-ledger / restrained 的视觉语言。
 
 ## 技术栈
 
@@ -59,7 +59,6 @@ npm run preview            # 预览构建结果
 - [`docs/project-structure.md`](./docs/project-structure.md)：仓库结构、目录职责与阅读顺序
 - [`docs/maintenance-quickstart.md`](./docs/maintenance-quickstart.md)：日常维护的最短安全上手路径
 - [`docs/operations-workflow.md`](./docs/operations-workflow.md)：较完整的内容准备、检查与操作流程
-- [`升级优化规划.md`](./升级优化规划.md)：未来升级、专业化演进和阶段路线图
 
 ## 当前维护建议
 
@@ -67,14 +66,13 @@ npm run preview            # 预览构建结果
 - 想做日常安全检查：优先参考 [`docs/maintenance-quickstart.md`](./docs/maintenance-quickstart.md)，默认路径是 `links:check` → `build:astro` → `preview`。
 - 想了解完整内容流程：去看 [`docs/operations-workflow.md`](./docs/operations-workflow.md)，不要把 README 当作完整操作手册。
 - 想理解目录和文件归属：去看 [`docs/project-structure.md`](./docs/project-structure.md)。
-- 想减少本地端口冲突和浏览器 QA 不稳定：先看 [`docs/maintenance-quickstart.md`](./docs/maintenance-quickstart.md) 里的“本地预览与 QA 的默认分流”，再看 [`docs/operations-workflow.md`](./docs/operations-workflow.md) 里的“本地浏览器 QA 的稳定工作流”。
+- 想做页面或浏览器 QA：先看 [`docs/maintenance-quickstart.md`](./docs/maintenance-quickstart.md) 的最短入口，再按 [`docs/operations-workflow.md`](./docs/operations-workflow.md) 的完整 QA 工作流执行。
 
-## 当前页面维护状态（简版）
+## 当前站点快照
 
-- 正式内容页家族当前已经进入 **A 路线（低温整理）第一阶段**，主范围包括：`/blog`、`/categories`、`/archive`、`/blog/topics/[topic]`，以及共享详情布局 `src/layouts/ArticleLayout.astro`。
-- `docs` 与 `projects` 已做过一轮正式页收尾，同样按 A 路线收回到统一家族里。
-- 首页 `index.astro` 当前仍视为**封面 / 海报型页面**，不按内容页同一套节奏直接推进；如果以后要改首页，默认应保留“视觉封面优先”这个方向。
-- 想继续维护页面视觉时，先看 [`docs/project-structure.md`](./docs/project-structure.md) 里对页面家族和关键文件的说明，再决定是改正式页、共享布局，还是只做局部 polish。
+- 主要页面区域包括博客、公开文档、项目、起源、关于、归档与分类，详情页覆盖嵌套的博客专题和文档路由；`/lab` 路由保持隔离，仅承载实验。
+- 共享 `Layout` 负责栏目级导航：它区分精确路由和当前栏目，保留原生修饰键与中键行为，并在跨栏目时先播放单一 slider，再进入目标页。
+- 页面维护与浏览器验收遵循 [`dsi-browser-visual-qa`](./.opencode/skills/dsi-browser-visual-qa/SKILL.md) Skill；完整流程见 [`docs/operations-workflow.md`](./docs/operations-workflow.md)。
 
 ## 内容与文档边界（简版）
 
