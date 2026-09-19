@@ -30,7 +30,7 @@ const {
 } = Astro.props;
 
 const navItems = [
-	{ href: '/blog', label: '博客', ownedPaths: ['/blog', '/archive', '/categories'] },
+	{ href: '/blog', label: '文章', ownedPaths: ['/blog', '/archive', '/categories'] },
 	{ href: '/projects', label: '项目', ownedPaths: ['/projects'] },
 	{ href: '/docs', label: '文档', ownedPaths: ['/docs'] },
 	{ href: '/origin', label: '起源', ownedPaths: ['/origin'] },
@@ -547,7 +547,7 @@ const activeNavIndex = navItems.findIndex((item) =>
 	}
 
 	.editorial-page .intro {
-		padding: clamp(var(--space-8), 9vw, calc(var(--space-9) + var(--space-4))) 0 var(--space-8);
+		padding: clamp(var(--space-2), 1vw, var(--space-4)) 0 var(--space-6);
 		border-bottom: var(--rule-hero) solid var(--text);
 	}
 
@@ -649,7 +649,7 @@ const activeNavIndex = navItems.findIndex((item) =>
 	}
 
 	.editorial-page .section {
-		padding: var(--space-8) 0;
+		padding: var(--space-6) 0;
 		border-bottom: var(--rule-thin) solid var(--line);
 	}
 
@@ -859,7 +859,7 @@ const activeNavIndex = navItems.findIndex((item) =>
 		}
 
 		.editorial-page .intro {
-			padding-top: var(--space-8);
+			padding-top: var(--space-4);
 		}
 
 		.editorial-page .intro-grid {
