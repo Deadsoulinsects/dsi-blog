@@ -1,0 +1,91 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import { getSortedPosts } from '../../../utils/content';
+import { withBase } from '../../../utils/paths';
+import { getTopicGroups } from '../../../utils/topics';
+
+const posts = await getSortedPosts();
+const topicGroups = getTopicGroups(posts);
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout
+	title="全部专题 | Dead Soul Insects"
+	description="浏览 Dead Soul Insects 博客的全部专题、专题说明与文章数量。"
+	canonicalPath="/blog/topics/"
+>
+	<div class="editorial-page topics-page">
+		<section class="intro intro--single topics-index" aria-labelledby="topics-title">
+			<a class="back-link" href={withBase(base, '/blog/')}>返回博客</a>
+			<h1 id="topics-title">专题</h1>
+			<div class="rule-list">
+				{topicGroups.map((topicGroup) => {
+					const description = topicGroup.description?.trim();
+
+					return (
+						<a class="rule-row topic-row text-link" href={withBase(base, `/blog/topics/${topicGroup.slug}/`)}>
+							<div class="topic-copy">
+								<h2 class="row-title">{topicGroup.name}</h2>
+								{description && <p class="row-copy">{description}</p>}
+							</div>
+							<span class="topic-count">{topicGroup.posts.length} 篇</span>
+						</a>
+					);
+				})}
+			</div>
+		</section>
+	</div>
+</Layout>
+
+<style>
+	.back-link {
+		display: inline-block;
+		margin-bottom: var(--space-5);
+		color: var(--text-soft);
+		font-family: var(--font-ui);
+		font-size: var(--text-small);
+		text-decoration-color: var(--line);
+		text-decoration-thickness: var(--rule-thin);
+		text-underline-offset: var(--space-1);
+		transition:
+			color var(--duration-fast) ease,
+			text-decoration-color var(--duration-fast) ease;
+	}
+
+	.back-link:is(:hover, :focus-visible) {
+		color: var(--accent-soft);
+		text-decoration-color: currentColor;
+	}
+
+	.topics-index h1 {
+		margin-bottom: var(--space-7);
+	}
+
+	.topic-row {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: var(--space-3) var(--space-5);
+	}
+
+	.topic-copy {
+		flex: 1 1 var(--list-measure);
+		min-width: 0;
+	}
+
+	.row-copy {
+		overflow-wrap: normal;
+		word-break: auto-phrase;
+		text-wrap: pretty;
+	}
+
+	.topic-count {
+		flex: none;
+		color: var(--text-soft);
+		font-family: var(--font-meta);
+		font-size: var(--text-kicker);
+		font-variant-numeric: tabular-nums lining-nums;
+		white-space: nowrap;
+	}
+</style>
