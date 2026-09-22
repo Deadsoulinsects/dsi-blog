@@ -1,6 +1,6 @@
 # Dead Soul Insects
 
-This context defines the stable project vocabulary for the Dead Soul Insects personal static blog. It is a glossary, not an engineering policy, design policy, or operations manual. Engineering rules live in `AGENTS.md`, project-level design decisions live in `DESIGN.md`, and operational steps live in `docs/operations-workflow.md`.
+This context defines the stable project vocabulary for the Dead Soul Insects personal static blog. It is a glossary, not an engineering policy, design policy, or operations manual. Engineering rules live in `AGENTS.md`, project-level design decisions live in `DESIGN.md`, and operational steps live in `docs/操作与发布流程.md`.
 
 ## Language
 
@@ -22,10 +22,10 @@ _Avoid_: 只有标题的项目, 无状态的项目说明
 
 **发文流程**:
 从 Obsidian 写完内容，到同步、检查 Markdown 链接、纯构建验证，再决定是否发布的一组维护步骤。
-具体执行顺序和风险边界由 `docs/operations-workflow.md` 说明，操作权限由 `AGENTS.md` 约束。
+具体执行顺序和风险边界由 `docs/操作与发布流程.md` 说明，操作权限由 `AGENTS.md` 约束。
 
 **发文检查清单**:
-面向维护者的可执行检查步骤，详细清单分别由 `docs/maintenance-quickstart.md` 提供最短安全入口、`docs/operations-workflow.md` 提供完整流程与风险边界。
+面向维护者的可执行检查步骤，详细清单分别由 `docs/维护快速指南.md` 提供最短安全入口、`docs/操作与发布流程.md` 提供完整流程与风险边界。
 _Avoid_: 抽象流程图, 只写概念不写操作
 
 **内容规范**:
