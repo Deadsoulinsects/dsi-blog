@@ -27,3 +27,9 @@ pnpm-debug.log*
 备份/
 .sisyphus/
 升级优化规划.md
+
+# agent runtime state
+.omo/run-continuation/
+
+# local browser QA artifacts
+.playwright-mcp/
