@@ -1,6 +1,6 @@
 # Dead Soul Insects
 
-This context defines the stable product language for the Dead Soul Insects personal static blog.
+This context defines the stable project vocabulary for the Dead Soul Insects personal static blog. It is a glossary, not an engineering policy, design policy, or operations manual. Engineering rules live in `AGENTS.md`, project-level design decisions live in `DESIGN.md`, and operational steps live in `docs/operations-workflow.md`.
 
 ## Language
 
@@ -22,15 +22,14 @@ _Avoid_: 只有标题的项目, 无状态的项目说明
 
 **发文流程**:
 从 Obsidian 写完内容，到同步、检查 Markdown 链接、纯构建验证，再决定是否发布的一组维护步骤。
-_Avoid_: 直接发布, 跳过检查
+具体执行顺序和风险边界由 `docs/operations-workflow.md` 说明，操作权限由 `AGENTS.md` 约束。
 
 **发文检查清单**:
 面向维护者的可执行检查步骤，详细清单分别由 `docs/maintenance-quickstart.md` 提供最短安全入口、`docs/operations-workflow.md` 提供完整流程与风险边界。
 _Avoid_: 抽象流程图, 只写概念不写操作
 
 **内容规范**:
-用于区分博客、文档、项目记录等内容类型的写作边界和 frontmatter 要求，优先写在 `README.md` 中保持易发现。
-_Avoid_: 混用栏目, 随意省略元数据
+用于描述博客、文档、项目记录等内容类型的写作边界和 frontmatter 概念。具体编辑规则由 `AGENTS.md` 与当前 content schema 提供。
 
 **博客**:
 用于发布过程记录、踩坑、阶段性总结和个人思考的内容类型。博客可以保留过程感，不要求像教程一样完全整理成稳定说明。
@@ -49,29 +48,22 @@ _Avoid_: 纯想法记录, 无真实产物的项目说明
 _Avoid_: 混写两层文档, 把访客入口写成维护手册
 
 **生产视觉语言**:
-当前正式站点使用 dark / cool / editorial / archive-ledger / restrained 语言，以排版、留白、规则线、对齐和有限阅读宽度建立层级。
-_Avoid_: 把大圆角玻璃卡片、强 glow、Bento 或营销型 Hero 当作正式页面的默认表达
+指正式站点当前采用的项目级视觉方向。完整定义、设计原则、反模式和后续设计判断以根目录 `DESIGN.md` 为准。
 
 **实验路由**:
 位于 `/lab` 的隔离实验页面，不是正式生产页面的视觉依据。
-_Avoid_: 把实验结果直接描述为当前生产风格
 
 **栏目**:
-主导航中的一级内容分组。当前 navItems 为 Blog、Projects、Docs、Origin、About；`/archive` 与 `/categories` 属于 Blog 的 active section，而不是独立主导航项。
-_Avoid_: 把归档、分类或每一个嵌套详情页当成独立栏目
+主导航中的一级内容分组。当前栏目成员、路由归属和 active 判断属于实现事实，应以当前代码为准。
 
 **精确路由**:
 浏览器当前 URL 与主导航目标的 href 完全相同的状态。点击精确路由不会触发导航刷新。
-_Avoid_: 与 active section 状态混为一谈
 
 **同栏目导航**:
-当前路由与目标路由解析到同一主导航 active section、但 URL 不同的导航；例如 Blog 与其归档、分类或嵌套路由之间。Layout 立即进入目标路由，不播放 slider。
-_Avoid_: 因为 active section 保持激活就阻止进入栏目首页或兄弟详情页
+当前路由与目标路由解析到同一主导航 active section、但 URL 不同的导航。精确行为以当前代码和浏览器 QA 结果为准。
 
 **跨栏目导航**:
-目标解析到不同主导航 active section 时的导航。Layout 在同一 DOM 中移动单一 slider 200ms 后导航；启用 reduced motion 时立即导航。
-_Avoid_: 为该效果引入 SPA 或拦截修饰键、中键等原生浏览器行为
+目标解析到不同主导航 active section 时的导航。动画时长、DOM 行为和 reduced-motion 处理属于实现事实，以当前代码和浏览器 QA 结果为准。
 
 **A 路线（低温整理）**:
-历史视觉方案，已被当前生产视觉语言替代。
-_Avoid_: 作为当前生产描述使用
+历史视觉方案名称。其状态和当前生产设计方向以 `DESIGN.md` 的 Design Decision Log 为准。

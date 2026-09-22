@@ -1,12 +1,14 @@
 # Field Notebook Lab Design Contract
 
-Status: approved pre-implementation contract. No page, component, mock data, or stylesheet is implemented by this document.
+Status: implemented; primary exploration complete; Historical / Scoped Design Experiment.
+
+This contract applies only to Field Notebook. It preserves the experiment's historical design reasoning and local constraints; it is not the production site design system. Current project-level visual language and design decisions are owned by the root `DESIGN.md`.
 
 ## 0. Research And Reference Log
 
 - **Selected reference:** the Field Notebook candidate in `D:\ai-output\dsi-blog-visual-redesign-handoff\dsi-blog-visual-redesign-handoff\candidate`, supported by its `HANDOFF.md`, `VISUAL_REDESIGN_REPORT.md`, and migration manifest. It was selected over Independent Issue, Index Grid, Raw Dispatch, and Quiet Archive because it best balances long-form reading, scan speed, responsive behavior, accessibility, and maintenance.
 - **Candidate files inspected:** `tokens.css`, `candidate.css`, `global.css`, `BaseLayout.astro`, `NotebookPage.astro`, `SecondaryPage.astro`, `PostRows.astro`, `ArticleBody.astro`, `mock.ts`, and `verify-candidate.mjs`.
-- **Repository patterns inspected:** the shared layouts, article layout, three existing lab view components, the current docs/projects/categories pages, the current lab index, `withBase()`, package scripts, Astro configuration, and generated sitemap files. Existing pages use Astro components, component-scoped CSS, and `withBase()`; the production visual language is dark, glassy, rounded, and card-led, so it is a deliberate anti-reference for this isolated light editorial lab.
+- **Repository patterns inspected:** the shared layouts, article layout, three existing lab view components, the current docs/projects/categories pages, the current lab index, `withBase()`, package scripts, Astro configuration, and generated sitemap files. These observations record the implementation context at the time of the experiment; current production design must be read from the root `DESIGN.md` and current code.
 - **Guidance applied:** frontend design-system architecture, image-to-code extraction, perfection/accessibility constraints, and designpowers direction/review/debt guidance. Accessibility outranks candidate fidelity where they conflict.
 - **Research not repeated:** no new Lazyweb or Imagen lane was run because the user supplied a selected, previously compared, implementation-ready visual reference. No real content was inspected.
 - **Candidate corrections:** namespace every token, contain every selector below `.field-notebook`, use base-safe links, add lab-only robots and sitemap isolation, and change tertiary text from `#687168` (4.43:1 on paper) to `#646d64` (4.69:1 on paper).
@@ -28,7 +30,7 @@ This contract governs only the isolated route family below and only when an ance
 | `/lab/field-notebook/categories/` | Subject index |
 | `/lab/field-notebook/not-found/` | Missing field-note state |
 
-The future stylesheet is `src/styles/field-notebook.css`. Its tokens must be declared on `.field-notebook`, and every visual selector must include `.field-notebook`. It must not contain `:root`, bare `html`/`body`/element selectors, or rules that can affect production pages. This file is not a project-global design system and does not authorize changes to existing production tokens, layouts, navigation, content, or routes.
+The implemented stylesheet is `src/styles/field-notebook.css`. Its tokens are declared on `.field-notebook`, and every visual selector must include `.field-notebook`. It must not contain `:root`, bare `html`/`body`/element selectors, or rules that can affect production pages. This file is not a project-global design system and does not authorize changes to existing production tokens, layouts, navigation, content, or routes.
 
 The lab must remain static, dependency-free, mock-only, `noindex,nofollow`, absent from sitemaps, and unlinked from production navigation. Internal URLs must pass through the repository's `withBase(import.meta.env.BASE_URL, path)` convention.
 
@@ -47,7 +49,7 @@ The memorable moment is the current entry opening across the paper grid, followe
 
 ## 2. Color
 
-All literals below are declaration values for `.field-notebook`; implementation rules consume only the token names.
+All literals below are an implementation snapshot for `.field-notebook`; current exact values must be confirmed from the experiment code.
 
 | Role | Token | Value | Use |
 |---|---|---:|---|
@@ -161,7 +163,7 @@ The 760px breakpoint is a contract boundary: 768px must exercise the retained-ra
 
 ### Stable Verification Hooks
 
-These classes are the minimal shared vocabulary between future Astro components, the scoped stylesheet, and the static verifier. They describe roles rather than page-specific appearance.
+These classes are the minimal shared vocabulary between the implemented Astro components, the scoped stylesheet, and the static verifier. They describe roles rather than page-specific appearance.
 
 | Class | Contract role |
 |---|---|
@@ -286,7 +288,6 @@ The depth strategy is **borders-only plus one tonal rail shift**.
 | ID | Item | Affected users / risk | Why accepted now | Owner / exit condition |
 |---|---|---|---|---|
 | FN-D01 | System serif and CJK font metrics vary across Windows and macOS. | Readers may see different line wraps, but no content may be lost. | The isolated lab adds no font files or dependencies. | Implementation owner; close after 390/768/1440 visual QA on Windows and one WebKit/macOS-equivalent environment, or after a separately approved local font strategy. |
-| FN-D02 | This RED phase has no rendered Field Notebook surface. | Visual geometry, sticky behavior, and actual focus rendering cannot yet be observed. | Routes/components/styles are explicitly out of scope for this phase. | Implementation owner; this debt blocks visual sign-off and closes only with fresh browser evidence. |
 | FN-D03 | The Node verifier checks static invariants, not a full accessibility tree or computed layout. | Screen-reader, zoom, and runtime layout failures remain possible. | No dependency or browser harness is being added in this baseline. | QA owner; close with browser accessibility/geometry checks. The static verifier must remain in place afterward. |
 
 No WCAG violation is accepted as design debt. Any discovered Critical or Major accessibility barrier blocks completion rather than entering this table.

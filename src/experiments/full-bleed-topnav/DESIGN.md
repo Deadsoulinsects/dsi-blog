@@ -1,14 +1,14 @@
 # Full-Bleed Top Navigation Blog Experiment
 
-Status: approved implementation contract for the isolated Astro route `/lab/full-bleed-topnav/`.
+Status: implemented scoped experiment contract for the isolated Astro route `/lab/full-bleed-topnav/`.
 
-This document governs only the experiment rooted at `.full-bleed-topnav-page`. It is not a production redesign and does not authorize changes to `Layout.astro`, production pages, shared styles, content, dependencies, or package/config files beyond the two exact isolated exceptions named below: add the dedicated npm verifier script, and exclude only `/lab/full-bleed-topnav/` from the existing sitemap filter.
+This document governs only the experiment rooted at `.full-bleed-topnav-page`. It does not override the root `DESIGN.md`, and its choices do not become production design rules unless the user explicitly approves and migrates them into the root design policy. It does not grant permission to modify production files; engineering permissions remain owned by `AGENTS.md`.
 
 ## 1. Visual Thesis
 
 Keep the Dead Soul Insects atmosphere: a cold near-black canvas, blue-violet residual light, pale text, translucent depth, and restrained glow. Change the composition, not the identity. The memorable device is an uninterrupted sequence of viewport-wide tonal bands and luminous horizontal rules, with editorial copy held inside a quiet reading measure.
 
-The page must read as a full-bleed publication index, not as the current card system made wider:
+The page must read as a full-bleed publication index, not as a centered card composition made wider:
 
 - The top navigation, hero, topic band, chronology band, row rules, and footer rule span the viewport.
 - Only the inner copy frame is width-constrained; it has no background, border, radius, or shadow.
@@ -17,9 +17,9 @@ The page must read as a full-bleed publication index, not as the current card sy
 
 **Structural acceptance test:** at 1440px, removing the inner copy from view must still leave distinct hero, topic, and chronology bands touching both viewport edges. If the page can be described as one centered shell containing large panels, the implementation fails this contract.
 
-## 2. Production Sources And Inheritance
+## 2. Implementation Sources And Local Inheritance
 
-The experiment extracts the existing implicit system rather than introducing a new brand direction:
+The experiment records selected production implementation details observed when it was created rather than introducing a new project-wide brand direction. Current production design is owned by the root `DESIGN.md`, and current implementation facts must be read from code:
 
 - [`Layout.astro`](../../layouts/Layout.astro): production palette, font stack, glass treatment, focus ring, brand, top-navigation labels/order, footer line, and base-aware navigation behavior.
 - [`blog.astro`](../../pages/blog.astro): sole content prototype, section sequence, copy, counts, topic rows, standalone article rows, and conditional rendering.
@@ -37,7 +37,7 @@ The experiment extracts the existing implicit system rather than introducing a n
 
 ## 3. Local Tokens
 
-All experiment tokens are declared on `.full-bleed-topnav-page` and use the `--fb-` prefix. Raw visual values may appear only in that local declaration block; component rules consume tokens. These are local copies of production decisions, not additions to the production token set.
+All experiment tokens are declared on `.full-bleed-topnav-page` and use the `--fb-` prefix. Raw visual values may appear only in that local declaration block; component rules consume tokens. The values below are an implementation snapshot for this experiment, not additions to the production token set or a maintained mirror of current production values.
 
 ### Color And Material
 
@@ -225,7 +225,7 @@ At all widths:
 
 ## 9. Isolation
 
-- All UI implementation code lives under `src/experiments/full-bleed-topnav/` with only a thin route entry at `src/pages/lab/full-bleed-topnav/index.astro` when implementation begins. The only other authorized edits are adding the dedicated npm verifier script and changing the existing sitemap filter solely to exclude `/lab/full-bleed-topnav/`; no dependency, unrelated script, or other configuration change is permitted.
+- The implemented UI code is isolated under `src/experiments/full-bleed-topnav/` with a thin route entry at `src/pages/lab/full-bleed-topnav/index.astro`. Its original implementation also added a dedicated verifier and the route-specific sitemap exclusion; this historical contract does not authorize future edits outside the experiment scope.
 - Use an experiment-local Astro document shell so the route can own `noindex` metadata without changing `Layout.astro`. Reproduce only the production top-navigation contract and local token values named here.
 - The body carries the sole root class `.full-bleed-topnav-page`; descendant classes use the `fb-` prefix.
 - Every selector begins with `.full-bleed-topnav-page`. Do not declare global `:root`, `html`, generic `body`, `.site-*`, `.page-*`, or shared component rules.

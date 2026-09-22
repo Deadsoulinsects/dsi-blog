@@ -2,7 +2,7 @@
 
 Dead Soul Insects 是一个基于 Astro 的个人静态博客仓库，用来整理博客文章、项目记录、说明文档，以及与站点气质相关的起源页面。
 
-当前默认工作方式是 **Astro + Markdown + Obsidian 同步**。正式站点采用 dark / cool / editorial / archive-ledger / restrained 的视觉语言。
+当前默认工作方式是 **Astro + Markdown + Obsidian 同步**。正式站点采用 dark / cool / editorial / archive-ledger / restrained 的视觉语言；当前项目级设计判断以 [`DESIGN.md`](./DESIGN.md) 为准。
 
 ## 技术栈
 
@@ -11,6 +11,12 @@ Dead Soul Insects 是一个基于 Astro 的个人静态博客仓库，用来整�
 - Markdown / Astro Content Collections
 - npm
 - GitHub Pages
+
+## 规则与设计入口
+
+- [`AGENTS.md`](./AGENTS.md)：工程实现、修改权限、验证和协作规则
+- [`DESIGN.md`](./DESIGN.md)：项目级视觉语言、信息层级和设计原则
+- [`docs/README.md`](./docs/README.md)：内部维护文档地图与详细说明入口
 
 ## 最小仓库结构
 
@@ -35,6 +41,8 @@ docs/               面向维护者 / AI 的深度说明文档
 ```bash
 npm install                # 安装依赖
 npm run dev                # 启动本地开发服务器
+npm run lint               # 只读 Oxlint 代码静态检查
+npm run lint:fix           # 用 Oxlint 修复可自动处理的问题，会写入文件
 npm run links:check        # 检查 Markdown 链接
 npm run sync:blog:dry      # 预览博客同步，不写入
 npm run sync:origin:dry    # 预览起源同步，不写入
@@ -47,6 +55,7 @@ npm run preview            # 预览构建结果
 
 ## 关键风险提醒
 
+- `npm run lint` 是只读的代码静态检查。`npm run lint:fix` 会写入文件，执行后应审阅 diff，并重新运行 `npm run lint`；两者都不替代 `npm run build:astro` 对 Astro 构建与模板的验证。
 - `npm run build:astro` 是**纯 Astro 构建检查**，如果你只是想确认站点能否构建，优先用它。
 - `npm run build` **不是普通 build 检查**。它会先跑 `prebuild`，其中包含 Obsidian 内容同步、frontmatter 补全和 Markdown 链接转换，因此**可能改动仓库里的 Markdown 文件**。
 - `npm run content:prepare` 也会写入文件；如果只是想先看结果，优先使用带 `:dry` 的命令。
@@ -63,7 +72,7 @@ npm run preview            # 预览构建结果
 ## 当前维护建议
 
 - 想快速理解仓库：先看本 README，再看 [`docs/README.md`](./docs/README.md)。
-- 想做日常安全检查：优先参考 [`docs/maintenance-quickstart.md`](./docs/maintenance-quickstart.md)，默认路径是 `links:check` → `build:astro` → `preview`。
+- 想做日常安全检查：优先参考 [`docs/maintenance-quickstart.md`](./docs/maintenance-quickstart.md)，按改动类型选择最低充分的检查；详细边界见 [`docs/operations-workflow.md`](./docs/operations-workflow.md)。
 - 想了解完整内容流程：去看 [`docs/operations-workflow.md`](./docs/operations-workflow.md)，不要把 README 当作完整操作手册。
 - 想理解目录和文件归属：去看 [`docs/project-structure.md`](./docs/project-structure.md)。
 - 想做页面或浏览器 QA：先看 [`docs/maintenance-quickstart.md`](./docs/maintenance-quickstart.md) 的最短入口，再按 [`docs/operations-workflow.md`](./docs/operations-workflow.md) 的完整 QA 工作流执行。

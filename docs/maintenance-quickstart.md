@@ -4,6 +4,8 @@
 
 如果你想看完整操作流、内容准备关系和发布边界，请去 `docs/operations-workflow.md`。这里不展开深层流程。
 
+本文件只提供快速操作入口。工程权限与验证边界以根目录 `AGENTS.md` 为准，项目级视觉判断以根目录 `DESIGN.md` 为准。
+
 ## 环境假设
 
 - 你在仓库根目录运行命令
@@ -13,21 +15,24 @@
 
 ## 最短安全启动路径
 
-按这个顺序走，默认最稳：
+先安装依赖，再启动一次开发服务器确认本地环境能运行：
 
 ```bash
 npm install
 npm run dev
-npm run links:check
-npm run build:astro
 ```
 
-这条路径的目标很简单：
+这两步的目标很简单：
 
 1. `npm install`，安装依赖
 2. `npm run dev`，确认本地开发服务器能启动
-3. `npm run links:check`，先检查 Markdown 链接
-4. `npm run build:astro`，做默认的构建验证
+
+首次接手不需要把所有验证器都跑一遍。完成修改后，按改动类型选择最低充分的检查：
+
+- 只改维护文档或其他文字说明：通常审阅本次 scoped diff 即可；链接或目标路径变动时再运行 `npm run links:check`。
+- 改 JavaScript、TypeScript 或可由 Oxlint 覆盖的代码：运行 `npm run lint`，它是只读静态检查。`npm run lint:fix` 会写入文件，只在明确要自动修复时执行，之后审阅 diff 并重新运行 `npm run lint`。
+- 改 Astro 页面、组件、布局、内容集合或可能影响模板构建的内容：按需要运行 `npm run build:astro`。Oxlint 不替代 Astro 构建，也不完整验证模板。
+- 改 Markdown 链接或移动链接目标：运行 `npm run links:check`。
 
 补充两个很容易误判的小点：
 
@@ -49,9 +54,8 @@ npm run build:astro
 - 看一眼 `README.md`，确认仓库用途和高风险区域
 - 运行 `npm install`
 - 运行 `npm run dev`，确认开发服务器能启动
-- 运行 `npm run links:check`
-- 运行 `npm run build:astro`
-- 如果前面都正常，再决定是否需要 `npm run preview`
+- 按本次修改类型选择上面的检查
+- 需要人工查看构建结果时，再决定是否运行 `npm run preview`
 
 如果你只是想人工确认已经构建好的结果，而不想让终端长期挂着开发服务器，可以优先把 `npm run preview` 当成补充查看手段。
 
@@ -74,19 +78,22 @@ npm run preview
 ```bash
 npm install
 npm run dev
+npm run lint
 npm run links:check
 npm run build:astro
 ```
 
-这些命令适合作为日常进入仓库时的默认入口。
+这些命令在对应改动类型下适合作为日常检查入口，其中 `lint` 与 `links:check` 仅读取检查，`build:astro` 会生成 `dist/`。
 
 ### 需要更谨慎的命令
 
 ```bash
+npm run lint:fix
 npm run build
 npm run publish
 ```
 
+- `npm run lint:fix`：会自动修复并写入代码文件。执行后先审阅 diff，再运行 `npm run lint`；它不替代 `npm run build:astro`。
 - `npm run build`：**不是默认第一验证路径**。它可能因为前置流程而改写内容文件。
 - `npm run publish`：**高风险命令**。它可能触发构建、提交、推送，应该只在你明确知道自己要发布时才运行。
 - 任何带有 `sync`、`prepare`、`apply` 含义的内容处理命令，也应先假设它们**可能写入文件**，不要把它们当成普通只读检查命令。
@@ -97,7 +104,7 @@ npm run publish
 
 - 你已经完成内容或代码修改
 - 你知道本次变更是否允许写回文件
-- 你已经做过基础检查，至少包含 `npm run links:check` 和 `npm run build:astro`
+- 你已按本次改动类型完成必要检查；链接或链接目标变动时包含 `npm run links:check`，模板或构建相关改动时包含 `npm run build:astro`
 - 你清楚这个命令可能进入发布动作，而不只是本地验证
 
 ```bash
@@ -108,6 +115,6 @@ npm run publish
 
 ## 一句话版本
 
-第一次进仓库，先跑：`npm install` → `npm run dev` → `npm run links:check` → `npm run build:astro`。涉及页面时，再按 `dsi-browser-visual-qa` Skill 验收。
+第一次进仓库，先跑：`npm install`，再用 `npm run dev` 确认环境。完成修改后按改动类型选择 `lint`、`links:check`、`build:astro` 或浏览器 QA；涉及页面时，再按 `dsi-browser-visual-qa` Skill 验收。
 
 记住两件事：`npm run build` 不是默认首选检查命令，`npm run publish` 是高风险命令。

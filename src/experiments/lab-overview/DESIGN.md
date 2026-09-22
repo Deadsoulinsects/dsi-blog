@@ -1,10 +1,12 @@
 # DSI Lab Overview Production Contract
 
-Status: approved production contract for the isolated Astro route `/lab/`, adapted from `D:\ai-output\dsi-lab-overview-playground\DESIGN.md`.
+Status: implemented scoped experiment contract for the isolated Astro route `/lab/`, adapted from `D:\ai-output\dsi-lab-overview-playground\DESIGN.md`.
+
+This contract applies only to the Lab overview route. It does not override the root `DESIGN.md`, and its experiment-specific choices do not become production design rules unless the user explicitly approves and migrates them into the root design policy. Exact tokens, breakpoints, counts, component behavior, and paths recorded here are implementation snapshots; current facts must be confirmed from code and runtime results.
 
 ## 0. Source And Scope
 
-- The approved playground and its design contract are the visual source of truth.
+- The approved playground and its design contract are the visual reference for this experiment only.
 - Existing sources inspected: `Layout.astro`, the Field Notebook and Full-Bleed Topnav contracts/layouts, and the three list experiment page/component patterns.
 - The audience is the site owner navigating five existing Lab families. The overview distinguishes two independent page systems from one three-stage list-page lineage.
 - This route is an index only. It does not preview, merge, restyle, or modify any child Lab page.
@@ -26,7 +28,7 @@ One `nav` owns the route map. Every row is one direct anchor. No child family re
 
 ## 2. Tokens
 
-All overview tokens are declared on `.lab-overview`. Component rules consume token names only. Exact matches alias existing `Layout` tokens; overview-only roles stay local.
+All overview tokens are declared on `.lab-overview`. Component rules consume token names only. Exact matches alias the `Layout` values observed when this experiment was implemented; overview-only roles stay local, and current production values must be read from code.
 
 ### Color And Material
 

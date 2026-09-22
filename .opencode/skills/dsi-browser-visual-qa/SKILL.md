@@ -5,13 +5,31 @@ description: 仅用于 DSI-blog 项目内的浏览器视觉 QA、响应式验证
 
 # DSI 浏览器视觉与响应式 QA
 
+## Authority / Precedence
+
+```text
+修改权限、工程边界
+→ /AGENTS.md
+
+项目级视觉判断
+→ /DESIGN.md
+
+浏览器视觉 QA 执行流程
+→ 本 SKILL.md
+
+路由、组件行为、动画时长、DOM 等精确事实
+→ 当前代码和实际运行结果
+```
+
+本 Skill 不扩大 `AGENTS.md` 授予的操作权限，也不定义新的生产视觉方向。局部 Lab / experiment 的视觉判断还应遵守其 scoped `DESIGN.md`，且不得覆盖根 `DESIGN.md`。
+
 ## 目标
 
 确认页面在真实浏览器中：
 1. 结构安全；
 2. 响应式稳定；
 3. 关键组件没有非预期换行、挤压或错位；
-4. 视觉仍符合 DSI 当前 editorial / archive-ledger 语言。
+4. 视觉仍符合根 `DESIGN.md` 定义的当前项目级设计语言。
 
 核心原则：
 
@@ -112,30 +130,73 @@ description: 仅用于 DSI-blog 项目内的浏览器视觉 QA、响应式验证
 
 需要本地浏览器 QA 时：
 
-1. 用后台进程、persistent terminal 或 session 启动 `npm run dev` / `npm run preview`；
-2. 不等待长期 server 自然退出；
-3. 读取实际 URL / port；
-4. 等待 HTTP ready，必须有限 timeout；
-5. ready 后立即：
+将启动到首次导航视为一笔连续事务，由一个已知 owner 完整负责：
+
+1. owner 用不会阻塞当前工具调用的独立进程、persistent terminal 或 session 启动 `npm run dev` / `npm run preview`，不等待长期 server 自然退出；
+2. 在开始 readiness 前，记录该进程的 PID 或可用于精确停止的 process handle；
+3. 从启动输出读取并记录实际 URL / port，或使用预先保留且严格指定的 port，不得猜测端口；
+4. owner 以有限 timeout 等待 HTTP ready，并在成功后不输出 commentary、不 yield、不暴露对话停顿，立即执行：
 
 ```text
 browser_navigate(<实际 URL>)
 ```
 
+### Windows / OpenCode 强制启动方式
+
+在当前 Windows harness 中，禁止在 `bash` 里用以下方式启动长期 Astro server：
+
+```text
+npm run dev
+Start-Process npm.cmd ...
+Start-Job ...
+```
+
+即使 `Start-Process` 配合 `-PassThru` 和 stdout / stderr 重定向，工具仍可能等待整个后代进程树，导致 server 已 ready，但 `bash` 一直不返回，最终在工具 timeout 后才有机会调用浏览器。
+
+必须使用 `Win32_Process.Create` 让 server 脱离当前 tool job，并在同一个有限时长的 `bash` 调用中完成以下步骤：
+
+1. 确认 strict port 未占用；
+2. 准备位于允许临时目录中的 stdout、stderr 和 manifest 路径；
+3. 通过 `Invoke-CimMethod -ClassName Win32_Process -MethodName Create` 启动带日志重定向的 `cmd.exe /c npm.cmd ...`；
+4. 立即把返回的 root PID、URL 和日志路径写入 manifest；
+5. 用该 PID 检查进程存活，并以有限 timeout 轮询 HTTP；
+6. readiness 成功后向工具输出包含 PID、URL、HTTP status、日志和 manifest 路径的 JSON，然后结束 `bash` 调用；
+7. 下一次工具调用必须是 `browser_navigate(<JSON 中的 URL>)`，中间不得输出 commentary 或调用其他工具。
+
+核心启动形态：
+
+```powershell
+$commandLine = 'cmd.exe /d /s /c ""{0}" run dev -- --host 127.0.0.1 --port {1} --strictPort 1>"{2}" 2>"{3}""' -f $npm, $port, $stdout, $stderr
+$created = Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{
+	CommandLine = $commandLine
+	CurrentDirectory = $projectRoot
+}
+
+if ($created.ReturnValue -ne 0) {
+	throw "Win32_Process.Create failed: $($created.ReturnValue)"
+}
+
+$rootPid = [int]$created.ProcessId
+```
+
+`Win32_Process.Create` 返回的 PID 是本轮事务唯一允许递归清理的根进程。readiness、导航或 QA 失败时，先关闭 browser，再用该 PID 精确停止进程树，最后删除本轮日志与 manifest。
+
 禁止：
 
 ```text
 server ready
-→ 没有 browser_navigate
-→ 持续等待
+→ commentary / yield / 对话停顿
+→ browser_navigate
 ```
 
-导航失败时：
-- 检查 server 是否存活；
-- 检查 URL / port；
-- 检查 route；
-- 只做有限次数重试；
-- 仍失败则停止并报告未验证项。
+主 session 无法保持上述连续所有权时，必须把完整事务委托给一个同步的、具备 shell 与 browser 能力的 worker。worker 仍必须使用上面的 Windows 启动方式；同步委托本身不能修复一个阻塞中的 server 启动命令。不得将 start、readiness 与 `browser_navigate` 拆给独立并行工具调用，独立并行调用不保证顺序。
+
+启动或首次导航失败时：
+- startup 与 navigation 都必须使用有限 timeout；
+- 每次失败均立即只停止本次事务启动并已记录 PID 或 handle 的进程；
+- 如需恢复，最多尝试一次，并为新进程重新记录 PID 或 handle、URL / port；
+- 不按 port 杀进程，不停止用户或其他 QA 已启动的进程；
+- 报告未验证的页面、viewport 或状态范围。
 
 同一轮 QA 尽量复用同一个 server 和 browser session。
 
@@ -354,7 +415,7 @@ grid-template-columns: ...;
 - alignment；
 - reading measure；
 - section density；
-- 是否符合 dark / cool / editorial / archive-ledger / restrained。
+- 是否符合根 `DESIGN.md` 的项目级设计判断。
 
 探索页额外判断：
 - 是否真的改变 component archetype / grouping logic / opening rhythm；

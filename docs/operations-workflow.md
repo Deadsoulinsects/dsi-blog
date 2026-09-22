@@ -4,9 +4,11 @@
 
 这里的单一事实来源以当前仓库文件为准，尤其是 `package.json` 里的 scripts。不要凭习惯假设这是一个“普通静态站点 build 流程”，因为这个仓库的 `build` 前面挂了内容同步和内容预处理步骤。
 
+本文件只描述操作流程。修改权限、工程边界和验证要求以根目录 `AGENTS.md` 为准；项目级视觉判断以根目录 `DESIGN.md` 为准。
+
 ## 先记住的总原则
 
-1. 日常检查默认走安全路径，先用 dry-run 和只检查不写入的命令。
+1. 日常检查按改动文件选择最低充分的命令，优先用 dry-run 和只检查不写入的命令。
 2. `npm run content:prepare` 会写入文件，`npm run build` 也可能写入文件，不适合当成“随手试一下”的纯检查命令。
 3. 如果 `links:check`、`content:prepare:dry`、`build:astro` 或其他检查步骤失败，先停下来排查原因，不要带着报错继续执行 `publish`。
 4. `npm run publish` 不是日常验证命令。它属于接近发布时才考虑的高风险操作。
@@ -20,6 +22,8 @@
 | `npm run sync:blog:dry` | 预览博客同步结果，确认 Obsidian 博客内容会怎么进入仓库 | 否 | 想先看博客同步会发生什么时 | 低 |
 | `npm run sync:origin:dry` | 预览起源页同步结果，确认起源内容同步效果 | 否 | 想先看起源内容同步会发生什么时 | 低 |
 | `npm run content:prepare:dry` | 预览完整内容准备流程，内部会跑 `prepare:content:dry`、`prepare:origin:dry`、`links:check` | 否 | 想先做完整内容检查，但不希望落盘时 | 低 |
+| `npm run lint` | 运行 Oxlint 代码静态检查 | 否 | 修改 JavaScript、TypeScript 或可由 Oxlint 覆盖的代码时 | 低 |
+| `npm run lint:fix` | 用 Oxlint 自动修复可处理的问题 | 是，会改动文件 | 明确接受自动修复时；随后必须审阅 diff 并重新运行 `npm run lint` | 中 |
 | `npm run links:check` | 检查 Markdown 链接是否需要修正，仅读取并报告问题 | 否 | 改了内容、移动了文件、怀疑链接失效时 | 低 |
 | `npm run content:prepare` | 执行完整内容准备流程，内部会跑 `prepare:content`、`prepare:origin`、`links:apply` | 是，会改动内容文件 | 确认需要正式写入 frontmatter、起源页准备结果和链接修正时 | 中 |
 | `npm run build:astro` | 只执行 Astro 构建检查，验证站点能否构建 | 是，会生成构建产物到 `dist/`，但不会触发仓库内容预处理写回 | 做“纯构建验证”时的默认命令 | 中 |
@@ -30,6 +34,12 @@
 ## 仓库里的真实流程关系
 
 只看命令名很容易误判，下面把仓库里实际存在的组合关系写清楚。
+
+### 代码静态检查与 Astro 构建
+
+`npm run lint` 执行 `oxlint`，是只读的代码静态检查。它适合 JavaScript、TypeScript 与 Oxlint 可覆盖的代码改动，但不替代 `npm run build:astro`，也不完整验证 Astro 构建或模板。
+
+`npm run lint:fix` 执行 `oxlint --fix`，会写入可自动修复的文件。只有明确需要修复时才运行它，之后应审阅 diff，并重新运行 `npm run lint`。
 
 ### 1. dry-run 内容路径
 
@@ -79,19 +89,22 @@
 
 所以 `npm run build` 不能被理解成普通的“只编译一下”。它实际是“先同步和写内容，再构建”。这也是为什么它属于高风险命令。
 
-## 推荐的详细操作顺序
+## 按改动选择验证
 
-下面这套顺序适合日常维护、发文前自检、或者 AI 协作时做安全验证。
+日常维护、发文前自检或 AI 协作时，不设全命令默认路线。根据改动文件选择必要检查：
+
+- 只改维护文档或其他文字说明：通常审阅本次 scoped diff 即可；链接或目标路径变动时才运行 `npm run links:check`。
+- 改 JavaScript、TypeScript 或可由 Oxlint 覆盖的代码：运行 `npm run lint`；如明确执行 `npm run lint:fix`，先审阅 diff，再重新运行 `npm run lint`。
+- 改 Astro 页面、组件、布局、内容集合或可能影响模板构建的内容：运行 `npm run build:astro`。Oxlint 不替代这项验证。
+- 改 Markdown 链接或移动链接目标：运行 `npm run links:check`。
+- 准备同步或预处理内容：按需要运行对应 dry-run，再决定是否接受 `content:prepare` 的写入。
+- 需要人工确认构建结果或页面行为：在相关构建后运行 `npm run preview`，页面、布局、样式或交互改动再按浏览器 QA Skill 验收。
 
 ## 本地浏览器 QA 工作流
 
-页面、布局、样式或交互改动应由 `dsi-browser-visual-qa` Skill 决定最低足够的 L1、L2 或 L3 验收级别。先做 DOM 或 geometry 检查，再按需要截图；共享 Layout、Header、导航或全局 token 的改动应提高验收范围。
+页面、布局、样式或交互改动统一按 [`dsi-browser-visual-qa`](../.opencode/skills/dsi-browser-visual-qa/SKILL.md) Skill 选择最低足够的 L1、L2 或 L3，并执行浏览器启动、显式导航、geometry、screenshot、interaction、清理和报告流程。
 
-1. 以非阻塞方式启动 `npm run dev` 或完成 `npm run build:astro` 后启动 `npm run preview`。
-2. 在有限等待时间内确认 HTTP 已就绪，并从终端输出读取实际 Local URL，不假设端口。
-3. 显式执行 `browser_navigate` 打开该 URL。服务就绪不等于浏览器已进入页面。
-4. 按 Skill 检查本次风险涉及的路由、交互与响应式状态。导航改动还应确认精确路由不刷新、同栏目不同路由立即进入、跨栏目 slider 完成 200ms 后进入、reduced motion 立即进入，且修饰键和中键保持原生行为。
-5. 完成本轮后关闭本次启动的临时服务，避免残留进程影响后续检查。
+路由、Header 状态、导航行为、动画时长、DOM 结构和组件不变量等精确事实，以当前代码、实际运行结果和 Skill 的执行检查为准，不在本操作手册中复制维护。
 
 ### 第 1 步，先决定你现在要的是“预览变化”还是“正式写入”
 
@@ -145,19 +158,15 @@ npm run content:prepare
 - 只是想知道会不会有改动
 - 当前工作区里还有不想被自动修正碰到的内容
 
-### 第 3 步，先做链接检查，再做纯构建验证
+### 第 3 步，按本次改动做检查或构建验证
 
-即使前面已经跑过 `content:prepare:dry`，单独保留这两个步骤仍然有意义，因为它们分别回答两个不同问题。
-
-```bash
-npm run links:check
-npm run build:astro
-```
-
-各自回答的问题：
+`npm run links:check` 与 `npm run build:astro` 分别回答不同问题，按本次改动选择，不要求顺序执行或同时执行：
 
 - `npm run links:check`：当前 Markdown 链接是否仍然一致、是否存在需要修正的链接
 - `npm run build:astro`：站点本身是否能完成 Astro 构建
+- `npm run lint`：JavaScript、TypeScript 或可由 Oxlint 覆盖的代码是否通过静态检查
+
+`npm run lint` 不替代 `npm run build:astro` 对 Astro 构建与模板的验证。若使用 `npm run lint:fix`，它会写入文件，先审阅 diff，再重新运行 `npm run lint`。
 
 为什么默认不直接用 `npm run build`：
 
@@ -165,9 +174,9 @@ npm run build:astro
 - `prebuild` 会再次同步和写内容
 - 你可能本来只想查构建问题，却顺手改了仓库文件
 
-### 第 4 步，构建通过后再预览站点结果
+### 第 4 步，需要时预览站点结果
 
-当 `npm run build:astro` 成功后，再执行：
+当本次改动需要人工确认构建结果时，在相关构建成功后执行：
 
 ```bash
 npm run preview
@@ -219,33 +228,6 @@ npm run preview
 4. 在没有重新通过检查前，不要发布
 
 不要把 `publish` 当成“试试看能不能顺便过”的命令。它的职责是发布，不是诊断。
-
-## 一条适合日常维护的默认路线
-
-如果你只是做日常内容维护，默认建议按下面顺序走：
-
-```bash
-npm run sync:blog:dry
-npm run sync:origin:dry
-npm run content:prepare:dry
-npm run links:check
-npm run build:astro
-npm run preview
-```
-
-只有在你确认需要正式写入时，再插入：
-
-```bash
-npm run content:prepare
-```
-
-只有在你明确需要完整链路验证时，再考虑：
-
-```bash
-npm run build
-```
-
-`npm run publish` 不属于这条普通日常路线。
 
 ## 补充说明，关于内部脚本名和维护层命令名
 
