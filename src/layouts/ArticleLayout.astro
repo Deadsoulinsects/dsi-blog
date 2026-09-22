@@ -106,7 +106,9 @@ const articleStructuredData = canonicalPath
 			)}
 
 			<div class="article-body" id="article-body">
-				<slot />
+				<div class="article-prose">
+					<slot />
+				</div>
 			</div>
 		</div>
 
@@ -132,6 +134,9 @@ const articleStructuredData = canonicalPath
 	let lockedTocLink: HTMLAnchorElement | null = null;
 	let lockedTocTarget: HTMLElement | null = null;
 	let unlockTocTimer = 0;
+	const tocPositionTolerance = 1;
+	const getTocScrollOffset = (target: HTMLElement) =>
+		Number.parseFloat(window.getComputedStyle(target).getPropertyValue('scroll-margin-block-start'));
 
 	const setActiveTocLink = (activeLink?: HTMLAnchorElement) => {
 		for (const link of tocLinks) {
@@ -150,7 +155,7 @@ const articleStructuredData = canonicalPath
 		let activeLink = tocTargets[0]?.link;
 
 		for (const item of tocTargets) {
-			if (item.target.getBoundingClientRect().top <= 72) {
+			if (item.target.getBoundingClientRect().top <= getTocScrollOffset(item.target) + tocPositionTolerance) {
 				activeLink = item.link;
 			}
 		}
@@ -172,7 +177,10 @@ const articleStructuredData = canonicalPath
 			return;
 		}
 
-		if (Math.abs(lockedTocTarget.getBoundingClientRect().top) <= 96) {
+		if (
+			Math.abs(lockedTocTarget.getBoundingClientRect().top - getTocScrollOffset(lockedTocTarget)) <=
+			tocPositionTolerance
+		) {
 			lockedTocLink = null;
 			lockedTocTarget = null;
 			setActiveTocLink(getCurrentTocLink());
@@ -289,21 +297,20 @@ const articleStructuredData = canonicalPath
 
 <style>
 	.article-shell {
+		--article-anchor-offset: calc(var(--space-8) + var(--space-4));
+		--article-rule: color-mix(in srgb, var(--accent-soft) 16%, transparent);
+		--article-rule-muted: color-mix(in srgb, var(--text) 8%, transparent);
+		--article-header-wash: color-mix(in srgb, var(--panel) 40%, transparent);
+		--article-reading-wash: color-mix(in srgb, var(--panel-strong) 38%, transparent);
+		--article-accent-wash: color-mix(in srgb, var(--accent-soft) 7%, transparent);
+		--article-title-size: clamp(2.4rem, 5vw, 4rem);
+		--article-toc-width: calc(var(--column-archive-year) + var(--space-7));
+		--article-reading-edge: 12%;
+
 		position: relative;
 		container: article-shell / inline-size;
 		display: grid;
-		gap: clamp(20px, 2.7vw, 30px);
-	}
-
-	.article-shell :where(.article-header, .toc-card, .article-body) {
-		border: 1px solid var(--line);
-		border-radius: var(--radius-panel);
-		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
-			color-mix(in srgb, var(--panel) 90%, var(--bg));
-		box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
-		box-sizing: border-box;
-		overflow: clip;
+		gap: var(--space-6);
 	}
 
 	.article-header,
@@ -315,20 +322,26 @@ const articleStructuredData = canonicalPath
 	}
 
 	.article-header {
-		gap: 22px;
-		padding: clamp(26px, 3.5vw, 34px);
+		gap: var(--space-5);
+		padding: var(--space-6) 0 var(--space-7);
+		border: 0;
+		border-block: var(--rule-thin) solid var(--article-rule);
+		border-radius: 0;
+		background: linear-gradient(90deg, var(--article-header-wash), transparent 76%);
+		box-shadow: none;
+		overflow: visible;
 	}
 
 	.article-heading {
 		display: grid;
-		grid-template-columns: minmax(0, 1.4fr) minmax(15rem, 0.72fr);
+		grid-template-columns: minmax(0, 1fr) minmax(12rem, 0.44fr);
 		align-items: start;
-		gap: 28px;
+		gap: var(--space-7);
 	}
 
 	.article-copy {
-		gap: 14px;
-		max-width: 46rem;
+		gap: var(--space-3);
+		max-width: var(--reading-measure);
 	}
 
 	.back-link,
@@ -396,75 +409,88 @@ const articleStructuredData = canonicalPath
 		overflow-wrap: anywhere;
 	}
 
-	h1 {
+	.article-copy h1 {
 		margin: 0;
-		font-size: clamp(2rem, 4vw, 3rem);
+		color: var(--text);
+		font-family: var(--font-reading);
+		font-size: var(--article-title-size);
+		font-weight: 500;
 		line-height: 1.08;
+		text-wrap: balance;
 	}
 
 	.article-description {
 		margin: 0;
-		max-width: 44rem;
+		max-width: var(--reading-measure);
 		line-height: 1.82;
 		color: var(--text-soft);
+		text-wrap: pretty;
 	}
 
 	.article-meta {
 		grid-template-columns: 1fr;
-		gap: 10px;
+		gap: 0;
 		align-content: start;
-		padding-left: 20px;
-		border-left: 1px solid rgba(153, 176, 255, 0.12);
+		padding-left: var(--space-5);
+		border-left: var(--rule-thin) solid var(--article-rule);
 	}
 
 	.meta-index-item {
 		grid-template-columns: minmax(0, 1fr) auto;
 		align-items: end;
-		gap: 12px;
-		min-height: 72px;
-		padding: 14px 16px;
-		border: 1px solid rgba(153, 176, 255, 0.14);
-		border-radius: 20px;
-		background: color-mix(in srgb, var(--panel-strong) 78%, var(--bg));
+		gap: var(--space-3);
+		min-height: 0;
+		padding: var(--space-3) 0;
+		border: 0;
+		border-bottom: var(--rule-thin) solid var(--article-rule-muted);
+		border-radius: 0;
+		background: transparent;
 	}
 
-	.meta-index-item.muted {
-		background: color-mix(in srgb, var(--panel) 92%, var(--bg));
+	.meta-index-item:first-child {
+		border-top: var(--rule-thin) solid var(--article-rule-muted);
 	}
 
 	.meta-index-item strong,
 	.meta-index-item time {
 		justify-self: end;
 		text-align: right;
-		font-size: 1rem;
+		color: var(--text-soft);
+		font-family: var(--font-meta);
+		font-size: var(--text-small);
+		font-weight: 500;
 		line-height: 1.35;
-		color: var(--text);
 	}
 
 	.article-grid {
 		display: grid;
 		grid-template-columns: 1fr;
-		gap: 18px;
+		gap: var(--space-7);
 		align-items: start;
 	}
 
 	.toc-card {
-		padding: 22px 22px 18px;
-		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.016), rgba(255, 255, 255, 0)),
-			color-mix(in srgb, var(--panel) 94%, var(--bg));
+		padding: var(--space-4) 0 var(--space-4) var(--space-4);
+		border: 0;
+		border-left: var(--rule-thin) solid var(--article-rule);
+		border-radius: 0;
+		background: linear-gradient(90deg, var(--article-accent-wash), transparent);
+		box-shadow: none;
+		overflow: visible;
 	}
 
 	.toc-card summary {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: 12px;
+		gap: var(--space-3);
 		margin-bottom: 0;
-		padding-bottom: 14px;
-		border-bottom: 1px solid rgba(153, 176, 255, 0.1);
-		font-size: 0.98rem;
+		padding: 0 0 var(--space-3);
+		border-bottom: var(--rule-thin) solid var(--article-rule-muted);
+		font-family: var(--font-meta);
+		font-size: var(--text-meta);
 		font-weight: 700;
+		letter-spacing: var(--tracking-meta);
 		cursor: pointer;
 		list-style: none;
 	}
@@ -485,15 +511,17 @@ const articleStructuredData = canonicalPath
 	}
 
 	.toc-count {
-		padding: 4px 8px;
-		border: 1px solid rgba(153, 176, 255, 0.14);
-		background: rgba(255, 255, 255, 0.035);
-		color: var(--text-soft);
-		font-size: 0.78rem;
+		padding: 0;
+		border: 0;
+		border-radius: 0;
+		background: transparent;
+		color: var(--accent-soft);
+		font-family: var(--font-meta);
+		font-size: var(--text-meta);
 	}
 
 	.toc-panel {
-		padding-top: 8px;
+		padding-top: var(--space-2);
 		overflow: visible;
 	}
 
@@ -511,7 +539,7 @@ const articleStructuredData = canonicalPath
 
 	.toc-card li {
 		padding: 0;
-		border-top: 1px solid rgba(153, 176, 255, 0.1);
+		border-top: var(--rule-thin) solid var(--article-rule-muted);
 	}
 
 	.toc-card li:first-child {
@@ -527,9 +555,9 @@ const articleStructuredData = canonicalPath
 	}
 
 	.toc-card li.nested {
-		margin-left: 12px;
-		padding-left: 12px;
-		border-left: 1px solid rgba(153, 176, 255, 0.14);
+		margin-left: var(--space-3);
+		padding-left: var(--space-3);
+		border-left: var(--rule-thin) solid var(--article-rule-muted);
 	}
 
 	.toc-card li.nested::after {
@@ -538,8 +566,9 @@ const articleStructuredData = canonicalPath
 
 	.toc-card a {
 		display: block;
-		padding: 10px 12px;
-		border-radius: 14px;
+		padding: var(--space-2) var(--space-3);
+		border-left: var(--rule-thin) solid transparent;
+		border-radius: 0;
 		color: var(--text-soft);
 		text-decoration: none;
 		transition:
@@ -548,18 +577,19 @@ const articleStructuredData = canonicalPath
 	}
 
 	.toc-card a:is(:hover, .is-active) {
-		background: rgba(255, 255, 255, 0.04);
+		border-left-color: var(--accent-soft);
+		background: linear-gradient(90deg, var(--article-accent-wash), transparent);
 		color: var(--text);
 	}
 
 	.toc-card a.is-active {
-		box-shadow: inset 0 0 0 1px rgba(153, 176, 255, 0.12);
+		box-shadow: none;
 	}
 
 	@container article-shell (min-width: 60rem) {
 		.article-grid.has-toc {
-			grid-template-columns: minmax(0, 17rem) minmax(0, 1fr);
-			gap: 20px;
+			grid-template-columns: minmax(0, var(--article-toc-width)) minmax(0, 1fr);
+			gap: var(--space-7);
 		}
 
 		.article-grid.has-toc .toc-card {
@@ -569,22 +599,38 @@ const articleStructuredData = canonicalPath
 	}
 
 	.article-body {
-		padding: clamp(28px, 3.8vw, 40px);
+		padding: var(--space-7) var(--space-6);
+		border: 0;
+		border-block: var(--rule-thin) solid var(--article-rule-muted);
+		border-radius: 0;
 		font-size: 1.03rem;
 		line-height: 1.9;
 		color: var(--text);
 		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.014), rgba(255, 255, 255, 0)),
-			color-mix(in srgb, var(--panel-strong) 86%, var(--bg));
-		box-shadow:
-			0 12px 28px rgba(0, 0, 0, 0.18),
-			inset 0 1px 0 rgba(255, 255, 255, 0.02);
+			linear-gradient(180deg, var(--article-accent-wash), transparent var(--space-8)),
+			linear-gradient(
+				90deg,
+				transparent,
+				var(--article-reading-wash) var(--article-reading-edge),
+				var(--article-reading-wash) calc(100% - var(--article-reading-edge)),
+				transparent
+			);
+		box-shadow: none;
+		overflow: visible;
+	}
+
+	.article-prose {
+		min-inline-size: 0;
+		inline-size: min(100%, var(--reading-measure));
+		margin-inline: auto;
 	}
 
 	.article-body :global(h2),
 	.article-body :global(h3) {
+		font-family: var(--font-reading);
+		font-weight: 500;
 		line-height: 1.22;
-		scroll-margin-top: 28px;
+		scroll-margin-block-start: var(--article-anchor-offset);
 	}
 
 	.article-body :global(h2) {
@@ -692,45 +738,54 @@ const articleStructuredData = canonicalPath
 		padding: 7px 12px;
 	}
 
+	@media (max-width: 760px) {
+		.article-shell {
+			--article-anchor-offset: var(--space-4);
+		}
+	}
+
 	@media (max-width: 720px) {
 		.article-shell {
-			gap: 14px;
+			--article-title-size: clamp(2rem, 7vw, 2.4rem);
+
+			gap: var(--space-5);
 		}
 
-		.article-shell :where(.article-header, .article-body) {
-			padding: 22px;
+		.article-header {
+			padding: var(--space-5) 0 var(--space-6);
 		}
 
-		.article-heading,
-		.article-meta {
+		.article-heading {
 			grid-template-columns: 1fr;
+			gap: var(--space-5);
 		}
 
 		.article-meta {
 			padding-left: 0;
-			padding-top: 10px;
+			padding-top: var(--space-3);
 			border-left: 0;
-			border-top: 1px solid rgba(153, 176, 255, 0.12);
+			border-top: var(--rule-thin) solid var(--article-rule);
 		}
 
-		.meta-index-item {
-			grid-template-columns: 1fr;
-		}
-
-		.meta-index-item strong,
-		.meta-index-item time {
-			justify-self: start;
-			text-align: left;
+		.meta-index-item:first-child {
+			border-top: 0;
 		}
 
 		.toc-card {
 			padding: 0;
+			border: 0;
+			border-block: var(--rule-thin) solid var(--article-rule-muted);
+			background: transparent;
 			overflow: hidden;
+		}
+
+		.article-grid.has-toc {
+			gap: var(--space-2);
 		}
 
 		.toc-card summary {
 			margin-bottom: 0;
-			padding: 16px 22px;
+			padding: var(--space-4) 0;
 		}
 
 		.toc-card summary::after {
@@ -739,14 +794,16 @@ const articleStructuredData = canonicalPath
 
 		.toc-panel {
 			max-height: 240px;
-			padding: 8px 20px 16px;
+			padding: var(--space-2) 0 var(--space-4);
 			overflow: auto;
 			-webkit-overflow-scrolling: touch;
 		}
 
 		.article-body {
+			padding: var(--space-6) 0;
 			font-size: 1.01rem;
 			line-height: 1.88;
+			background: transparent;
 			overflow-wrap: anywhere;
 		}
 

@@ -128,6 +128,11 @@ const base = import.meta.env.BASE_URL;
 </Layout>
 
 <style>
+	.blog-page {
+		--blog-rule: color-mix(in srgb, var(--accent-soft) 16%, transparent);
+		--blog-rule-muted: color-mix(in srgb, var(--text) 8%, transparent);
+	}
+
 	.blog-page .intro {
 		border-bottom: 0;
 	}
@@ -192,15 +197,45 @@ const base = import.meta.env.BASE_URL;
 	}
 
 	.blog-topic-list {
-		border-bottom: var(--rule-thin) solid var(--line);
+		border-bottom: var(--rule-thin) solid var(--blog-rule);
 	}
 
 	.blog-topic-list .topic-row:last-child {
 		border-bottom: 0;
 	}
 
-	.blog-section-heading {
-		margin-bottom: var(--space-6);
+	.blog-page .blog-section-heading {
+		display: flex;
+		align-items: center;
+		gap: var(--space-4);
+		margin-bottom: var(--space-5);
+	}
+
+	.blog-page .blog-section-heading::after {
+		content: '';
+		flex: 1 1 auto;
+		block-size: var(--rule-thin);
+		background: var(--blog-rule);
+	}
+
+	.blog-page .blog-section-heading h2 {
+		flex: 0 0 auto;
+		color: var(--accent-soft);
+		font-family: var(--font-meta);
+		font-size: var(--text-kicker);
+		font-weight: 700;
+		letter-spacing: var(--tracking-kicker);
+	}
+
+	.blog-page .rule-list,
+	.blog-page .blog-topic-list,
+	.blog-page .intro-index {
+		border-color: var(--blog-rule);
+	}
+
+	.blog-page .rule-row,
+	.blog-page .archive-list li {
+		border-color: var(--blog-rule-muted);
 	}
 
 	.topic-row {
@@ -237,21 +272,23 @@ const base = import.meta.env.BASE_URL;
 		white-space: nowrap;
 	}
 
-	.post-row {
+	.blog-page .post-row {
 		display: grid;
 		grid-template-columns: var(--column-post-meta) minmax(0, 1fr);
-		gap: var(--space-6);
+		gap: var(--space-7);
+		padding-block: var(--space-6);
 	}
 
 	.post-row article {
 		min-width: 0;
 	}
 
-	.post-meta {
+	.blog-page .post-meta {
 		display: grid;
 		align-content: start;
 		gap: var(--space-2);
-		color: var(--text-soft);
+		padding-top: var(--space-1);
+		color: color-mix(in srgb, var(--text-soft) 86%, var(--bg));
 		font-family: var(--font-meta);
 		font-size: var(--text-meta);
 		line-height: 1.5;
@@ -266,6 +303,14 @@ const base = import.meta.env.BASE_URL;
 		color: var(--accent-soft);
 	}
 
+	.blog-page .post-row .row-title {
+		color: var(--text);
+		font-family: var(--font-reading);
+		font-size: var(--text-editorial-row);
+		font-weight: 500;
+		text-wrap: pretty;
+	}
+
 	.row-copy,
 	.post-description {
 		overflow-wrap: normal;
@@ -275,7 +320,7 @@ const base = import.meta.env.BASE_URL;
 
 	.post-description {
 		max-width: var(--list-measure);
-		margin-top: var(--space-3);
+		margin-top: var(--space-2);
 		color: var(--text-soft);
 		font-size: var(--text-body);
 		line-height: 1.72;
@@ -288,40 +333,41 @@ const base = import.meta.env.BASE_URL;
 		padding-top: var(--space-2);
 	}
 
-	.archive-year {
-		font-family: var(--font-ui);
-		font-size: var(--text-year);
+	.blog-page .archive-year {
+		margin-top: var(--space-1);
+		color: var(--text-soft);
+		font-family: var(--font-meta);
+		font-size: var(--text-row);
 		font-weight: 500;
-		line-height: 0.9;
-		letter-spacing: var(--tracking-tight);
+		line-height: 1;
+		letter-spacing: var(--tracking-date);
 		font-variant-numeric: lining-nums tabular-nums;
 		white-space: nowrap;
-		margin-top: var(--space-2);
 	}
 
-	.archive-year-meta {
-		margin-top: var(--space-3);
+	.blog-page .archive-year-meta {
+		margin-top: var(--space-2);
 		color: var(--text-soft);
 		font-family: var(--font-meta);
 		font-size: var(--text-meta);
 		letter-spacing: var(--tracking-date);
 	}
 
-	.archive-list {
+	.blog-page .archive-list {
 		position: relative;
 		padding: 0;
 		list-style: none;
-		border-top: var(--rule-strong) solid var(--text);
+		border-top: var(--rule-thin) solid var(--blog-rule);
 	}
 
-	.archive-list::before {
+	.blog-page .archive-list::before {
 		content: '';
 		position: absolute;
-		top: calc(-1 * var(--rule-strong));
+		top: calc(-1 * var(--rule-thin));
 		right: 100%;
 		width: calc(var(--column-archive-year) + var(--space-6));
-		height: var(--rule-strong);
-		background: var(--text);
+		height: var(--rule-thin);
+		background: var(--blog-rule);
 	}
 
 	.archive-list li {
@@ -344,7 +390,8 @@ const base = import.meta.env.BASE_URL;
 		font-variant-numeric: tabular-nums lining-nums;
 	}
 
-	.archive-link {
+	.blog-page .archive-link {
+		color: color-mix(in srgb, var(--text) 88%, var(--text-soft));
 		font-family: var(--font-reading);
 		font-size: var(--text-body);
 		line-height: 1.45;
@@ -378,7 +425,7 @@ const base = import.meta.env.BASE_URL;
 		}
 
 		.topic-row,
-		.post-row {
+		.blog-page .post-row {
 			grid-template-columns: minmax(0, 1fr);
 			gap: var(--space-3);
 		}

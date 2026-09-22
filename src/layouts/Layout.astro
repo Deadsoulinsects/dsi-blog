@@ -144,11 +144,9 @@ const activeNavIndex = navItems.findIndex((item) =>
 
 	if (siteNav) {
 		const navLinks = Array.from(siteNav.querySelectorAll<HTMLAnchorElement>('a'));
-		const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 		const normalizePathname = (pathname: string) => (pathname === '/' ? '/' : pathname.replace(/\/+$/, ''));
-		let navigationPending = false;
 
-		navLinks.forEach((link, index) => {
+		for (const link of navLinks) {
 			link.addEventListener('click', (event) => {
 				if (
 					event.defaultPrevented ||
@@ -164,34 +162,13 @@ const activeNavIndex = navItems.findIndex((item) =>
 					return;
 				}
 
-				event.preventDefault();
 				const destinationUrl = new URL(link.href);
 
 				if (normalizePathname(destinationUrl.pathname) === normalizePathname(window.location.pathname)) {
-					return;
+					event.preventDefault();
 				}
-
-				if (link.classList.contains('active') || link.getAttribute('aria-current') === 'page') {
-					window.location.assign(link.href);
-					return;
-				}
-
-				if (navigationPending) {
-					return;
-				}
-
-				if (reducedMotion.matches) {
-					window.location.assign(link.href);
-					return;
-				}
-
-				navigationPending = true;
-				siteNav.style.setProperty('--nav-index', String(index));
-				window.setTimeout(() => {
-					window.location.assign(link.href);
-				}, 200);
 			});
-		});
+		}
 	}
 </script>
 
@@ -242,7 +219,7 @@ const activeNavIndex = navItems.findIndex((item) =>
 		--column-contact-label: 7rem;
 		--column-contact-action: 5rem;
 		--text-kicker: 0.72rem;
-		--text-meta: 0.7rem;
+		--text-meta: 0.75rem;
 		--text-note: 0.92rem;
 		--text-small: 0.82rem;
 		--text-body: 1rem;
@@ -252,6 +229,7 @@ const activeNavIndex = navItems.findIndex((item) =>
 		--text-display: clamp(3.1rem, 7vw, 6.25rem);
 		--text-year: clamp(2.8rem, 5vw, 4.3rem);
 		--tracking-tight: -0.05em;
+		--tracking-display-cjk: -0.025em;
 		--tracking-heading: -0.035em;
 		--tracking-row: -0.02em;
 		--tracking-kicker: 0.11em;
@@ -584,8 +562,8 @@ const activeNavIndex = navItems.findIndex((item) =>
 		font-family: var(--font-reading);
 		font-size: var(--text-display);
 		font-weight: 500;
-		line-height: 0.96;
-		letter-spacing: var(--tracking-tight);
+		line-height: 1.06;
+		letter-spacing: var(--tracking-display-cjk);
 		text-wrap: balance;
 	}
 
@@ -630,7 +608,7 @@ const activeNavIndex = navItems.findIndex((item) =>
 		display: block;
 		color: var(--text-soft);
 		font-family: var(--font-meta);
-		font-size: 0.68rem;
+		font-size: var(--text-meta);
 		letter-spacing: 0.06em;
 	}
 
