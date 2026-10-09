@@ -7,268 +7,116 @@ const categories = await getAllDocCategories();
 const base = import.meta.env.BASE_URL;
 ---
 
-<Layout title="分类 | Dead Soul Insects" description="查看 Dead Soul Insects 文档分类入口。" canonicalPath="/categories/">
-	<div class="page-shell">
-		<section class="page-card intro-card">
-			<header class="page-intro">
-				<div class="intro-copy">
-					<p class="kicker">分类</p>
-					<h1>按分类浏览文档</h1>
-					<p class="lead">这里先给出文档分类入口，适合在知道方向、但还没确定具体页面时先缩小查找范围。</p>
-				</div>
-
-				<div class="intro-index" aria-label="分类概览">
-					<div class="intro-index-item">
-						<span class="index-label">分类总数</span>
-						<strong>{categories.length}</strong>
-					</div>
-				</div>
-			</header>
-
-			<div class="intro-note">
-				<p>先用分类缩小方向，再进入具体页面，会比直接在整站里搜索更稳定。</p>
-			</div>
-		</section>
-
-		<section class="page-card section-card" aria-label="文档分类入口列表">
-			<div class="section-heading">
-				<div class="section-copy">
-					<p class="kicker">索引</p>
-					<h2>先进入明确的分类</h2>
-				</div>
-				<p class="section-note">每个分类都像一个稳定入口，适合先缩小范围，再继续往下看具体文档。</p>
-			</div>
-
-			<div class="entry-list">
-				{categories.map((category) => (
-					<a class="entry-card" href={withBase(base, `/categories/${category.slug}/`)}>
-						<div class="entry-copy">
-							<p class="entry-kicker">文档分类</p>
-							<h3>{category.name}</h3>
-						</div>
-						<div class="entry-index" aria-hidden="true">
-							<span class="index-label">页面</span>
-							<strong>{category.count}</strong>
-						</div>
-					</a>
-				))}
-			</div>
-		</section>
+<Layout title="文档分类 | Dead Soul Insects" description="按分类查阅 Dead Soul Insects 的公开文档。" canonicalPath="/categories/" mainId="categories-main" skipLinkLabel="跳到文档分类">
+	<div class="category-catalog">
+		<header class="catalog-heading">
+			<h1>文档分类</h1>
+			<a class="catalog-all" href={withBase(base, '/docs/')}>全部文档 →</a>
+		</header>
+		<nav aria-label="文档分类">
+			{categories.length ? (
+				<ul class="category-list" role="list">
+					{categories.map((category) => (
+						<li>
+							<a class="category-link" href={withBase(base, `/categories/${category.slug}/`)}>
+								<span class="category-name">{category.name}</span>
+								<span class="category-count">{category.count} 篇文档</span>
+								<span class="category-arrow" aria-hidden="true">→</span>
+							</a>
+						</li>
+					))}
+				</ul>
+			) : <p class="catalog-empty">暂无公开文档分类。</p>}
+		</nav>
 	</div>
 </Layout>
 
 <style>
-	.page-shell {
-		display: grid;
-		gap: clamp(22px, 2.8vw, 30px);
+	:global(#categories-main) {
+		scroll-margin-block-start: calc(var(--space-8) + var(--space-7));
 	}
-
-	.page-card,
-	.entry-card {
-		border: 1px solid var(--line);
-		backdrop-filter: var(--glass-blur);
-		box-sizing: border-box;
+	.category-catalog {
+		padding-top: var(--space-7);
 	}
-
-	.page-card {
-		padding: clamp(24px, 3.4vw, 34px);
-		border-radius: var(--radius-panel);
-		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0)),
-			var(--panel);
-		box-shadow: 0 18px 42px rgba(0, 0, 0, 0.22);
-		overflow: clip;
-	}
-
-	.page-intro,
-	.intro-card,
-	.section-card,
-	.intro-copy,
-	.section-copy,
-	.entry-copy {
-		display: grid;
-		gap: 12px;
-	}
-
-	.page-intro,
-	.intro-card,
-	.section-card {
-		gap: 20px;
-	}
-
-	.page-intro {
-		grid-template-columns: minmax(0, 1.35fr) minmax(14rem, 0.7fr);
-		align-items: start;
-		gap: 24px;
-	}
-
-	.intro-copy {
-		max-width: 40rem;
-	}
-
-	.intro-index {
-		display: grid;
-		grid-template-columns: 1fr;
-		gap: 12px;
-		align-content: start;
-	}
-
-	.intro-index-item {
-		display: grid;
-		gap: 8px;
-		padding: 16px 18px;
-		border: 1px solid rgba(153, 176, 255, 0.14);
-		border-radius: 20px;
-		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.022), rgba(255, 255, 255, 0)),
-			color-mix(in srgb, var(--panel-strong) 84%, transparent);
-		box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
-	}
-
-	.intro-index-item strong,
-	.entry-index strong {
-		font-size: 1.05rem;
-		line-height: 1;
-		color: var(--text);
-	}
-
-	.intro-note {
-		padding-top: 2px;
-		border-top: 1px solid rgba(153, 176, 255, 0.12);
-	}
-
-	.section-heading {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.8fr);
-		gap: 14px;
-		align-items: end;
-	}
-
-	.section-copy {
-		gap: 8px;
-	}
-
-	.section-note {
-		max-width: 36rem;
-		align-self: end;
-	}
-
-	.kicker {
-		margin: 0;
-		font-size: 0.82rem;
-		letter-spacing: 0.14em;
-		text-transform: uppercase;
-		color: var(--accent-soft);
-	}
-
-	.entry-kicker,
-	.index-label {
-		margin: 0;
-		font-size: 0.78rem;
-		letter-spacing: 0.12em;
-		text-transform: uppercase;
-		color: var(--text-soft);
-	}
-
-	h1,
-	h2,
-	h3,
-	strong,
-	p,
-	span {
-		margin: 0;
-		overflow-wrap: anywhere;
-	}
-
-	h1 {
-		font-size: clamp(2rem, 4vw, 3rem);
-		line-height: 1.08;
-	}
-
-	h2 {
-		font-size: clamp(1.35rem, 2.5vw, 1.8rem);
-		line-height: 1.16;
-	}
-
-	h3 {
-		font-size: clamp(1.18rem, 2vw, 1.4rem);
-		line-height: 1.22;
-	}
-
-	p {
-		color: var(--text-soft);
-		line-height: 1.78;
-	}
-
-	.lead {
-		font-size: 1.02rem;
-	}
-
-	.entry-list {
-		display: grid;
-		gap: 14px;
-	}
-
-	.entry-card {
-		padding: 20px 22px;
-		border-radius: 20px;
-		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.024), rgba(255, 255, 255, 0)),
-			color-mix(in srgb, var(--panel) 90%, var(--bg));
-		box-shadow: 0 8px 18px rgba(0, 0, 0, 0.14);
-		color: inherit;
-		text-decoration: none;
+	.catalog-heading {
 		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
 		justify-content: space-between;
-		align-items: start;
-		gap: 20px;
-		transition:
-			transform 0.18s ease,
-			border-color 0.2s ease,
-			background 0.2s ease,
-			box-shadow 0.2s ease;
+		gap: var(--space-4) var(--space-6);
+		margin-bottom: var(--space-8);
 	}
-
-	.entry-copy {
+	.catalog-heading h1 {
+		margin: 0;
+		min-width: 0;
+		color: var(--text);
+		font-family: var(--font-reading);
+		font-size: var(--text-section);
+		font-weight: 500;
+		line-height: 1.2;
+	}
+	.catalog-all {
+		color: var(--text-soft);
+		font-size: var(--text-small);
+		text-underline-offset: var(--space-1);
+	}
+	.category-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-4) var(--space-8);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	.category-list li {
+		flex: 0 1 18rem;
 		min-width: 0;
 	}
-
-	.entry-index {
+	.category-link {
 		display: grid;
-		gap: 8px;
-		justify-items: end;
-		text-align: right;
-		flex-shrink: 0;
+		grid-template-columns: minmax(0, 1fr) auto auto;
+		align-items: baseline;
+		gap: var(--space-3);
+		min-height: var(--space-7);
+		padding-block: var(--space-4);
+		color: var(--text);
+		text-decoration: none;
 	}
-
-	.entry-card:is(:hover, :focus-visible) {
-		transform: translateY(-1px);
-		border-color: var(--hover-border);
-		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0)),
-			color-mix(in srgb, var(--panel-strong) 90%, var(--bg));
-		box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
+	.category-name {
+		font-family: var(--font-reading);
+		font-size: var(--text-row);
+		line-height: 1.3;
+		overflow-wrap: anywhere;
+		text-decoration: underline;
+		text-decoration-color: var(--line);
+		text-decoration-thickness: var(--rule-thin);
+		text-underline-offset: var(--space-1);
 	}
-
-	.entry-card:focus-visible {
-		outline: var(--focus-ring);
-		outline-offset: var(--focus-offset);
+	.category-count {
+		color: var(--text-soft);
+		font-family: var(--font-meta);
+		font-size: var(--text-small);
+		line-height: 1.6;
+		white-space: nowrap;
 	}
-
-	@media (max-width: 960px) {
-		.page-intro,
-		.section-heading,
-		.entry-card {
-			grid-template-columns: 1fr;
-		}
-
-		.entry-card {
-			display: grid;
-		}
-
-		.entry-index {
-			justify-items: start;
-			text-align: left;
+	.category-arrow {
+		color: var(--accent-soft);
+		font-size: var(--text-body);
+	}
+	.catalog-all:is(:hover, :focus-visible),
+	.category-link:is(:hover, :focus-visible) .category-name {
+		color: var(--accent-soft);
+		text-decoration-color: currentColor;
+	}
+	.catalog-empty {
+		margin: 0;
+		color: var(--text-soft);
+		font-size: var(--text-body);
+		line-height: 1.75;
+	}
+	@media (max-width: 760px) {
+		.category-catalog {
+			padding-top: var(--space-6);
 		}
 	}
 </style>

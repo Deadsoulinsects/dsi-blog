@@ -1,134 +1,76 @@
 ---
 import Layout from './Layout.astro';
+import { withBase } from '../utils/paths';
 
 interface Props {
-	title?: string;
-	description?: string;
+	frontmatter: {
+		title: string;
+		description: string;
+	};
 }
 
-const {
-	title = '起源详情 | Dead Soul Insects',
-	description = 'Dead Soul Insects 的起源详情文章。',
-} = Astro.props;
+const { title, description } = Astro.props.frontmatter;
+const base = import.meta.env.BASE_URL;
 ---
 
 <Layout title={`${title} | Dead Soul Insects`} description={description}>
-	<article class="origin-detail-card">
-		<button class="back-button" type="button" id="origin-detail-back-button" aria-label="返回">
-			<svg viewBox="0 0 80 24" fill="none" aria-hidden="true">
-  				<path
-    				d="M80 12H0"
-			    	stroke="currentColor"
-    				stroke-width="5"
-    				stroke-linecap="round"
-  				/>
-  				<path
-    				d="M20 0L0 12L20 24"
-    				stroke="currentColor"
-    				stroke-width="5"
-    				stroke-linecap="round"
-    				stroke-linejoin="round"
-  				/>
-			</svg>
-		</button>
+	<article class="origin-detail">
+		<header class="origin-detail-heading">
+			<a class="origin-back" href={withBase(base, '/origin/')}>
+				<span aria-hidden="true">←</span> 返回起源
+			</a>
+			<h1>{title}</h1>
+		</header>
 		<div class="origin-detail-body">
 			<slot />
 		</div>
 	</article>
 </Layout>
 
-<script>
-	const backButton = document.querySelector<HTMLButtonElement>('#origin-detail-back-button');
-
-	backButton?.addEventListener('click', () => {
-		if (window.history.length > 1) {
-			window.history.back();
-			return;
-		}
-
-		window.location.href = '/origin/';
-	});
-</script>
-
 <style>
-	.origin-detail-card {
-		padding: 32px;
-		border: 1px solid var(--line);
-		border-radius: var(--radius-panel);
-		background:
-			radial-gradient(circle at top right, rgba(110, 195, 255, 0.08), transparent 32%),
-			linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
-			var(--panel);
-		backdrop-filter: var(--glass-blur);
-		box-shadow: var(--shadow);
+	.origin-detail {
+		inline-size: min(100%, var(--reading-measure));
+		margin-inline: auto;
+		overflow-wrap: anywhere;
 	}
 
-	.back-button {
+	.origin-back {
 		display: inline-flex;
 		align-items: center;
-		justify-content: center;
-		width: 60px;
-		height: 25px;
-		margin: 0 0 20px;
-		padding: 0;
-		border: 1px solid rgba(153, 210, 255, 0.32);
-		border-radius: 18px;
-		background:
-			radial-gradient(circle at 32% 18%, rgba(178, 225, 255, 0.28), transparent 58%),
-			linear-gradient(135deg, rgba(110, 195, 255, 0.16), rgba(157, 140, 255, 0.14)),
-			rgba(14, 27, 48, 0.78);
-		box-shadow:
-			0 0 18px rgba(110, 195, 255, 0.1),
-			0 10px 24px rgba(0, 0, 0, 0.16),
-			inset 0 1px 0 rgba(255, 255, 255, 0.12);
-		color: var(--text);
-		font: inherit;
-		font-weight: 700;
-		line-height: 1;
-		cursor: pointer;
-		transition:
-			transform 0.2s ease,
-			border-color 0.2s ease,
-			background 0.2s ease,
-			box-shadow 0.2s ease,
-			color 0.2s ease;
+		gap: var(--space-2);
+		min-block-size: 2.75rem;
+		color: var(--text-soft);
+		font-size: var(--text-note);
+		line-height: 1.6;
+		text-underline-offset: var(--space-1);
 	}
 
-	.back-button svg {
-		display: block;
-		width: 35px;
-		height: 30px;
+	.origin-back:is(:hover, :focus-visible) {
+		color: var(--accent-soft);
 	}
 
-	.back-button:hover,
-	.back-button:focus-visible {
-		transform: translateY(-1px);
-		border-color: rgba(178, 225, 255, 0.48);
-		background:
-			radial-gradient(circle at 32% 18%, rgba(178, 225, 255, 0.34), transparent 58%),
-			linear-gradient(135deg, rgba(110, 195, 255, 0.22), rgba(157, 140, 255, 0.18)),
-			rgba(14, 27, 48, 0.88);
-		box-shadow:
-			0 0 22px rgba(110, 195, 255, 0.14),
-			0 12px 26px rgba(0, 0, 0, 0.18),
-			inset 0 1px 0 rgba(255, 255, 255, 0.16);
-		color: #f3f6ff;
+	.origin-detail-heading {
+		margin-block-end: var(--space-7);
 	}
 
-	.back-button:focus-visible {
-		outline: var(--focus-ring);
-		outline-offset: var(--focus-offset);
+	.origin-detail-heading h1 {
+		margin: var(--space-5) 0 0;
+		font-family: var(--font-reading);
+		font-size: clamp(2rem, 4vw, 3rem);
+		font-weight: 500;
+		line-height: 1.3;
+		text-wrap: balance;
 	}
 
 	.origin-detail-body {
-		inline-size: min(100%, var(--reading-measure));
+		inline-size: min(100%, var(--article-reading-measure));
 		margin-inline: auto;
-		font-size: 1.03rem;
-		line-height: 1.95;
-		color: #d8e0f8;
+		font-size: var(--article-body-size);
+		font-weight: 400;
+		line-height: var(--article-body-line);
+		color: var(--text);
 	}
 
-	.origin-detail-body :global(h1),
 	.origin-detail-body :global(h2),
 	.origin-detail-body :global(h3),
 	.origin-detail-body :global(p),
@@ -139,16 +81,26 @@ const {
 		margin-top: 0;
 	}
 
-	.origin-detail-body :global(h1) {
-		margin-bottom: 24px;
-		font-size: clamp(2rem, 4vw, 3rem);
-		line-height: 1.1;
-	}
-
 	.origin-detail-body :global(h2),
 	.origin-detail-body :global(h3) {
-		margin: 36px 0 16px;
-		line-height: 1.24;
+		margin: var(--space-7) 0 var(--space-4);
+		font-family: var(--font-reading);
+		font-weight: 500;
+		line-height: 1.4;
+	}
+
+	.origin-detail-body :global(h2) {
+		font-size: var(--text-row);
+	}
+
+	.origin-detail-body :global(h3) {
+		font-family: var(--font-ui);
+		font-weight: 600;
+		font-size: 1.25rem;
+	}
+
+	.origin-detail-body :global(> :first-child) {
+		margin-block-start: 0;
 	}
 
 	.origin-detail-body :global(p),
@@ -156,27 +108,22 @@ const {
 	.origin-detail-body :global(ol),
 	.origin-detail-body :global(pre),
 	.origin-detail-body :global(blockquote) {
-		margin-bottom: 20px;
+		margin-bottom: var(--space-5);
 	}
 
 	.origin-detail-body :global(a) {
 		color: var(--accent-soft);
-		text-decoration-color: rgba(110, 195, 255, 0.5);
+		text-decoration-color: currentColor;
 		text-underline-offset: 0.18em;
 	}
 
-	.origin-detail-body :global(a:hover),
-	.origin-detail-body :global(a:focus-visible) {
-		text-decoration-color: rgba(110, 195, 255, 0.9);
+	.origin-detail-body :global(a:is(:hover, :focus-visible)) {
+		color: var(--text);
 	}
 
-	@media (max-width: 640px) {
-		.origin-detail-card {
-			padding: 24px;
-		}
-
-		.back-button {
-			margin-bottom: 20px;
+	@media (max-width: 760px) {
+		.origin-detail-heading {
+			margin-block-end: var(--space-6);
 		}
 	}
 </style>

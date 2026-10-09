@@ -7,127 +7,161 @@ const docs = await getSortedDocs();
 const base = import.meta.env.BASE_URL;
 ---
 
-<Layout title="文档 | Dead Soul Insects" description="Dead Soul Insects 的文档列表页，整理分享文档、学习资料与配置说明。" canonicalPath="/docs/">
-	<div class="editorial-page docs-page">
-		<section class="intro">
-			<div class="intro-grid">
-				<div>
-					<p class="kicker">文档</p>
-					<h1>把零散记录收紧成可复用的说明</h1>
-				</div>
+<Layout
+	title="文档 | Dead Soul Insects"
+	description="Dead Soul Insects 的公开文档与使用说明。"
+	canonicalPath="/docs/"
+	mainId="docs-main"
+	skipLinkLabel="跳到文档内容"
+>
+	<div class="docs-page">
+		<header class="docs-heading">
+			<h1>文档</h1>
+		</header>
 
-				<div class="intro-side">
-					<p class="lead">
-						博客偏向持续写下来的过程，文档页更偏向整理后的结果。这里直接列出当前可读的说明页，方便查阅，也方便在需要时重新打开。
-					</p>
-
-					<div class="intro-index" aria-label="文档概览">
-						<div class="intro-stat">
-							<span>公开文档</span>
-							<strong>{docs.length}</strong>
-						</div>
-						<div class="intro-stat">
-							<span>浏览方式</span>
-							<strong class="browse-mode">按清单</strong>
-						</div>
-					</div>
-
-					<p class="intro-note">这里优先保留已经整理成说明的页面，适合在需要时直接重新打开，不必再从博客过程里回找。</p>
-				</div>
-			</div>
-		</section>
-
-		<section class="section" aria-labelledby="docs-index-title">
-			<header class="section-heading">
-				<span class="section-index">01 / INDEX</span>
-				<div class="section-copy">
-					<p class="kicker">索引</p>
-					<h2 id="docs-index-title">按整理后的说明进入</h2>
-					<p class="section-note">每条文档保留标题、摘要与更新时间，先缩小目标，再进入具体页面。</p>
-				</div>
-			</header>
-
-			<div class="rule-list">
+		<section aria-label="文档目录">
+			<ul class="docs-list">
 				{docs.map((doc) => {
 					const dateTime = formatDateTime(doc.data.pubDate);
 					const category = doc.data.category.trim();
+					const description = doc.data.description.trim();
 
 					return (
-						<a class="rule-row doc-row text-link" href={withBase(base, `/docs/${doc.id}/`)}>
-							<div>
-								<h3 class="doc-title">{doc.data.title}</h3>
-								<p class="doc-description">{doc.data.description}</p>
-							</div>
-
-							<div class="doc-meta">
-								<time datetime={dateTime}>{dateTime.replaceAll('-', '.')}</time>
-								{category && <span>{category}</span>}
-							</div>
-						</a>
+						<li>
+							<a class="doc-link" href={withBase(base, `/docs/${doc.id}/`)}>
+								<div class="doc-copy">
+									<h2 class="doc-title">{doc.data.title}</h2>
+									{description && <p class="doc-description">{description}</p>}
+									<p class="doc-meta">
+										{category && <span class="doc-category">{category}</span>}
+										<span class="doc-date">发布于 <time datetime={dateTime}>{dateTime}</time></span>
+									</p>
+								</div>
+								<span class="doc-arrow" aria-hidden="true">→</span>
+							</a>
+						</li>
 					);
 				})}
-			</div>
+			</ul>
 		</section>
 	</div>
 </Layout>
 
 <style>
-	.browse-mode {
-		padding-top: var(--space-1);
-		font-family: var(--font-ui);
-		font-size: var(--text-body);
+	.docs-page {
+		max-width: 100%;
+		padding-top: var(--space-7);
 	}
 
-	.doc-row {
+	.docs-heading {
+		margin-bottom: var(--space-6);
+		padding-bottom: var(--space-5);
+		border-bottom: var(--rule-thin) solid var(--line);
+	}
+
+	.docs-heading h1 {
+		margin: 0;
+		color: var(--text);
+		font-family: var(--font-reading);
+		font-size: var(--text-section);
+		font-weight: 500;
+		line-height: 1.2;
+	}
+
+	.docs-list {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) var(--column-doc-meta);
-		gap: var(--space-6);
+		gap: var(--space-4);
+		margin: 0;
+		padding: 0;
+		list-style: none;
 	}
 
-	.doc-row > div {
+	.doc-link {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		align-items: start;
+		gap: var(--space-5);
+		padding: var(--space-5);
+		color: var(--text);
+		text-decoration: none;
+	}
+
+	.doc-copy {
 		min-width: 0;
 	}
 
 	.doc-title {
+		margin: 0;
 		font-family: var(--font-reading);
-		font-size: var(--text-editorial-row);
+		font-size: var(--text-row);
 		font-weight: 500;
-		line-height: 1.18;
-		letter-spacing: var(--tracking-row);
+		line-height: 1.3;
+		overflow-wrap: anywhere;
+		text-decoration: underline;
+		text-decoration-color: var(--line);
+		text-decoration-thickness: var(--rule-thin);
+		text-underline-offset: var(--space-1);
 	}
 
 	.doc-description {
-		max-width: var(--list-measure);
-		margin-top: var(--space-3);
+		max-width: var(--reading-measure);
+		margin: var(--space-3) 0 0;
 		color: var(--text-soft);
-		line-height: 1.7;
+		font-size: var(--text-body);
+		line-height: 1.75;
+		overflow-wrap: anywhere;
 	}
 
 	.doc-meta {
-		display: grid;
-		justify-items: end;
-		align-content: start;
-		gap: var(--space-2);
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-2) var(--space-4);
+		margin: var(--space-4) 0 0;
 		color: var(--text-soft);
-		font-family: var(--font-meta);
-		font-size: var(--text-meta);
-		text-align: right;
+		font-size: var(--text-small);
+		line-height: 1.6;
 	}
 
-	.doc-meta time {
-		letter-spacing: var(--tracking-date);
+	.doc-category {
+		overflow-wrap: anywhere;
+	}
+
+	.doc-date {
+		white-space: nowrap;
+	}
+
+	.doc-date time {
+		font-family: var(--font-meta);
 		font-variant-numeric: tabular-nums lining-nums;
 	}
 
+	.doc-arrow {
+		color: var(--accent-soft);
+		font-size: var(--text-body);
+		line-height: 1.75;
+	}
+
+	.doc-link:is(:hover, :focus-visible) {
+		background: color-mix(in srgb, var(--panel) 42%, transparent);
+	}
+
+	.doc-link:is(:hover, :focus-visible) .doc-title {
+		color: var(--accent-soft);
+		text-decoration-color: currentColor;
+	}
+
 	@media (max-width: 760px) {
-		.doc-row {
-			grid-template-columns: minmax(0, 1fr);
-			gap: var(--space-3);
+		.docs-page {
+			padding-top: var(--space-6);
 		}
 
-		.doc-meta {
-			justify-items: start;
-			text-align: left;
+		.docs-heading {
+			margin-bottom: var(--space-5);
+		}
+
+		.doc-link {
+			gap: var(--space-3);
+			padding: var(--space-4) 0;
 		}
 	}
 </style>

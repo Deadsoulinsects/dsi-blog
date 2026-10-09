@@ -297,7 +297,7 @@ const articleStructuredData = canonicalPath
 
 <style>
 	.article-shell {
-		--article-anchor-offset: calc(var(--space-8) + var(--space-4));
+		--article-anchor-offset: calc(var(--space-8) + var(--space-6));
 		--article-rule: color-mix(in srgb, var(--accent-soft) 16%, transparent);
 		--article-rule-muted: color-mix(in srgb, var(--text) 8%, transparent);
 		--article-header-wash: color-mix(in srgb, var(--panel) 40%, transparent);
@@ -594,7 +594,7 @@ const articleStructuredData = canonicalPath
 
 		.article-grid.has-toc .toc-card {
 			position: sticky;
-			top: 20px;
+			top: var(--article-anchor-offset);
 		}
 	}
 
@@ -603,8 +603,9 @@ const articleStructuredData = canonicalPath
 		border: 0;
 		border-block: var(--rule-thin) solid var(--article-rule-muted);
 		border-radius: 0;
-		font-size: 1.03rem;
-		line-height: 1.9;
+		font-size: var(--article-body-size);
+		font-weight: 400;
+		line-height: var(--article-body-line);
 		color: var(--text);
 		background:
 			linear-gradient(180deg, var(--article-accent-wash), transparent var(--space-8)),
@@ -621,7 +622,7 @@ const articleStructuredData = canonicalPath
 
 	.article-prose {
 		min-inline-size: 0;
-		inline-size: min(100%, var(--reading-measure));
+		inline-size: min(100%, var(--article-reading-measure));
 		margin-inline: auto;
 	}
 
@@ -639,6 +640,8 @@ const articleStructuredData = canonicalPath
 	}
 
 	.article-body :global(h3) {
+		font-family: var(--font-ui);
+		font-weight: 600;
 		margin: 30px 0 12px;
 		font-size: clamp(1.18rem, 2.2vw, 1.4rem);
 	}
@@ -801,8 +804,6 @@ const articleStructuredData = canonicalPath
 
 		.article-body {
 			padding: var(--space-6) 0;
-			font-size: 1.01rem;
-			line-height: 1.88;
 			background: transparent;
 			overflow-wrap: anywhere;
 		}

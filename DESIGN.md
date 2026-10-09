@@ -168,6 +168,19 @@ Decoration
 
 Metadata 应可识别但保持次级，不应与正文标题争夺注意力。
 
+### A1 字体角色
+
+已确认的正式角色是 Newsreader 400 的英文 Brand、Noto Serif SC 的中文 Display、
+Noto Sans SC 的 Body / UI，以及 IBM Plex Mono 的 Meta / Code。混排 Display 的英文
+使用 Newsreader；Article H3 和 Projects 条目名称使用 Sans 600。
+
+文章阅读正文使用 17px / 400 / 1.88，正文阅读区最大 40rem。该尺度仅约束正文，
+不用于全局页面、索引、标题、目录或其他容器。页面既有字号层级、布局、背景、配色与
+交互继续保留；生产实现不复制字体实验的包装、控制条、路由替换或非字体规则。
+
+字体使用已固定且校验的本地资源，按真实字符和字重加载；保留显示失败时的系统回退。
+字体资源的传输成本和缓存表现须在实际生产页面验收，不以本地构建成功代替性能结论。
+
 ## 6. Layout & Spatial Rhythm
 
 页面结构优先依靠：

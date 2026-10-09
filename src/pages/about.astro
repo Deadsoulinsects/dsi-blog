@@ -1,175 +1,214 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { siteConfig } from '../data/site-config';
 
-const aboutSections = [
-	{
-		title: '这个站是做什么的',
-		description:
-			'Dead Soul Insects 用来收纳博客、项目入口和整理后的说明页。不求面面俱到，只保留愿意长期留下的内容。',
-	},
-	{
-		title: '主要内容方向',
-		description:
-			'目前主要写建站记录、AI 工具实践，以及一些还在继续完善的项目和想法。',
-	},
-	{
-		title: '这一页为什么存在',
-		description:
-			'这一页只补充必要的信息：这里是谁在写、内容大致覆盖什么、如果需要该怎样联系。',
-	},
-] as const;
-
-const contacts = [
-	{
-		label: '邮箱',
-		value: '3178381848@qq.com',
-		copyValue: '3178381848@qq.com',
-	},
-	{
-		label: 'QQ',
-		value: '3178381848',
-		copyValue: '3178381848',
-	},
-	{
-		label: '微信',
-		value: 'ky3178381848',
-		copyValue: 'ky3178381848',
-	},
-] as const;
+const writingDirection = siteConfig.about.overview.sections.find((section) => section.title === '主要内容方向');
+const contacts = siteConfig.about.contact.items;
 ---
 
-<Layout title="关于 | Dead Soul Insects" description="Dead Soul Insects 的简要站点介绍与写作方向说明。" canonicalPath="/about/">
-	<div class="editorial-page about-page">
-		<section class="intro intro--single">
-			<div class="intro-grid">
-				<div class="intro-copy">
-					<p class="kicker">关于</p>
-					<h1>简要说明<span class="heading-unit">这个站</span>和写它的人</h1>
-					<p class="lead">这里不放完整履历，只把站点用途、写作方向和联系方式说明白。</p>
-				</div>
-			</div>
-		</section>
+<Layout
+	title={`关于 | ${siteConfig.site.name}`}
+	description={siteConfig.about.metaDescription}
+	canonicalPath="/about/"
+	mainId="about-main"
+	skipLinkLabel="跳到关于内容"
+>
+	<div class="about-page">
+		<h1>关于</h1>
+		<div class="about-copy">
+			<p>{siteConfig.site.name} 是一个个人博客，收纳博客文章、项目入口和整理后的说明页。</p>
+			{writingDirection && <p>{writingDirection.description}</p>}
+		</div>
 
-		<section class="section" aria-labelledby="about-title">
-			<header class="section-heading">
-				<span class="section-index">01 / ABOUT</span>
-				<div class="section-copy">
-					<p class="kicker">说明</p>
-					<h2 id="about-title">把必要的信息留在这里</h2>
-					<p class="section-note">更多内容会回到博客、项目和文档里展开，这里只保留最必要的说明。</p>
-				</div>
-			</header>
-
-			<div class="editorial-stack">
-				{aboutSections.map((section, index) => (
-					<article class="editorial-row">
-						<span class="editorial-row-index">{String(index + 1).padStart(2, '0')}</span>
-						<div>
-							<h3>{section.title}</h3>
-							<p>{section.description}</p>
-						</div>
-					</article>
-				))}
-			</div>
-		</section>
-
-		<section class="section" aria-labelledby="contact-title">
-			<header class="section-heading">
-				<span class="section-index">02 / CONTACT</span>
-				<div class="section-copy">
-					<p class="kicker">CONTACT</p>
-					<h2 id="contact-title">联系方式</h2>
-				</div>
-			</header>
-
+		<section class="about-contact" aria-labelledby="contact-title">
+			<h2 id="contact-title">{siteConfig.about.contact.heading}</h2>
 			<ul class="contact-list">
 				{contacts.map((contact) => (
 					<li class="contact-row">
-						<span class="contact-label">{contact.label}</span>
-						<span class="contact-value">{contact.value}</span>
-						<button class="copy-btn" type="button" data-copy-value={contact.copyValue}>
-							<span data-copy-label aria-live="polite">复制</span>
+						<div class="contact-detail">
+							<span class="contact-label">{contact.label}</span>
+							<span class="contact-value">{contact.value}</span>
+						</div>
+						<button
+							class="copy-btn"
+							type="button"
+							data-copy-value={contact.copyValue}
+							data-contact-label={contact.label}
+							aria-label={`复制${contact.label}`}
+						>
+							复制
 						</button>
 					</li>
 				))}
 			</ul>
 		</section>
 	</div>
+	<div class="copy-toast" role="status" aria-live="polite" aria-atomic="true"></div>
 </Layout>
 
 <script>
 	const copyButtons = document.querySelectorAll<HTMLButtonElement>('.copy-btn');
+	const toast = document.querySelector<HTMLElement>('.copy-toast');
 
-	copyButtons.forEach((button) => {
-		let resetTimer: number | undefined;
+	if (toast) {
+		let toastTimer: number | undefined;
+		const showToast = (message: string, duration = 4000) => {
+			window.clearTimeout(toastTimer);
+			toast.textContent = message;
+			toast.classList.add('is-visible');
+			toastTimer = window.setTimeout(() => {
+				toast.classList.remove('is-visible');
+				toast.textContent = '';
+			}, duration);
+		};
 
-		button.addEventListener('click', async () => {
-			const copyValue = button.dataset.copyValue;
-			const label = button.querySelector<HTMLSpanElement>('[data-copy-label]');
-			const clipboard = navigator.clipboard;
+		copyButtons.forEach((button) => {
+			button.addEventListener('click', async () => {
+				const copyValue = button.dataset.copyValue;
+				const contactLabel = button.dataset.contactLabel;
+				const clipboard = navigator.clipboard;
 
-			if (!copyValue || !label || !clipboard) {
-				return;
-			}
+				if (!copyValue || !contactLabel) {
+					return;
+				}
 
-			try {
-				await clipboard.writeText(copyValue);
-			} catch {
-				return;
-			}
+				if (!clipboard) {
+					showToast(`${contactLabel}无法自动复制，请手动复制。`, 6000);
+					return;
+				}
 
-			window.clearTimeout(resetTimer);
-			label.textContent = '已复制';
-			button.classList.add('copied');
+				button.disabled = true;
+				button.textContent = '复制中';
 
-			resetTimer = window.setTimeout(() => {
-				label.textContent = '复制';
-				button.classList.remove('copied');
-			}, 1200);
+				try {
+					await clipboard.writeText(copyValue);
+					showToast(`${contactLabel}已复制。`);
+				} catch {
+					showToast(`${contactLabel}复制失败，请手动复制或重试。`, 6000);
+				} finally {
+					button.disabled = false;
+					button.textContent = '复制';
+				}
+			});
 		});
-	});
+	}
 </script>
 
 <style>
-	.heading-unit {
-		white-space: nowrap;
+	.about-page {
+		margin-inline: auto;
+		padding-block-start: var(--space-7);
+		overflow-wrap: anywhere;
+	}
+
+	h1 {
+		margin: 0 0 var(--space-6);
+		font-family: var(--font-reading);
+		font-size: var(--text-section);
+		font-weight: 500;
+		line-height: 1.3;
+	}
+
+	.about-copy p {
+		margin: 0;
+		font-size: var(--text-body);
+		line-height: 1.85;
+	}
+
+	.about-copy p + p {
+		margin-block-start: var(--space-4);
+		color: var(--text-soft);
+	}
+
+	.about-contact {
+		margin-block-start: var(--space-7);
+	}
+
+	h2 {
+		margin: 0 0 var(--space-3);
+		font-size: var(--text-body);
+		font-weight: 600;
+		line-height: 1.6;
 	}
 
 	.contact-list {
+		container-type: inline-size;
+		margin: 0;
 		padding: 0;
 		list-style: none;
-		border-top: var(--rule-strong) solid var(--text);
+		border-block-start: var(--rule-thin) solid var(--line);
 	}
 
 	.contact-row {
 		display: grid;
-		grid-template-columns: var(--column-contact-label) minmax(0, 1fr) var(--column-contact-action);
-		gap: var(--space-5);
+		grid-template-columns: minmax(0, 1fr) auto;
+		column-gap: var(--space-4);
 		align-items: center;
-		padding: var(--space-4) 0;
+		padding: var(--space-5) 0;
 		border-bottom: var(--rule-thin) solid var(--line);
 	}
 
+	.contact-detail {
+		min-inline-size: 0;
+	}
+
 	.contact-label {
-		color: var(--accent-soft);
-		font-size: var(--text-meta);
-		letter-spacing: var(--tracking-meta);
+		display: block;
+		margin-block-end: var(--space-1);
+		color: var(--text-soft);
+		font-size: var(--text-note);
+		line-height: 1.6;
 	}
 
 	.contact-value {
-		min-width: 0;
 		color: var(--text);
+		font-size: var(--text-body);
+		line-height: 1.75;
 		overflow-wrap: anywhere;
+		user-select: text;
+	}
+
+	.copy-toast {
+		position: fixed;
+		z-index: 150;
+		inset-block-end: var(--space-4);
+		inset-inline-start: 50%;
+		inline-size: max-content;
+		max-inline-size: min(calc(100% - var(--space-6)), var(--intro-measure));
+		padding: var(--space-3) var(--space-4);
+		border: var(--rule-thin) solid var(--line);
+		border-radius: var(--space-3);
+		background: var(--panel-strong);
+		color: var(--text);
+		font-size: var(--text-note);
+		line-height: 1.75;
+		overflow-wrap: anywhere;
+		pointer-events: none;
+		opacity: 0;
+		transform: translate(-50%, var(--space-2));
+		transition:
+			opacity var(--duration-fast) ease,
+			transform var(--duration-fast) var(--ease-standard);
+	}
+
+	.copy-toast.is-visible {
+		opacity: 1;
+		transform: translate(-50%, 0);
 	}
 
 	.copy-btn {
+		position: relative;
+		isolation: isolate;
+		overflow: hidden;
 		justify-self: end;
-		padding: var(--space-2) var(--space-3);
+		min-block-size: 2.75rem;
+		padding: var(--space-2) var(--space-4);
 		border: var(--rule-thin) solid var(--line);
 		border-radius: var(--radius-pill);
 		background: transparent;
 		color: var(--text-soft);
-		font-size: 0.76rem;
+		font-size: var(--text-note);
+		white-space: nowrap;
 		cursor: pointer;
 		transition:
 			border-color var(--duration-fast) ease,
@@ -177,21 +216,60 @@ const contacts = [
 			color var(--duration-fast) ease;
 	}
 
-	.copy-btn:is(:hover, :focus-visible, .copied) {
+	.copy-btn::before {
+		content: '';
+		position: absolute;
+		z-index: -1;
+		inset-block-start: 50%;
+		inset-inline-start: 50%;
+		inline-size: 100%;
+		aspect-ratio: 1;
+		border-radius: 50%;
+		background: color-mix(in srgb, var(--accent-soft) 8%, transparent);
+		pointer-events: none;
+		transform: translate(-50%, -50%) scale(0);
+		transition: transform calc(var(--duration-slider) * 2.5) ease-in-out;
+	}
+
+	.copy-btn:not(:disabled):is(:hover, :focus-visible)::before {
+		transform: translate(-50%, -50%) scale(1.5);
+	}
+
+	.copy-btn:is(:hover, :focus-visible) {
 		border-color: color-mix(in srgb, var(--accent-soft) 28%, var(--line));
 		background: color-mix(in srgb, var(--accent-soft) 8%, transparent);
 		color: var(--text);
 	}
 
-	@media (max-width: 760px) {
+	.copy-btn:disabled {
+		cursor: progress;
+	}
+
+	@container (max-width: 18rem) {
 		.contact-row {
-			grid-template-columns: 5rem minmax(0, 1fr);
-			gap: var(--space-3);
+			grid-template-columns: minmax(0, 1fr);
 		}
 
 		.copy-btn {
-			grid-column: 2;
 			justify-self: start;
+			margin-block-start: var(--space-3);
+		}
+	}
+
+	@media (max-width: 760px) {
+		.about-page {
+			padding-block-start: var(--space-6);
+		}
+
+		.copy-toast {
+			inset-block-start: calc(var(--space-8) * 2);
+			inset-block-end: auto;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.copy-btn::before {
+			transition: none;
 		}
 	}
 </style>

@@ -2,79 +2,143 @@
 import Layout from '../layouts/Layout.astro';
 import { withBase } from '../utils/paths';
 
-interface OriginSection {
-	readonly title: string;
-	readonly description: string;
-	readonly link?: {
-		readonly href: string;
-		readonly label: string;
-	};
-}
-
-const originSections: readonly OriginSection[] = [
+const otherOrigins = [
 	{
-		title: 'Dead Soul Insects 名字来源',
-		description:
-			'这个名字被保留下来，是因为它和站点的气质贴得很近：冷一点、静一点，也还留着一丝微弱的光。',
-		link: {
-			href: '/origin/详情文章/名字来源/',
-			label: '查看详情',
-		},
+		title: '《犬夜叉》',
+		href: '/origin/详情文章/《犬夜叉》/',
 	},
 	{
-		title: 'Dead Soul Insects 的意象',
-		description:
-			'“Dead Soul Insects”更接近一种意象，而不是完整设定。它能把夜色、残光、碎片和缓慢整理中的内容放进同一条语气里。',
+		title: '优化',
+		href: '/origin/详情文章/优化/',
 	},
 ];
 
 const base = import.meta.env.BASE_URL;
 ---
 
-<Layout title="起源 | Dead Soul Insects" description="解释 Dead Soul Insects 的名字来源、死魂虫意象与站点视觉选择。" canonicalPath="/origin/">
-	<div class="editorial-page origin-page">
-		<section class="intro intro--single">
-			<div class="intro-grid">
-				<div class="intro-copy">
-					<p class="kicker">起源</p>
-					<h1>这个名字留下了一种冷静的语气</h1>
-					<p class="lead">Dead Soul Insects 不是完整设定，更像给这个站点定下的气息：安静、偏冷，留一点微光。</p>
-				</div>
-			</div>
+<Layout title="起源 | Dead Soul Insects" description="Dead Soul Insects 的名字来自《犬夜叉》中的死魂虫。阅读名字来源与命名经过。" canonicalPath="/origin/">
+	<div class="origin-page">
+		<h1>起源</h1>
+		<section class="origin-story" aria-labelledby="origin-name">
+			<h2 id="origin-name">Dead Soul Insects</h2>
+			<p>名字来自《犬夜叉》中的“死魂虫”，也就是桔梗身边收集死魂的妖怪。</p>
+			<p>《犬夜叉》是我很稚嫩时看的第一部动漫。重新取名时，我想到了死魂虫；后来为电脑用户文件夹选择英文名，最终采用了复数形式。</p>
+			<a class="origin-read" href={withBase(base, '/origin/详情文章/名字来源/')}>
+				阅读名字来源 <span aria-hidden="true">→</span>
+			</a>
 		</section>
-
-		<section class="section" aria-labelledby="origin-title">
-			<header class="section-heading">
-				<span class="section-index">01 / ORIGIN</span>
-				<div class="section-copy">
-					<p class="kicker">说明</p>
-					<h2 id="origin-title">这一页只解释它为什么合适</h2>
-					<p class="section-note">想知道这个名字从哪里来，可以从这里开始；剩下的部分留给读者自己感受。</p>
-				</div>
-			</header>
-
-			<div class="editorial-stack">
-				{originSections.map((section, index) => (
-					<article class="editorial-row">
-						<span class="editorial-row-index">{String(index + 1).padStart(2, '0')}</span>
-						<div>
-							<h3>{section.title}</h3>
-							<p>{section.description}</p>
-							{section.link && (
-								<a class="arrow-link" href={withBase(base, section.link.href)}>
-									{section.link.label} <span aria-hidden="true">→</span>
-								</a>
-							)}
-						</div>
-					</article>
+		<section class="origin-other" aria-labelledby="other-origins">
+			<h2 id="other-origins">其他起源条目</h2>
+			<ul>
+				{otherOrigins.map((entry) => (
+					<li>
+						<a href={withBase(base, entry.href)}>{entry.title}</a>
+						<span>暂无正文</span>
+					</li>
 				))}
-			</div>
-
-			<div class="aftertone">
-				<p class="kicker">AFTERTONE</p>
-				<h2>保留一点模糊感</h2>
-				<p>不必把每个意象都说尽。只要它还能让人感到安静、冷调和一点微光，这个名字就成立。</p>
-			</div>
+			</ul>
 		</section>
 	</div>
 </Layout>
+
+<style>
+	.origin-page {
+		margin-inline: auto;
+		padding-block-start: var(--space-4);
+		overflow-wrap: anywhere;
+	}
+
+	h1 {
+		margin: 0 0 var(--space-7);
+		font-family: var(--font-reading);
+		font-size: 2rem;
+		font-weight: 500;
+		line-height: 1.3;
+	}
+
+	.origin-story h2 {
+		margin: 0 0 var(--space-5);
+		font-family: var(--font-reading);
+		font-size: clamp(2rem, 4vw, 3rem);
+		font-weight: 500;
+		line-height: 1.3;
+		text-wrap: balance;
+	}
+
+	.origin-story p {
+		margin: 0 0 var(--space-4);
+		font-size: var(--text-body);
+		line-height: 1.85;
+	}
+
+	.origin-story p + p {
+		color: var(--text-soft);
+	}
+
+	.origin-page a {
+		color: var(--accent-soft);
+		text-underline-offset: var(--space-1);
+		text-decoration-thickness: var(--rule-thin);
+	}
+
+	.origin-page a:is(:hover, :focus-visible) {
+		color: var(--text);
+	}
+
+	.origin-read {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2);
+		min-block-size: 2.75rem;
+		margin-block-start: var(--space-2);
+		line-height: 1.6;
+	}
+
+	.origin-other {
+		margin-block-start: var(--space-8);
+		padding-block-start: var(--space-5);
+		border-block-start: var(--rule-thin) solid var(--line);
+	}
+
+	.origin-other h2 {
+		margin: 0 0 var(--space-3);
+		color: var(--text-soft);
+		font-size: var(--text-body);
+		font-weight: 500;
+		line-height: 1.6;
+	}
+
+	.origin-other ul {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.origin-other li {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: var(--space-2) var(--space-5);
+	}
+
+	.origin-other a {
+		padding-block: var(--space-3);
+		line-height: 1.6;
+	}
+
+	.origin-other span {
+		color: var(--text-soft);
+		font-size: var(--text-note);
+		line-height: 1.6;
+	}
+
+	@media (max-width: 760px) {
+		h1 {
+			margin-block-end: var(--space-6);
+		}
+
+		.origin-other {
+			margin-block-start: var(--space-7);
+		}
+	}
+</style>

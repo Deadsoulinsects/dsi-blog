@@ -13,11 +13,13 @@ interface Props {
 	readonly twitterDescription?: string;
 }
 
+import { siteConfig } from '../data/site-config';
 import { withBase } from '../utils/paths';
+import { fontStylesheetHref } from '../fonts/resources.mjs';
 
 const {
-	title = 'Dead Soul Insects',
-	description = '在灵魂残光中，记录技术、项目与碎片。',
+	title = siteConfig.site.name,
+	description = siteConfig.site.defaultDescription,
 	hideChrome = false,
 	fullBleed = false,
 	canonicalPath,
@@ -30,11 +32,11 @@ const {
 } = Astro.props;
 
 const navItems = [
-	{ href: '/blog', label: '文章', ownedPaths: ['/blog', '/archive', '/categories'] },
-	{ href: '/projects', label: '项目', ownedPaths: ['/projects'] },
-	{ href: '/docs', label: '文档', ownedPaths: ['/docs'] },
-	{ href: '/origin', label: '起源', ownedPaths: ['/origin'] },
-	{ href: '/about', label: '关于', ownedPaths: ['/about'] },
+	{ href: '/blog', label: siteConfig.navigation.header.blog, ownedPaths: ['/blog', '/archive'] },
+	{ href: '/projects', label: siteConfig.navigation.header.projects, ownedPaths: ['/projects'] },
+	{ href: '/docs', label: siteConfig.navigation.header.docs, ownedPaths: ['/docs', '/categories'] },
+	{ href: '/origin', label: siteConfig.navigation.header.origin, ownedPaths: ['/origin'] },
+	{ href: '/about', label: siteConfig.navigation.header.about, ownedPaths: ['/about'] },
 ] as const;
 
 const base = import.meta.env.BASE_URL;
@@ -78,6 +80,7 @@ const activeNavIndex = navItems.findIndex((item) =>
 		<meta name="twitter:title" content={twitterTitle} />
 		<meta name="twitter:description" content={twitterDescription} />
 		<title>{title}</title>
+		<link rel="stylesheet" href={fontStylesheetHref('a1', base)} />
 	</head>
 	<body>
 		{mainId && skipLinkLabel && <a class="site-skip-link" href={`#${mainId}`}>{skipLinkLabel}</a>}
@@ -86,8 +89,8 @@ const activeNavIndex = navItems.findIndex((item) =>
 				<header class="site-header" data-site-header>
 					<div class="site-nav-shell">
 						<a class="brand" href={withBase(base, '/')}>
-							<span class="brand-name">Dead Soul Insects</span>
-							<span class="brand-tag">个人博客 / 笔记 / 项目</span>
+							<span class="brand-name">{siteConfig.site.name}</span>
+							<span class="brand-tag">{siteConfig.site.brandTagline}</span>
 						</a>
 
 						<nav
@@ -118,7 +121,7 @@ const activeNavIndex = navItems.findIndex((item) =>
 
 			{!hideChrome && (
 				<footer class="site-footer">
-					<p>Where Dead Souls Still Glow</p>
+					<p>{siteConfig.site.footerMotto}</p>
 				</footer>
 			)}
 		</div>
@@ -144,9 +147,11 @@ const activeNavIndex = navItems.findIndex((item) =>
 
 	if (siteNav) {
 		const navLinks = Array.from(siteNav.querySelectorAll<HTMLAnchorElement>('a'));
+		const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 		const normalizePathname = (pathname: string) => (pathname === '/' ? '/' : pathname.replace(/\/+$/, ''));
+		let navigationPending = false;
 
-		for (const link of navLinks) {
+		navLinks.forEach((link, index) => {
 			link.addEventListener('click', (event) => {
 				if (
 					event.defaultPrevented ||
@@ -162,13 +167,34 @@ const activeNavIndex = navItems.findIndex((item) =>
 					return;
 				}
 
+				event.preventDefault();
 				const destinationUrl = new URL(link.href);
 
 				if (normalizePathname(destinationUrl.pathname) === normalizePathname(window.location.pathname)) {
-					event.preventDefault();
+					return;
 				}
+
+				if (link.classList.contains('active') || link.getAttribute('aria-current') === 'page') {
+					window.location.assign(link.href);
+					return;
+				}
+
+				if (navigationPending) {
+					return;
+				}
+
+				if (reducedMotion.matches) {
+					window.location.assign(link.href);
+					return;
+				}
+
+				navigationPending = true;
+				siteNav.style.setProperty('--nav-index', String(index));
+				window.setTimeout(() => {
+					window.location.assign(link.href);
+				}, 200);
 			});
-		}
+		});
 	}
 </script>
 
@@ -194,9 +220,13 @@ const activeNavIndex = navItems.findIndex((item) =>
 		--section-measure: 48rem;
 		--reading-measure: 44rem;
 		--intro-measure: 38rem;
-		--font-reading: Georgia, 'Iowan Old Style', 'Songti SC', STSong, serif;
-		--font-ui: Inter, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-		--font-meta: ui-monospace, 'Cascadia Mono', 'SFMono-Regular', Consolas, monospace;
+		--font-brand: 'Newsreader', Georgia, 'Times New Roman', serif;
+		--font-reading: 'Newsreader', 'Noto Serif SC', 'Iowan Old Style', 'Songti SC', STSong, serif;
+		--font-ui: 'Noto Sans SC', 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+		--font-meta: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', 'SFMono-Regular', Consolas, 'Noto Sans SC', 'Microsoft YaHei', monospace;
+		--article-reading-measure: 40rem;
+		--article-body-size: 1.0625rem;
+		--article-body-line: 1.88;
 		--space-1: 0.25rem;
 		--space-2: 0.5rem;
 		--space-3: 0.75rem;
@@ -279,6 +309,11 @@ const activeNavIndex = navItems.findIndex((item) =>
 	body {
 		color: var(--text);
 		font-family: var(--font-ui);
+		font-synthesis: style;
+	}
+
+	:is(code, pre) {
+		font-family: var(--font-meta);
 	}
 
 	a {
@@ -383,9 +418,9 @@ const activeNavIndex = navItems.findIndex((item) =>
 	}
 
 	.brand-name {
-		font-family: var(--font-reading);
+		font-family: var(--font-brand);
 		font-size: 1.1rem;
-		font-weight: 600;
+		font-weight: 400;
 		letter-spacing: -0.015em;
 		transition: font-size var(--duration-fast) ease;
 	}
@@ -411,10 +446,7 @@ const activeNavIndex = navItems.findIndex((item) =>
 		align-items: center;
 		gap: 0;
 		padding: 0.22rem;
-		border: var(--rule-thin) solid color-mix(in srgb, var(--text) 8%, transparent);
 		border-radius: var(--radius-pill);
-		background: color-mix(in srgb, var(--panel) 58%, transparent);
-		box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text) 3%, transparent);
 		overflow: hidden;
 		isolation: isolate;
 	}
@@ -468,7 +500,6 @@ const activeNavIndex = navItems.findIndex((item) =>
 
 	.site-header.is-scrolled .site-nav {
 		padding: 0.18rem;
-		background: color-mix(in srgb, var(--panel-strong) 62%, transparent);
 	}
 
 	.site-header.is-scrolled .nav-slider {

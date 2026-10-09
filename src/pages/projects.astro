@@ -64,14 +64,11 @@ const projects: readonly ProjectItem[] = [
 	},
 ];
 
-const typeDescriptions = {
-	站点项目: '围绕站点本体、页面入口和公开结构的持续维护。',
-	自动化脚本: '服务于内容准备、同步与构建检查的实际流程工具。',
-	'AI 项目': '已经做出可演示结果，或已经留下阶段记录的 AI 实践。',
-} as const;
-
-const typeOrder = ['站点项目', '自动化脚本', 'AI 项目'] as const;
-const statusOrder = ['已完成', '进行中', '实验', '暂停'] as const satisfies readonly ProjectStatus[];
+const projectTypes = [
+	{ name: '站点项目', id: 'site-projects' },
+	{ name: '自动化脚本', id: 'automation-projects' },
+	{ name: 'AI 项目', id: 'ai-projects' },
+] as const;
 const statusClassMap = {
 	已完成: 'done',
 	进行中: 'active',
@@ -79,22 +76,12 @@ const statusClassMap = {
 	暂停: 'paused',
 } as const satisfies Record<ProjectStatus, string>;
 
-const groupedProjects = typeOrder
+const groupedProjects = projectTypes
 	.map((type) => ({
-		type,
-		description: typeDescriptions[type],
-		items: projects.filter((project) => project.type === type),
+		...type,
+		items: projects.filter((project) => project.type === type.name),
 	}))
 	.filter((group) => group.items.length > 0);
-
-const statusSummary = statusOrder
-	.map((status) => ({
-		status,
-		count: projects.filter((project) => project.status === status).length,
-	}))
-	.filter((item) => item.count > 0)
-	.map((item) => `${item.status} ${item.count}`)
-	.join('、');
 
 const base = import.meta.env.BASE_URL;
 ---
@@ -105,57 +92,45 @@ const base = import.meta.env.BASE_URL;
 	canonicalPath="/projects/"
 >
 	<div class="editorial-page projects-page">
-		<section class="intro">
-			<div class="intro-grid">
+		<header class="projects-intro">
+			<p class="kicker">Projects</p>
+			<h1>项目</h1>
+			<p class="lead">这里收录已经做出的网页实践，以及支撑本站内容发布与长期维护的工具和流程。</p>
+		</header>
+
+		<nav class="type-index" aria-label="项目类别">
+			{groupedProjects.map((group) => (
+				<a href={`#${group.id}`}>
+					<span>{group.name}</span>
+					<small>{String(group.items.length).padStart(2, '0')} <span aria-hidden="true">↓</span></small>
+				</a>
+			))}
+		</nav>
+
+		<section class="project-directory" aria-labelledby="project-directory-title">
+			<header class="directory-heading">
 				<div>
-					<p class="kicker">项目</p>
-					<h1>只把真实做过的<span class="heading-unit">项目</span>，压成清楚入口</h1>
+					<p class="kicker">完整目录</p>
+					<h2 id="project-directory-title">全部项目</h2>
 				</div>
-
-				<div class="intro-side">
-					<p class="lead">
-						这一页现在只整理已经有依据的项目条目：要么已经做出来，要么正在维护，要么至少已经留下了可继续追踪的实验记录。状态说明成熟度，类型负责说明它属于哪一类实践。
-					</p>
-
-					<div class="intro-index" aria-label="项目概览">
-						<div class="intro-stat">
-							<span>项目条目</span>
-							<strong>{projects.length}</strong>
-						</div>
-						<div class="intro-stat">
-							<span>类型分区</span>
-							<strong>{groupedProjects.length}</strong>
-						</div>
-					</div>
-
-					<p class="intro-note">当前收录的项目以 {statusSummary} 为主，先按类型缩小范围，会比把所有项目一次摊平更适合继续维护和回看。</p>
-				</div>
-			</div>
-		</section>
-
-		<section class="section" aria-labelledby="project-types-title">
-			<header class="section-heading">
-				<span class="section-index">01 / TYPES</span>
-				<div class="section-copy">
-					<p class="kicker">类型</p>
-					<h2 id="project-types-title">先按实践类别进入</h2>
-					<p class="section-note">保留类型说明、状态分布和真实条目，先判断属于哪一类实践，再继续进入相关页面或专题。</p>
-				</div>
+				<p>独立成果、维护工作和过程实验都保留记录，但不再强制使用相同的展示面积。</p>
 			</header>
 
 			<div class="project-groups">
 				{groupedProjects.map((group) => (
-					<section class="project-group" aria-labelledby={`project-type-${group.type}`}>
+					<section class="project-group" id={group.id} aria-labelledby={`${group.id}-title`}>
 						<header class="project-group-head">
-							<p class="type-label">PROJECT TYPE · {String(group.items.length).padStart(2, '0')}</p>
-							<h3 id={`project-type-${group.type}`}>{group.type}</h3>
-							<p class="project-group-description">{group.description}</p>
+							<h3 id={`${group.id}-title`}>{group.name}</h3>
+							<span>{String(group.items.length).padStart(2, '0')}</span>
 						</header>
 
 						<div class="project-list">
 							{group.items.map((project) => (
 								<article class="project-row">
 									<div>
+										<div class="project-row-meta">
+											<span class:list={['status', statusClassMap[project.status]]}>{project.status}</span>
+										</div>
 										<h4 class="project-name">{project.name}</h4>
 										<p class="project-purpose">{project.purpose}</p>
 										{project.links && (
@@ -172,7 +147,6 @@ const base = import.meta.env.BASE_URL;
 											</div>
 										)}
 									</div>
-									<span class:list={['status', statusClassMap[project.status]]}>{project.status}</span>
 								</article>
 							))}
 						</div>
@@ -184,8 +158,103 @@ const base = import.meta.env.BASE_URL;
 </Layout>
 
 <style>
-	.heading-unit {
-		white-space: nowrap;
+	.projects-page {
+		display: grid;
+		gap: var(--space-8);
+	}
+
+	.projects-intro {
+		max-width: var(--reading-measure);
+		padding: var(--space-8) 0 var(--space-3);
+	}
+
+	.projects-intro h1 {
+		margin-top: var(--space-3);
+		font-family: var(--font-reading);
+		font-size: var(--text-section);
+		font-weight: 500;
+		line-height: 1.08;
+	}
+
+	.projects-intro .lead {
+		max-width: 38rem;
+		margin-top: var(--space-4);
+	}
+
+	.type-index {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		border-top: var(--rule-thin) solid var(--line);
+		border-bottom: var(--rule-thin) solid var(--line);
+	}
+
+	.type-index a {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-3);
+		min-width: 0;
+		padding: var(--space-4);
+		color: var(--text);
+		text-decoration: none;
+	}
+
+	.type-index a + a {
+		border-left: var(--rule-thin) solid var(--line);
+	}
+
+	.type-index small {
+		color: var(--text-soft);
+		font-size: var(--text-meta);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.type-index a:is(:hover, :focus-visible) {
+		background: color-mix(in srgb, var(--panel) 72%, transparent);
+		color: var(--accent-soft);
+	}
+
+	.directory-heading,
+	.project-group-head,
+	.project-row-meta {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: var(--space-4);
+	}
+
+	.project-row-meta,
+	.project-group-head span {
+		color: var(--text-soft);
+		font-size: var(--text-meta);
+		letter-spacing: var(--tracking-date);
+	}
+
+	.directory-heading h2 {
+		font-family: var(--font-reading);
+		font-weight: 500;
+		line-height: 1.12;
+	}
+
+	.project-directory {
+		display: grid;
+		gap: var(--space-7);
+	}
+
+	.directory-heading {
+		align-items: end;
+	}
+
+	.directory-heading h2 {
+		margin-top: var(--space-2);
+		font-size: var(--text-section);
+	}
+
+	.directory-heading > p {
+		max-width: 32rem;
+		color: var(--text-soft);
+		font-size: var(--text-note);
+		line-height: 1.65;
 	}
 
 	.project-groups {
@@ -194,60 +263,67 @@ const base = import.meta.env.BASE_URL;
 	}
 
 	.project-group {
-		display: grid;
-		grid-template-columns: var(--column-project-aside) minmax(0, 1fr);
-		gap: var(--space-6);
+		display: block;
 		min-width: 0;
+		scroll-margin-top: var(--space-9);
 	}
 
 	.project-group-head {
-		align-self: start;
-		min-width: 0;
+		margin-bottom: var(--space-3);
 	}
 
-	.type-label {
-		color: var(--accent-soft);
-		font-size: var(--text-meta);
-		letter-spacing: var(--tracking-meta);
+	.project-group h3,
+	.project-name {
+		font-family: var(--font-reading);
+		font-weight: 500;
+		line-height: 1.2;
 	}
 
 	.project-group h3 {
-		margin-top: var(--space-2);
-		font-family: var(--font-reading);
-		font-size: var(--text-row);
-		font-weight: 500;
-		line-height: 1.18;
+		font-size: var(--text-note);
 	}
 
-	.project-group-description {
-		margin-top: var(--space-3);
-		color: var(--text-soft);
-		font-size: var(--text-note);
-		line-height: 1.65;
+	.project-name {
+		font-family: var(--font-ui);
+		font-weight: 600;
 	}
 
 	.project-list {
 		min-width: 0;
-		border-top: var(--rule-strong) solid var(--text);
+		border-top: var(--rule-thin) solid var(--line);
 	}
 
 	.project-row {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) var(--column-project-status);
-		gap: var(--space-5);
 		padding: var(--space-5) 0;
 		border-bottom: var(--rule-thin) solid var(--line);
 	}
 
-	.project-row > div {
-		min-width: 0;
+	.project-row-meta {
+		justify-content: flex-start;
+		margin-bottom: var(--space-2);
+	}
+
+	.project-row-meta .status {
+		color: var(--text-soft);
+	}
+
+	.status {
+		color: var(--text-soft);
+		font-size: var(--text-meta);
+		letter-spacing: var(--tracking-date);
+		white-space: nowrap;
+	}
+
+	.status.done {
+		color: var(--accent-soft);
+	}
+
+	.status.active {
+		color: var(--text);
 	}
 
 	.project-name {
-		font-family: var(--font-reading);
 		font-size: var(--text-row);
-		font-weight: 500;
-		line-height: 1.18;
 	}
 
 	.project-purpose {
@@ -260,55 +336,46 @@ const base = import.meta.env.BASE_URL;
 	.project-links {
 		display: flex;
 		flex-wrap: wrap;
-		gap: var(--space-3);
+		gap: var(--space-3) var(--space-4);
 		margin-top: var(--space-3);
 	}
 
 	.project-links a {
 		color: var(--accent-soft);
 		font-size: var(--text-small);
-		text-decoration: none;
-	}
-
-	.project-links a:is(:hover, :focus-visible) {
 		text-decoration: underline;
+		text-decoration-color: transparent;
 		text-underline-offset: var(--space-1);
 	}
 
-	.status {
-		justify-self: end;
-		color: var(--text-soft);
-		font-size: var(--text-meta);
-		letter-spacing: var(--tracking-date);
+	.project-links a:is(:hover, :focus-visible) {
+		text-decoration-color: currentColor;
 	}
 
-	.status.done {
-		color: var(--accent-soft);
+	@media (max-width: 820px) {
+		.projects-page {
+			gap: var(--space-7);
+		}
+
+		.projects-intro {
+			padding-top: var(--space-6);
+		}
+
+		.directory-heading {
+			align-items: start;
+			flex-direction: column;
+		}
+
 	}
 
-	.status.active {
-		color: var(--text);
-	}
-
-	@media (max-width: 760px) {
-		.project-group {
+	@media (max-width: 520px) {
+		.type-index {
 			grid-template-columns: minmax(0, 1fr);
-			gap: var(--space-3);
 		}
 
-		.project-groups {
-			gap: var(--space-8);
-		}
-	}
-
-	@media (max-width: 460px) {
-		.project-row {
-			grid-template-columns: minmax(0, 1fr);
-			gap: var(--space-3);
-		}
-
-		.status {
-			justify-self: start;
+		.type-index a + a {
+			border-top: var(--rule-thin) solid var(--line);
+			border-left: 0;
 		}
 	}
 </style>
