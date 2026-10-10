@@ -1,0 +1,15 @@
+{
+  "assets": {},
+  "documents": {
+    "article-1ed46dda8d4829f2": {
+      "markdownSha256": "519feae1f2cad0967bf8120ab4dc86aebf202eeada4ff8e1dea9d7e24cee9ad7",
+      "resources": {}
+    },
+    "article-270a2bac4a2632b4": {
+      "markdownSha256": "898ee43a0b6cabd08d18969936c9d1e4bf897a89144780b771eaef7b1f1b16ce",
+      "resources": {}
+    }
+  },
+  "recipes": {},
+  "schemaVersion": 1
+}
