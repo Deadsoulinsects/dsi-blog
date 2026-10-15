@@ -33,3 +33,12 @@ pnpm-debug.log*
 
 # local browser QA artifacts
 .playwright-mcp/
+
+# local media preparation lock and staging (never served by Astro)
+.media-work/
+
+# local analysis, shell artifacts and completed typography exploration
+.codegraph/
+/nul
+/src/experiments/typography/
+/src/pages/lab/typography/
