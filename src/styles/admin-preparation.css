@@ -1,0 +1,145 @@
+.admin-local {
+	display: grid;
+	gap: var(--admin-space-5);
+	padding-block: var(--admin-space-6);
+	border-bottom: var(--admin-rule-thin) solid var(--admin-line);
+}
+
+.admin-local form,
+.admin-local [data-local-result] {
+	display: grid;
+	gap: var(--admin-space-5);
+	min-width: 0;
+}
+
+.admin-local-tools > .admin-form-grid {
+	margin-top: var(--admin-space-4);
+}
+
+.admin-local :is(summary, button, a) {
+	font: inherit;
+}
+
+.admin-local summary {
+	cursor: pointer;
+	color: var(--admin-text-soft);
+	line-height: 1.65;
+}
+
+.admin-local-actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--admin-space-4);
+}
+
+.admin-local button {
+	min-height: var(--admin-space-7);
+	padding: var(--admin-space-3) var(--admin-space-4);
+	border: var(--admin-rule-thin) solid var(--admin-line-strong);
+	border-radius: var(--admin-radius-field);
+	color: var(--admin-text);
+	background: var(--admin-panel);
+	cursor: pointer;
+}
+
+.admin-local button:is(:hover, :active):enabled {
+	background: var(--admin-panel-strong);
+}
+
+.admin-local button:disabled {
+	color: var(--admin-text-soft);
+	cursor: default;
+	border-color: var(--admin-line);
+}
+
+.admin-local :is(button, a, summary):focus-visible {
+	outline: var(--admin-focus-ring);
+	outline-offset: var(--admin-focus-offset);
+}
+
+.admin-local a {
+	color: var(--admin-accent-soft);
+}
+
+.admin-local-verdict {
+	padding-block: var(--admin-space-4);
+	border-block: var(--admin-rule-thin) solid var(--admin-line);
+}
+
+.admin-local-verdict h3 {
+	margin-top: var(--admin-space-2);
+	font-family: var(--admin-font-reading);
+	font-size: var(--admin-text-row);
+	font-weight: 500;
+}
+
+.admin-local .admin-file-summary {
+	display: grid;
+	border-top: var(--admin-rule-thin) solid var(--admin-line);
+}
+
+.admin-local .admin-file-summary > div {
+	display: grid;
+	min-width: 0;
+	gap: var(--admin-space-2);
+	padding-block: var(--admin-space-3);
+	border-bottom: var(--admin-rule-thin) solid var(--admin-line);
+	line-height: 1.65;
+}
+
+.admin-local .admin-file-summary dt {
+	color: var(--admin-text-soft);
+	font-size: var(--admin-text-small);
+}
+
+.admin-local .admin-file-summary dd {
+	min-width: 0;
+	font-size: var(--admin-text-small);
+}
+
+@media (min-width: 48rem) {
+	.admin-local .admin-file-summary > div {
+		grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+		gap: var(--admin-space-5);
+	}
+}
+
+.admin-local-messages h3 {
+	font-size: var(--admin-text-body);
+}
+
+.admin-local-progress {
+	color: var(--admin-text-soft);
+	font-size: var(--admin-text-small);
+}
+
+.admin-local progress {
+	width: 100%;
+	accent-color: var(--admin-accent-soft);
+}
+
+.admin-local-resources li {
+	padding-block: var(--admin-space-2);
+	border-bottom: var(--admin-rule-thin) solid var(--admin-line);
+}
+
+.admin-local [data-local-next] {
+	white-space: pre-wrap;
+}
+
+.admin-local [data-local-warnings] li::before {
+	content: '注意';
+}
+
+.admin-local [data-local-next] li::before {
+	content: '操作';
+}
+
+.admin-local .admin-issue-list li[data-state='empty']::before {
+	content: '无';
+}
+
+.admin-local .admin-issue-list li > span {
+	min-width: 0;
+}

@@ -1,0 +1,116 @@
+---
+import ArticleLayout from '../../../../layouts/ArticleLayout.astro';
+import { withBase } from '../../../../utils/paths';
+import convertMarkdownLinksSource from '../../../../../scripts/convert-markdown-links.mjs?raw';
+import prepareContentSource from '../../../../../scripts/prepare-content.mjs?raw';
+import syncObsidianBlogSource from '../../../../../scripts/sync-obsidian-blog.mjs?raw';
+
+interface SourceBlock {
+	readonly name: string;
+	readonly code: string;
+}
+
+interface ProjectArticle {
+	readonly slug: string;
+	readonly title: string;
+	readonly description: string;
+	readonly problem: readonly string[];
+	readonly startingPoint: readonly string[];
+	readonly solution: readonly string[];
+	readonly sources: readonly SourceBlock[];
+}
+
+export function getStaticPaths() {
+	const displayedSyncSource = syncObsidianBlogSource.replace(
+		/[A-Za-z]:[\\/]+[^'"\r\n]*/g,
+		'[private Windows path]',
+	);
+	const articles = [
+		{
+			slug: 'sync-publishable-blog-bodies',
+			title: '同步可发布的博客正文',
+			description: '明确选择 Obsidian 原笔记同步博客正文，同时保留既有文章地址与站点技术字段。',
+			problem: [
+				'写作工作区里同时存在私人记录、过程材料与准备公开的文章。站点需要接收可发布正文，但不能把整个 Obsidian 空间当作公开内容源。',
+				'同一篇文章进入站点后，还会拥有面向公开页面维护的 frontmatter。后续同步正文时，如果直接覆盖整个文件，这些站点元数据也会被源笔记一并替换。',
+			],
+			startingPoint: [
+				'原笔记保留在自然目录，通过 Admin 明确选择公开。默认目录与待确认扫描排除“博客发布”和 picture，来源目录与网站专题可以不同。',
+				'已有文章通过作者确认重新绑定原笔记，保留目标文件名、URL、mediaId 和其他技术字段；旧绑定在明确迁移前继续使用，不自动替换路径。',
+			],
+			solution: [
+				'Admin 按文件名或标题的大小写、Unicode 与空白规范化结果提示候选，排除历史发布副本；唯一候选也不自动绑定。可能重复的新导入会被拒绝，提示明确绑定已有文章。',
+				'原笔记与旧副本可能各有修改，作者应比较并选择继续维护的原笔记内容；迁移不自动覆盖笔记，也不删除私人副本。',
+				'博客同步不再进入 prebuild，起源同步与其他内容准备保留。脚本不传 --file 时只输出说明，不扫描历史目录或写入；手动兜底使用 npm run sync:blog -- --file "<原笔记路径>"，加 --dry-run 可先预览。',
+			],
+			sources: [{ name: 'sync-obsidian-blog.mjs', code: displayedSyncSource }],
+		},
+		{
+			slug: 'prepare-metadata-and-links',
+			title: '准备内容元数据与站内链接',
+			description: '在发布前补齐博客与文档的必要元数据，并把可解析的本地 Markdown 链接规范为公开路由。',
+			problem: [
+				'进入仓库的 Markdown 可能带有文件开头 BOM、缺少 frontmatter，或缺少集合需要的默认字段。文章之间的链接也可能仍指向本地 Markdown 文件，而不是站点公开路由。',
+				'这些问题属于不同责任：前者决定内容能否按集合结构被识别，后者决定站内链接能否从本地文件关系转换为公开页面关系。',
+			],
+			startingPoint: [
+				'准备流程先整理文件头与元数据，再解析链接。这样链接脚本面对的是已经落在 blog 或 docs 集合中的文件，能够按真实文件路径和路由 slug 建立索引。',
+				'两支脚本都保留只检查、不直接改写的入口：元数据脚本使用 --dry-run，链接脚本默认运行 check 模式。',
+			],
+			solution: [
+				'prepare-content.mjs 读取内容时先移除开头 BOM，再判断是否已有 frontmatter。没有 frontmatter 的博客会得到标题、空描述、当天日期、空标签与空专题；文档会得到标题、空描述、当天日期、未分类类别与空标签。已有博客 frontmatter 只在缺少 topic 时补上空专题字段。',
+				'convert-markdown-links.mjs 递归索引 blog 与 docs 文件，优先按相对文件路径解析链接，也能按 slug 回退匹配，并保留标题锚点。check 模式报告待转换与无法解析的本地 Markdown 链接；--apply 写入已解析的公开路由，无法解析的链接仍会被报告。',
+			],
+			sources: [
+				{ name: 'prepare-content.mjs', code: prepareContentSource },
+				{ name: 'convert-markdown-links.mjs', code: convertMarkdownLinksSource },
+			],
+		},
+	] as const satisfies readonly ProjectArticle[];
+
+	return articles.map((article) => ({
+		params: { slug: article.slug },
+		props: { article },
+	}));
+}
+
+interface Props {
+	readonly article: ProjectArticle;
+}
+
+const { article } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const headings = [
+	{ depth: 2, slug: 'problem', text: '问题' },
+	{ depth: 2, slug: 'purpose', text: '目的' },
+	{ depth: 2, slug: 'solution', text: '解决方案' },
+	{ depth: 2, slug: 'script-source', text: '脚本代码展示' },
+];
+---
+
+<ArticleLayout
+	title={article.title}
+	description={article.description}
+	sectionLabel="项目专题 · 内容发布流程"
+	backHref={withBase(base, '/projects/topics/content-publishing/')}
+	backLabel="返回内容发布流程"
+	headings={headings}
+	canonicalPath={`/projects/topics/content-publishing/${article.slug}/`}
+>
+	<h2 id="problem">问题</h2>
+	{article.problem.map((paragraph) => <p>{paragraph}</p>)}
+
+	<h2 id="purpose">目的</h2>
+	{article.startingPoint.map((paragraph) => <p>{paragraph}</p>)}
+
+	<h2 id="solution">解决方案</h2>
+	{article.solution.map((paragraph) => <p>{paragraph}</p>)}
+
+	<h2 id="script-source">脚本代码展示</h2>
+	{article.sources.map((source) => (
+		<>
+			<p><strong><code>{source.name}</code></strong></p>
+			<pre><code>{source.code}</code></pre>
+		</>
+	))}
+</ArticleLayout>

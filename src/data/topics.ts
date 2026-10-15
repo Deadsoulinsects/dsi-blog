@@ -1,16 +1,15 @@
+import descriptions from './topics.json';
+
 export interface TopicMeta {
 	readonly description: string;
+	readonly pinned?: boolean;
 }
 
-export const featuredTopics = ['SBTI', 'Obsidian'] as const;
-
-export const topicMeta: Record<string, TopicMeta> = {
-	SBTI: {
-		description: '网络跟风制作的人格测试网页',
-	},
-	Obsidian: {
-		description: '试着把本地笔记和公开文章分开，再用更稳定的方式连接起来。',
-	},
-};
+export const topicMeta: Record<string, TopicMeta> = descriptions;
 
 export const getTopicMeta = (topic: string) => topicMeta[topic];
+
+export const getPinnedTopicPath = (): string[] | null => {
+	const pinned = Object.entries(topicMeta).find(([, metadata]) => metadata.pinned);
+	return pinned ? pinned[0].split('/') : null;
+};

@@ -20,46 +20,26 @@ interface ProjectItem {
 
 const projects: readonly ProjectItem[] = [
 	{
-		name: 'Dead Soul Insects 站点',
-		purpose: '把博客、项目记录、说明文档与起源页收进同一个 Astro 静态站点里，作为长期维护中的公开入口。',
-		status: '进行中',
-		type: '站点项目',
-		links: [
-			{ label: '打开首页', href: '/' },
-			{ label: '查看使用说明', href: '/docs/intro/' },
-		],
-	},
-	{
 		name: '项目页档案化改造',
 		purpose: '把原本偏说明性的项目页改成真实条目入口，并验证更紧凑的档案式浏览是否适合后续维护。',
 		status: '实验',
 		type: '站点项目',
 	},
 	{
-		name: 'Obsidian 到博客内容流',
-		purpose: '先在本地笔记里沉淀原始记录，再整理成适合公开的博客内容，减少把私人工作区直接搬上站点。',
+		name: '站点内容发布流程',
+		purpose: '把私有 Obsidian 工作区中明确可发布的正文同步进站点，再在发布前补齐内容元数据并规范站内 Markdown 链接。',
 		status: '进行中',
 		type: '自动化脚本',
-		links: [{ label: '查看 Obsidian 专题', href: '/blog/topics/obsidian/' }],
-	},
-	{
-		name: '内容准备与构建检查脚本',
-		purpose: '在发布前补齐内容准备、链接检查与纯构建验证，尽量把高风险步骤留在正式发布之前。',
-		status: '已完成',
-		type: '自动化脚本',
-		links: [
-			{ label: '文档入口', href: '/docs/' },
-			{ label: '使用说明', href: '/docs/intro/' },
-		],
+		links: [{ label: '进入项目专题', href: '/projects/topics/content-publishing/' }],
 	},
 	{
 		name: 'SBTI 2.0',
-		purpose: '围绕人格测试、结果页表现、BGM 氛围和部署上线做出来的 AI 小型网页实践。',
+		purpose: '围绕人格测试、结果页表现、BGM 氛围和部署上线完成的 AI 小型网页实践。',
 		status: '已完成',
 		type: 'AI 项目',
 		links: [
-			{ label: '查看 SBTI 专题', href: '/blog/topics/sbti/' },
-			{ label: '项目站点', href: 'https://sbti2.deadsoulinsects.cn', external: true },
+			{ label: '打开项目', href: 'https://sbti2.deadsoulinsects.cn', external: true },
+			{ label: '阅读项目记录', href: '/blog/topics/sbti-20/' },
 		],
 	},
 ];
@@ -107,20 +87,12 @@ const base = import.meta.env.BASE_URL;
 			))}
 		</nav>
 
-		<section class="project-directory" aria-labelledby="project-directory-title">
-			<header class="directory-heading">
-				<div>
-					<p class="kicker">完整目录</p>
-					<h2 id="project-directory-title">全部项目</h2>
-				</div>
-				<p>独立成果、维护工作和过程实验都保留记录，但不再强制使用相同的展示面积。</p>
-			</header>
-
+		<section class="project-directory" aria-label="项目目录">
 			<div class="project-groups">
 				{groupedProjects.map((group) => (
 					<section class="project-group" id={group.id} aria-labelledby={`${group.id}-title`}>
 						<header class="project-group-head">
-							<h3 id={`${group.id}-title`}>{group.name}</h3>
+							<h2 id={`${group.id}-title`}>{group.name}</h2>
 							<span>{String(group.items.length).padStart(2, '0')}</span>
 						</header>
 
@@ -131,7 +103,7 @@ const base = import.meta.env.BASE_URL;
 										<div class="project-row-meta">
 											<span class:list={['status', statusClassMap[project.status]]}>{project.status}</span>
 										</div>
-										<h4 class="project-name">{project.name}</h4>
+										<h3 class="project-name">{project.name}</h3>
 										<p class="project-purpose">{project.purpose}</p>
 										{project.links && (
 											<div class="project-links">
@@ -170,7 +142,7 @@ const base = import.meta.env.BASE_URL;
 
 	.projects-intro h1 {
 		margin-top: var(--space-3);
-		font-family: var(--font-reading);
+		font-family: var(--font-display);
 		font-size: var(--text-section);
 		font-weight: 500;
 		line-height: 1.08;
@@ -214,7 +186,6 @@ const base = import.meta.env.BASE_URL;
 		color: var(--accent-soft);
 	}
 
-	.directory-heading,
 	.project-group-head,
 	.project-row-meta {
 		display: flex;
@@ -228,33 +199,6 @@ const base = import.meta.env.BASE_URL;
 		color: var(--text-soft);
 		font-size: var(--text-meta);
 		letter-spacing: var(--tracking-date);
-	}
-
-	.directory-heading h2 {
-		font-family: var(--font-reading);
-		font-weight: 500;
-		line-height: 1.12;
-	}
-
-	.project-directory {
-		display: grid;
-		gap: var(--space-7);
-	}
-
-	.directory-heading {
-		align-items: end;
-	}
-
-	.directory-heading h2 {
-		margin-top: var(--space-2);
-		font-size: var(--text-section);
-	}
-
-	.directory-heading > p {
-		max-width: 32rem;
-		color: var(--text-soft);
-		font-size: var(--text-note);
-		line-height: 1.65;
 	}
 
 	.project-groups {
@@ -272,14 +216,14 @@ const base = import.meta.env.BASE_URL;
 		margin-bottom: var(--space-3);
 	}
 
-	.project-group h3,
+	.project-group h2,
 	.project-name {
-		font-family: var(--font-reading);
+		font-family: var(--font-display);
 		font-weight: 500;
 		line-height: 1.2;
 	}
 
-	.project-group h3 {
+	.project-group h2 {
 		font-size: var(--text-note);
 	}
 
@@ -360,12 +304,6 @@ const base = import.meta.env.BASE_URL;
 		.projects-intro {
 			padding-top: var(--space-6);
 		}
-
-		.directory-heading {
-			align-items: start;
-			flex-direction: column;
-		}
-
 	}
 
 	@media (max-width: 520px) {

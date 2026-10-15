@@ -1,98 +1,31 @@
-import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { basename, join, relative } from 'node:path';
+import { mergeBlogSource } from '../src/shared/content/frontmatter.mjs';
 
 const root = process.cwd();
 const isDryRun = process.argv.includes('--dry-run');
-
-const sources = [
-	'D:\\GitHub\\cloud-storage\\obsidian\\思考与实践\\AI项目\\博客发布',
-	'D:\\GitHub\\cloud-storage\\obsidian\\思考与实践\\improving\\博客发布',
-	'D:\\GitHub\\cloud-storage\\obsidian\\思考与实践\\问题\\博客发布',
-];
-
-const destination = join(root, 'src', 'content', 'blog');
-const copiedFiles = [];
-const seenFiles = new Map();
-
-const splitFrontmatter = (content) => {
-	const normalized = content.replace(/^\uFEFF/, '');
-	const match = normalized.match(/^(---\r?\n[\s\S]*?\r?\n---)(?:\r?\n)?([\s\S]*)$/);
-
-	if (!match) {
-		return { frontmatter: null, body: normalized };
-	}
-
-	return { frontmatter: match[1], body: match[2] };
-};
-
-const syncMarkdownFile = (sourceFile, destinationFile) => {
-	const sourceContent = readFileSync(sourceFile, 'utf8');
-	const sourceParts = splitFrontmatter(sourceContent);
-
-	if (!existsSync(destinationFile)) {
-		if (!isDryRun) {
-			writeFileSync(destinationFile, sourceContent, 'utf8');
-		}
-		return;
-	}
-
-	const destinationContent = readFileSync(destinationFile, 'utf8');
-	const destinationParts = splitFrontmatter(destinationContent);
-
-	if (!destinationParts.frontmatter) {
-		if (!isDryRun) {
-			writeFileSync(destinationFile, sourceContent, 'utf8');
-		}
-		return;
-	}
-
-	// Keep the site's frontmatter while refreshing the article body from Obsidian.
-	if (!isDryRun) {
-		writeFileSync(destinationFile, `${destinationParts.frontmatter}\n\n${sourceParts.body.replace(/^(?:\r?\n)+/, '')}`, 'utf8');
-	}
-};
-
-mkdirSync(destination, { recursive: true });
-
-for (const source of sources) {
-	if (!existsSync(source)) {
-		console.warn(`Warning: Obsidian blog source does not exist: ${source}`);
-		continue;
-	}
-
-	const sourceStats = statSync(source);
-	if (!sourceStats.isDirectory()) {
-		console.warn(`Warning: Obsidian blog source is not a directory: ${source}`);
-		continue;
-	}
-
-	const entries = readdirSync(source, { withFileTypes: true });
-
-	for (const entry of entries) {
-		if (!entry.isFile() || !entry.name.endsWith('.md')) {
-			continue;
-		}
-
-		const sourceFile = join(source, entry.name);
-		const destinationFile = join(destination, entry.name);
-		const previousSource = seenFiles.get(entry.name);
-
-		if (previousSource) {
-			console.warn(`Warning: duplicate markdown file "${entry.name}" from ${sourceFile} overwrites ${previousSource}`);
-		}
-
-		syncMarkdownFile(sourceFile, destinationFile);
-		seenFiles.set(entry.name, sourceFile);
-		copiedFiles.push(relative(root, destinationFile));
-	}
+const fileOption = process.argv.indexOf('--file');
+const explicitFile = fileOption < 0 ? null : process.argv[fileOption + 1];
+if (fileOption >= 0 && (!explicitFile || explicitFile.startsWith('--') || !/\.md$/i.test(explicitFile))) {
+	throw new TypeError('--file requires one existing Markdown file.');
 }
 
-if (copiedFiles.length === 0) {
-	console.log(isDryRun ? 'No Obsidian blog markdown files would be synced.' : 'No Obsidian blog markdown files synced.');
+if (!explicitFile) {
+	console.log('已停用“博客发布”目录自动同步。请在 Admin 纳入或绑定原文；手动同步单篇可使用 --file <原文完整路径>。');
 	process.exit(0);
 }
 
-console.log(isDryRun ? 'Obsidian blog markdown files that would be synced:' : 'Synced Obsidian blog markdown files:');
-for (const file of copiedFiles) {
-	console.log(`- ${file}`);
+if (!existsSync(explicitFile) || !statSync(explicitFile).isFile())
+	throw new TypeError(`Markdown source does not exist: ${explicitFile}`);
+
+const destination = join(root, 'src', 'content', 'blog');
+const destinationFile = join(destination, basename(explicitFile));
+const sourceContent = readFileSync(explicitFile, 'utf8');
+const destinationContent = existsSync(destinationFile) ? readFileSync(destinationFile, 'utf8') : '';
+const nextContent = mergeBlogSource(sourceContent, destinationContent, explicitFile);
+if (!isDryRun) {
+	mkdirSync(destination, { recursive: true });
+	if (nextContent !== destinationContent) writeFileSync(destinationFile, nextContent, 'utf8');
 }
+console.log(isDryRun ? 'Obsidian blog markdown files that would be synced:' : 'Synced Obsidian blog markdown files:');
+console.log(`- ${relative(root, destinationFile)}`);

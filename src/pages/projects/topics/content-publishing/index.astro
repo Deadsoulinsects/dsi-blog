@@ -1,0 +1,172 @@
+---
+import Layout from '../../../../layouts/Layout.astro';
+import { withBase } from '../../../../utils/paths';
+
+const records = [
+	{
+		role: '内容同步',
+		title: '同步可发布的博客正文',
+		href: '/projects/topics/content-publishing/sync-publishable-blog-bodies/',
+		metadata: 'sync-obsidian-blog.mjs',
+	},
+	{
+		role: '发布前整理',
+		title: '准备内容元数据与站内链接',
+		href: '/projects/topics/content-publishing/prepare-metadata-and-links/',
+		metadata: 'prepare-content.mjs · convert-markdown-links.mjs',
+	},
+] as const;
+
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout
+	title="内容发布流程 | Dead Soul Insects"
+	description="记录 Dead Soul Insects 如何从私有写作空间同步可发布正文，并在公开前整理内容元数据与站内链接。"
+	canonicalPath="/projects/topics/content-publishing/"
+>
+	<div class="editorial-page project-topic-page">
+		<header class="topic-intro">
+			<a class="back-link" href={withBase(base, '/projects/')}>← 返回项目</a>
+			<p class="kicker">项目专题</p>
+			<h1>内容发布流程</h1>
+			<p class="lead">
+				这套流程把公开边界拆成两个责任：先从私有 Obsidian 工作区取出明确进入发布目录的正文，再在站点仓库中补齐必要元数据并把可解析的本地 Markdown 链接改成公开路由。
+			</p>
+		</header>
+
+		<section class="workflow-index" aria-labelledby="workflow-index-title">
+			<header class="index-heading">
+				<p class="kicker">职责索引</p>
+				<h2 id="workflow-index-title">按脚本责任查看</h2>
+			</header>
+
+			<div class="workflow-list">
+				{records.map((record) => (
+					<a class="workflow-row" href={withBase(base, record.href)}>
+						<span class="record-role">{record.role}</span>
+						<span class="record-copy">
+							<strong>{record.title}</strong>
+							<small>{record.metadata}</small>
+						</span>
+					</a>
+				))}
+			</div>
+		</section>
+	</div>
+</Layout>
+
+<style>
+	.project-topic-page,
+	.workflow-index,
+	.index-heading,
+	.record-copy {
+		display: grid;
+	}
+
+	.project-topic-page {
+		gap: var(--space-8);
+	}
+
+	.topic-intro {
+		max-width: var(--reading-measure);
+		padding: var(--space-6) 0 var(--space-3);
+	}
+
+	.back-link {
+		display: inline-block;
+		margin-bottom: var(--space-6);
+		color: var(--text-soft);
+		font-family: var(--font-ui);
+		font-size: var(--text-small);
+		text-decoration-color: var(--line);
+		text-decoration-thickness: var(--rule-thin);
+		text-underline-offset: var(--space-1);
+		transition:
+			color var(--duration-fast) ease,
+			text-decoration-color var(--duration-fast) ease;
+	}
+
+	.back-link:is(:hover, :focus-visible) {
+		color: var(--accent-soft);
+		text-decoration-color: currentColor;
+	}
+
+	.topic-intro h1 {
+		margin-top: var(--space-3);
+		font-family: var(--font-display);
+		font-size: var(--text-section);
+		font-weight: 500;
+		line-height: 1.08;
+	}
+
+	.topic-intro .lead {
+		margin-top: var(--space-4);
+	}
+
+	.workflow-index {
+		gap: var(--space-5);
+	}
+
+	.index-heading {
+		gap: var(--space-2);
+	}
+
+	.index-heading h2 {
+		font-family: var(--font-display);
+		font-size: var(--text-row);
+		font-weight: 500;
+		line-height: 1.18;
+	}
+
+	.workflow-list {
+		border-top: var(--rule-thin) solid var(--line);
+	}
+
+	.workflow-row {
+		display: grid;
+		grid-template-columns: var(--column-project-aside) minmax(0, 1fr);
+		gap: var(--space-5);
+		padding: var(--space-5) 0;
+		border-bottom: var(--rule-thin) solid var(--line);
+		color: var(--text);
+		text-decoration: none;
+	}
+
+	.record-role {
+		color: var(--text-soft);
+		font-family: var(--font-meta);
+		font-size: var(--text-meta);
+		letter-spacing: var(--tracking-meta);
+	}
+
+	.record-copy {
+		min-width: 0;
+		gap: var(--space-2);
+	}
+
+	.record-copy strong {
+		font-family: var(--font-display);
+		font-size: var(--text-editorial-row);
+		font-weight: 500;
+		line-height: 1.18;
+	}
+
+	.record-copy small {
+		color: var(--text-soft);
+		font-family: var(--font-meta);
+		font-size: var(--text-meta);
+		overflow-wrap: anywhere;
+	}
+
+	.workflow-row:is(:hover, :focus-visible) .record-copy strong {
+		color: var(--accent-soft);
+	}
+
+	@media (max-width: 760px) {
+		.workflow-row {
+			grid-template-columns: minmax(0, 1fr);
+			gap: var(--space-2);
+		}
+	}
+</style>

@@ -13,13 +13,20 @@
     "sync:origin:dry": "node scripts/sync-obsidian-origin.mjs --dry-run",
     "prepare:content": "node scripts/prepare-content.mjs",
     "prepare:content:dry": "node scripts/prepare-content.mjs --dry-run",
+    "media:prepare": "node scripts/prepare-media.mjs",
+    "media:verify": "node scripts/verify-media.mjs",
+    "media:verify-article": "node scripts/verify-article-media.mjs",
+    "admin:verify-workspace": "node scripts/verify-admin-workspace.mjs",
+    "admin:verify-desktop": "node scripts/verify-admin-desktop.mjs",
+    "admin:desktop:dev": "node desktop/develop.mjs",
+    "admin:desktop:build": "node desktop/build.mjs",
     "prepare:origin": "node scripts/prepare-origin-pages.mjs",
     "prepare:origin:dry": "node scripts/prepare-origin-pages.mjs --dry-run",
     "links:check": "node scripts/convert-markdown-links.mjs --check",
     "links:apply": "node scripts/convert-markdown-links.mjs --apply",
     "content:prepare": "npm run prepare:content && npm run prepare:origin && npm run links:apply",
     "content:prepare:dry": "npm run prepare:content:dry && npm run prepare:origin:dry && npm run links:check",
-    "prebuild": "npm run sync:blog && npm run sync:origin && npm run prepare:content && npm run prepare:origin && npm run links:apply",
+    "prebuild": "npm run sync:origin && npm run prepare:content && npm run prepare:origin && npm run links:apply",
     "build:astro": "astro build",
     "verify:field-notebook": "node scripts/verify-field-notebook.mjs",
     "verify:full-bleed-topnav": "node scripts/verify-full-bleed-topnav.mjs",
@@ -36,9 +43,17 @@
     "@astrojs/rss": "^4.0.18",
     "@astrojs/sitemap": "^3.7.3",
     "astro": "^6.2.2",
-    "typescript": "^6.0.3"
+    "dompurify": "^3.4.16",
+    "dugite": "^3.2.3",
+    "github-slugger": "^2.0.0",
+    "marked": "^18.0.14",
+    "sharp": "0.34.5",
+    "typescript": "^6.0.3",
+    "yaml": "^2.9.1"
   },
   "devDependencies": {
+    "electron": "^44.5.1",
+    "electron-builder": "^26.15.3",
     "oxlint": "^1.85.0"
   }
 }

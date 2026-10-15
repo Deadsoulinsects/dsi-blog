@@ -1,7 +1,7 @@
 ---
 title: Obsidian 到个人博客的内容整理思路
 description: 试着把本地笔记和公开文章分开，再用更稳定的方式连接起来。
-pubDate: 2026-05-08
+completion_date: 2026-05-08
 tags:
   - Obsidian
   - 整理

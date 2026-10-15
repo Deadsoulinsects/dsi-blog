@@ -1,0 +1,79 @@
+<section class="admin-section admin-local" aria-labelledby="admin-local-title" data-admin-local data-local-enabled={import.meta.env.DEV}>
+	<header class="admin-section-heading">
+		<span class="admin-section-index">LOCAL / PREPARE</span>
+		<div>
+			<p class="admin-kicker">Obsidian → 网页资源 → 正式文章</p>
+			<h2 id="admin-local-title">本地发布准备</h2>
+			<p>仅在本机 Astro 开发服务中执行。原文和附件只读；准备操作只写网页资源与 media manifest，不覆盖正式文章。</p>
+		</div>
+	</header>
+	<form data-local-form>
+		<div class="admin-form-grid">
+			<div class="admin-field admin-field--wide">
+				<label for="local-note">Obsidian Markdown 完整路径</label>
+				<input id="local-note" name="note" type="text" required spellcheck="false" placeholder="D:\...\工作日记.md" />
+			</div>
+			<div class="admin-field admin-field--wide">
+				<label for="local-root">附件引用根目录</label>
+				<input id="local-root" name="sourceRoot" type="text" required spellcheck="false" aria-describedby="local-root-help" />
+				<small id="local-root-help">引用从 2026生态大实习/picture 开始时，根目录为“思考与实践”，不是 picture 子目录。使用完整路径严格匹配。</small>
+			</div>
+			<div class="admin-field">
+				<label for="local-id">稳定内容身份 / mediaId</label>
+				<input id="local-id" name="id" type="text" required spellcheck="false" placeholder="工作日记" />
+			</div>
+		</div>
+		<details class="admin-local-tools">
+			<summary>本地 FFmpeg 工具路径（视频需要）</summary>
+			<div class="admin-form-grid">
+				<div class="admin-field">
+					<label for="local-ffmpeg">FFmpeg</label>
+					<input id="local-ffmpeg" name="ffmpeg" type="text" spellcheck="false" placeholder="留空使用 FFMPEG_BIN 或 PATH" />
+				</div>
+				<div class="admin-field">
+					<label for="local-ffprobe">ffprobe</label>
+					<input id="local-ffprobe" name="ffprobe" type="text" spellcheck="false" placeholder="留空使用 FFPROBE_BIN 或 PATH" />
+				</div>
+			</div>
+		</details>
+		<div class="admin-local-actions">
+			<button type="submit" data-local-inspect>检查所选文章</button>
+			<button type="button" data-local-prepare disabled>准备网页资源</button>
+			<a data-local-article hidden>打开正式文章</a>
+		</div>
+	</form>
+	<p class="admin-import-status" role="status" aria-live="polite" data-local-status>尚未检查。选择本机源文件后开始；浏览器文件导入仍可独立使用。</p>
+	<div data-local-result hidden>
+		<div class="admin-local-verdict">
+			<p class="admin-kicker">正式渲染 readiness</p>
+			<h3 data-local-verdict>等待检查</h3>
+			<p class="admin-import-help">Ready 是本次检查时的本地快照，不代表已发布。浏览器草稿编辑不写回原文，也不改变下方正式管线结论；源文件变化后需重新检查。</p>
+		</div>
+		<dl class="admin-file-summary">
+			<div><dt>当前文章</dt><dd data-local-value="article">—</dd></div>
+			<div><dt>Metadata</dt><dd data-local-value="metadata">—</dd></div>
+			<div><dt>媒体引用 / 匹配</dt><dd data-local-value="matched">—</dd></div>
+			<div><dt>Gallery / 普通图片 / 视频</dt><dd data-local-value="semantics">—</dd></div>
+			<div><dt>可复用 / 待转换</dt><dd data-local-value="plan">—</dd></div>
+			<div><dt>网页资源准备</dt><dd data-local-value="prepared">—</dd></div>
+		</dl>
+		<label class="admin-local-progress" for="local-progress">资源准备进度 <span data-local-progress-text>尚未运行</span></label>
+		<progress id="local-progress" max="1" value="0" data-local-progress></progress>
+		<section class="admin-local-messages" aria-labelledby="local-errors-title">
+			<h3 id="local-errors-title">Error / 阻止 Ready</h3>
+			<ul class="admin-issue-list" data-local-errors></ul>
+		</section>
+		<section class="admin-local-messages" aria-labelledby="local-warnings-title">
+			<h3 id="local-warnings-title">Warning / 需审阅</h3>
+			<ul class="admin-issue-list" data-local-warnings></ul>
+		</section>
+		<section class="admin-local-messages" aria-labelledby="local-next-title">
+			<h3 id="local-next-title">下一步</h3>
+			<ul class="admin-issue-list" data-local-next></ul>
+		</section>
+		<details class="admin-local-resources">
+			<summary>完整资源清单：匹配、复用与转换</summary>
+			<ul class="admin-media-paths" data-local-resources></ul>
+		</details>
+	</div>
+</section>

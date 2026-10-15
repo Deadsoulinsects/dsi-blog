@@ -1,51 +1,21 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
-import { basename, extname, join, relative } from 'node:path';
+import { join, relative } from 'node:path';
+import { formatLocalDate, hasFrontmatter, isValidCompletionDate, normalizeFrontmatter, splitMarkdownSource } from '../src/shared/content/frontmatter.mjs';
+import { parse } from 'yaml';
 
 const root = process.cwd();
 const isDryRun = process.argv.includes('--dry-run');
 
-const getToday = () => {
-	const now = new Date();
-	const year = now.getFullYear();
-	const month = String(now.getMonth() + 1).padStart(2, '0');
-	const day = String(now.getDate()).padStart(2, '0');
-
-	return `${year}-${month}-${day}`;
-};
-
-const today = getToday();
-
-const getTitleFromFile = (file) => basename(file, extname(file));
-
-const escapeYamlString = (value) => value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+const today = formatLocalDate(new Date());
 
 const targets = [
 	{
 		directory: join(root, 'src', 'content', 'blog'),
-		ensureFrontmatterFields: ['topic: ""'],
-		createFrontmatter: (file) => [
-			'---',
-			`title: "${escapeYamlString(getTitleFromFile(file))}"`,
-			'description: ""',
-			`pubDate: ${today}`,
-			'tags: []',
-			'topic: ""',
-			'---',
-			'',
-		].join('\n'),
+		collection: 'blog',
 	},
 	{
 		directory: join(root, 'src', 'content', 'docs'),
-		createFrontmatter: (file) => [
-			'---',
-			`title: "${escapeYamlString(getTitleFromFile(file))}"`,
-			'description: ""',
-			`pubDate: ${today}`,
-			'category: "未分类"',
-			'tags: []',
-			'---',
-			'',
-		].join('\n'),
+		collection: 'docs',
 	},
 ];
 
@@ -77,34 +47,6 @@ const collectMarkdownFiles = (directory) => {
 
 const removeBom = (content) => content.replace(/^\uFEFF/, '');
 
-const hasFrontmatter = (content) => content.startsWith('---\n') || content.startsWith('---\r\n');
-
-const ensureFrontmatterFields = (content, fields) => {
-	if (fields.length === 0 || !hasFrontmatter(content)) {
-		return content;
-	}
-
-	const lineEnding = content.includes('\r\n') ? '\r\n' : '\n';
-	const closeMarker = `${lineEnding}---`;
-	const closeIndex = content.indexOf(closeMarker, 3);
-
-	if (closeIndex === -1) {
-		return content;
-	}
-
-	const frontmatter = content.slice(0, closeIndex);
-	const missingFields = fields.filter((field) => {
-		const key = field.split(':', 1)[0];
-		return !new RegExp(`^${key}:`, 'm').test(frontmatter);
-	});
-
-	if (missingFields.length === 0) {
-		return content;
-	}
-
-	return `${frontmatter}${lineEnding}${missingFields.join(lineEnding)}${content.slice(closeIndex)}`;
-};
-
 for (const target of targets) {
 	ensureDirectory(target.directory);
 
@@ -116,10 +58,16 @@ for (const target of targets) {
 
 		const original = readFileSync(file, 'utf8');
 		const normalized = removeBom(original);
+		const nextContent = normalizeFrontmatter(normalized, {
+			fileName: file,
+			pubDate: today,
+			collection: target.collection,
+		});
+		if (target.collection === 'blog' && !isValidCompletionDate(parse(splitMarkdownSource(nextContent).frontmatter)?.completion_date)) {
+			throw new TypeError(`${relative(root, file)}: completion_date 必须是 YYYY-MM-DD 的有效完成日期。`);
+		}
 
 		if (hasFrontmatter(normalized)) {
-			const nextContent = ensureFrontmatterFields(normalized, target.ensureFrontmatterFields ?? []);
-
 			if (nextContent !== normalized) {
 				if (isDryRun) {
 					console.log(`[dry-run] Would update frontmatter fields: ${relative(root, file)}`);
@@ -132,9 +80,6 @@ for (const target of targets) {
 
 			continue;
 		}
-
-		const frontmatter = target.createFrontmatter(file);
-		const nextContent = normalized.length > 0 ? `${frontmatter}\n${normalized}` : frontmatter;
 
 		if (isDryRun) {
 			console.log(`[dry-run] Would add frontmatter: ${relative(root, file)}`);

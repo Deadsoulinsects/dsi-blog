@@ -1,0 +1,275 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import { formatDate, formatDateTime, getSortedPosts } from '../../../utils/content';
+import { withBase } from '../../../utils/paths';
+import { getChildTopics, getTopicGroups, getTopicSlug } from '../../../utils/topics';
+
+export async function getStaticPaths() {
+	const posts = await getSortedPosts();
+	const topicGroups = getTopicGroups(posts);
+
+	return topicGroups.map((topicGroup) => ({
+		params: { topic: topicGroup.slug },
+		props: { topicGroup, childTopics: getChildTopics(topicGroups, topicGroup.path) },
+	}));
+}
+
+const { topicGroup, childTopics } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const sortedPosts = [...topicGroup.posts].sort((a, b) => a.data.completion_date.getTime() - b.data.completion_date.getTime());
+const hasDescendantPosts = topicGroup.posts.length > topicGroup.directPosts.length;
+const pageDescription = topicGroup.description ?? `查看 ${topicGroup.name} 专题下的博客文章。`;
+---
+
+<Layout title={`${topicGroup.name} | 专题 | Dead Soul Insects`} description={pageDescription} canonicalPath={`/blog/topics/${topicGroup.slug}/`}>
+	<div class="editorial-page topic-page">
+		<header class="topic-intro">
+			<nav class="topic-path" aria-label="专题路径">
+				<a href={withBase(base, '/blog/')}>文章</a>
+				<span aria-hidden="true">/</span>
+				<a href={withBase(base, '/blog/topics/')}>全部专题</a>
+				{topicGroup.path.map((name, index) => (
+					<>
+						<span aria-hidden="true">/</span>
+						{index === topicGroup.path.length - 1
+							? <span aria-current="page">{name}</span>
+							: <a href={withBase(base, `/blog/topics/${getTopicSlug(topicGroup.path.slice(0, index + 1))}/`)}>{name}</a>}
+					</>
+				))}
+			</nav>
+			<div class="topic-heading">
+				<h1>{topicGroup.name}</h1>
+				<span class="topic-count">{topicGroup.posts.length} 篇文章</span>
+			</div>
+			{topicGroup.description && <p class="topic-description">{topicGroup.description}</p>}
+		</header>
+
+		{childTopics.length > 0 && (
+			<section class="topic-children" aria-labelledby="children-title">
+				<h2 id="children-title" class="list-heading">子专题</h2>
+				<nav class="child-links" aria-label="直属子专题">
+					{childTopics.map((child) => (
+						<a href={withBase(base, `/blog/topics/${child.slug}/`)}>{child.name} · {child.posts.length} 篇</a>
+					))}
+				</nav>
+			</section>
+		)}
+
+		<section class="topic-posts" aria-labelledby="posts-title">
+			<div class="list-toolbar">
+				<h2 id="posts-title" class="list-heading">文章</h2>
+				<button class="list-control" type="button" data-sort-toggle aria-label="按时间排序，当前为旧到新" aria-pressed="true">
+					<span>时间顺序：</span><span data-sort-order>旧到新</span>
+				</button>
+			</div>
+			{hasDescendantPosts && (
+				<>
+					<div class="scope-controls" role="group" aria-label="文章范围">
+						<button class="list-control" type="button" data-scope="all" aria-pressed="true">全部文章 · {topicGroup.posts.length} 篇</button>
+						<button class="list-control" type="button" data-scope="direct" aria-pressed="false">当前专题 · {topicGroup.directPosts.length} 篇</button>
+					</div>
+					<p class="empty-state" data-empty-state hidden>当前专题暂无直接归属的文章，可查看子专题或全部文章。</p>
+				</>
+			)}
+			<div class="rule-list" data-post-list>
+				{sortedPosts.map((post) => (
+					<a class="rule-row post-row text-link" href={withBase(base, `/blog/${post.id}/`)} data-date={formatDateTime(post.data.completion_date)} data-direct={topicGroup.directPosts.some((direct) => direct.id === post.id) ? 'true' : 'false'}>
+						<time class="post-date" datetime={formatDateTime(post.data.completion_date)}>{formatDate(post.data.completion_date)}</time>
+						<div class="post-copy">
+							<h3 class="row-title">{post.data.title}</h3>
+							<p class="row-copy">{post.data.description}</p>
+						</div>
+					</a>
+				))}
+			</div>
+		</section>
+	</div>
+</Layout>
+
+<script>
+	const postList = document.querySelector<HTMLElement>('[data-post-list]');
+	const sortButton = document.querySelector<HTMLButtonElement>('[data-sort-toggle]');
+	const sortOrder = document.querySelector<HTMLElement>('[data-sort-order]');
+	let ascending = true;
+
+	sortButton?.addEventListener('click', () => {
+		ascending = !ascending;
+		Array.from(postList?.querySelectorAll<HTMLElement>('[data-date]') ?? [])
+			.sort((a, b) => {
+				const first = new Date(a.dataset.date ?? '').getTime();
+				const second = new Date(b.dataset.date ?? '').getTime();
+				return ascending ? first - second : second - first;
+			})
+			.forEach((row) => postList?.appendChild(row));
+
+		const order = ascending ? '旧到新' : '新到旧';
+		if (sortOrder) {
+			sortOrder.textContent = order;
+		}
+		sortButton.setAttribute('aria-label', `按时间排序，当前为${order}`);
+		sortButton.setAttribute('aria-pressed', String(ascending));
+	});
+
+	const scopeButtons = document.querySelectorAll<HTMLButtonElement>('[data-scope]');
+	const emptyState = document.querySelector<HTMLElement>('[data-empty-state]');
+	scopeButtons.forEach((button) => button.addEventListener('click', () => {
+		const directOnly = button.dataset.scope === 'direct';
+		const rows = Array.from(postList?.querySelectorAll<HTMLElement>('[data-date]') ?? []);
+		rows.forEach((row) => {
+			row.hidden = directOnly && row.dataset.direct !== 'true';
+		});
+		scopeButtons.forEach((control) => control.setAttribute('aria-pressed', String(control === button)));
+		if (emptyState) {
+			emptyState.hidden = rows.some((row) => !row.hidden);
+		}
+	}));
+</script>
+
+<style>
+	.topic-intro {
+		padding-top: var(--space-4);
+	}
+
+	.topic-path,
+	.child-links,
+	.scope-controls {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: var(--space-2) var(--space-4);
+	}
+
+	.topic-path {
+		margin-bottom: var(--space-5);
+		color: var(--text-soft);
+		font-family: var(--font-ui);
+		font-size: var(--text-small);
+	}
+
+	.topic-path a,
+	.child-links a {
+		color: var(--accent-soft);
+		text-underline-offset: var(--space-1);
+	}
+
+	.topic-heading,
+	.list-toolbar {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: var(--space-3) var(--space-5);
+	}
+
+	.topic-heading h1 {
+		font-family: var(--font-display);
+		font-size: var(--text-section);
+		font-weight: 500;
+		line-height: 1.18;
+		letter-spacing: var(--tracking-heading);
+		text-wrap: balance;
+	}
+
+	.topic-count,
+	.post-date {
+		color: var(--text-soft);
+		font-family: var(--font-meta);
+		font-size: var(--text-small);
+		font-variant-numeric: tabular-nums lining-nums;
+		white-space: nowrap;
+	}
+
+	.topic-description {
+		max-width: var(--section-measure);
+		margin-top: var(--space-4);
+		color: var(--text-soft);
+		line-height: 1.75;
+	}
+
+	.topic-children,
+	.topic-posts {
+		margin-top: var(--space-6);
+	}
+
+	.list-heading {
+		font-family: var(--font-ui);
+		font-size: var(--text-note);
+		font-weight: 600;
+		line-height: 1.5;
+	}
+
+	.child-links {
+		margin-top: var(--space-3);
+		font-size: var(--text-note);
+	}
+
+	.list-toolbar {
+		justify-content: space-between;
+		margin-bottom: var(--space-3);
+	}
+
+	.list-control {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-1);
+		min-height: var(--space-6);
+		padding: var(--space-2) var(--space-3);
+		border: var(--rule-thin) solid var(--line);
+		background: transparent;
+		color: var(--text-soft);
+		font-family: var(--font-ui);
+		font-size: var(--text-small);
+		line-height: 1.5;
+		white-space: nowrap;
+		cursor: pointer;
+		transition: color var(--duration-fast) ease, background var(--duration-fast) ease;
+	}
+
+	.list-control:is(:hover, :focus-visible),
+	[data-scope][aria-pressed='true'] {
+		background: var(--panel);
+		color: var(--text);
+	}
+
+	.list-control:focus-visible,
+	.post-row:focus-visible {
+		outline: var(--focus-ring);
+		outline-offset: var(--focus-offset);
+	}
+
+	.scope-controls {
+		margin-bottom: var(--space-4);
+	}
+
+	.empty-state {
+		padding-block: var(--space-5);
+		color: var(--text-soft);
+		line-height: 1.75;
+	}
+
+	.post-row {
+		display: grid;
+		grid-template-columns: var(--column-post-meta) minmax(0, 1fr);
+		align-items: baseline;
+		gap: var(--space-5);
+	}
+
+	.post-copy {
+		min-width: 0;
+	}
+
+	.post-row[hidden],
+	.empty-state[hidden] {
+		display: none;
+	}
+
+	@media (max-width: 640px) {
+		.post-row {
+			grid-template-columns: minmax(0, 1fr);
+			gap: var(--space-3);
+		}
+
+		.post-copy {
+			grid-row: 1;
+		}
+	}
+</style>

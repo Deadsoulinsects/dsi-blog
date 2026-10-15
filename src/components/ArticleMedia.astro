@@ -1,0 +1,30 @@
+---
+import '../styles/media.css';
+---
+
+<script>
+	import { mountGalleryLayouts } from '../shared/media/gallery-layout';
+
+	const root = document.querySelector<HTMLElement>('.article-prose');
+	if (root) {
+		const dispose = mountGalleryLayouts(root);
+		window.addEventListener('pagehide', dispose, { once: true });
+	}
+</script>
+
+<style is:global>
+	.article-prose {
+		--media-gap: var(--space-2);
+		--media-block-space: var(--space-5);
+		--media-caption-y: var(--space-1);
+		--media-caption-x: var(--space-2);
+		--media-caption-bg: var(--panel-strong);
+		--media-caption-text: var(--text);
+		--media-caption-font: var(--font-ui);
+		--media-caption-size: var(--text-meta);
+	}
+
+	.article-prose .dsi-gallery {
+		scroll-margin-block-start: var(--article-anchor-offset);
+	}
+</style>

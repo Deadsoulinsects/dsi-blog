@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { siteConfig } from '../data/site-config';
 
 type Star = {
 	id: number;
@@ -17,27 +18,27 @@ type Star = {
 
 const navItems = [
 	{
-		title: '博客',
+		title: siteConfig.navigation.home.blog,
 		href: '/blog',
 		icon: 'book',
 	},
 	{
-		title: '项目',
+		title: siteConfig.navigation.home.projects,
 		href: '/projects',
 		icon: 'folder',
 	},
 	{
-		title: '文档',
+		title: siteConfig.navigation.home.docs,
 		href: '/docs',
 		icon: 'file',
 	},
 	{
-		title: '起源',
+		title: siteConfig.navigation.home.origin,
 		href: '/origin',
 		icon: 'info',
 	},
 	{
-		title: '关于',
+		title: siteConfig.navigation.home.about,
 		href: '/about',
 		icon: 'info',
 	},
@@ -104,7 +105,7 @@ const buildStars = (): Star[] => {
 const stars = buildStars();
 ---
 
-<Layout title="Dead Soul Insects" description="冷色残光中的技术记录、项目与文档整理" hideChrome={true} fullBleed={true}>
+<Layout title={siteConfig.site.name} description={siteConfig.home.metaDescription} hideChrome={true} fullBleed={true}>
 	<section class="cover-frame" aria-labelledby="cover-title">
 		<div class="cover-ambient" aria-hidden="true"></div>
 
@@ -133,13 +134,13 @@ const stars = buildStars();
 		</div>
 
 		<div class="cover-content">
-			<p class="cover-kicker">DEAD SOUL INSECTS</p>
+			<p class="cover-kicker">{siteConfig.home.kicker}</p>
 
-			<h1 id="cover-title" class="cover-title">Dead Soul Insects</h1>
+			<h1 id="cover-title" class="cover-title">{siteConfig.site.name}</h1>
 
-			<p class="cover-subtitle">一个在冷色残光里，缓慢展开的个人站点</p>
+			<p class="cover-subtitle">{siteConfig.home.subtitle}</p>
 
-			<p class="cover-description">收纳技术记录、实践项目与长期整理，让零散想法在暗处缓慢成形</p>
+			<p class="cover-description">{siteConfig.home.description}</p>
 
 			<nav class="cover-nav" aria-label="首页主要入口">
 				{
@@ -182,8 +183,8 @@ const stars = buildStars();
 		</div>
 
 		<div class="cover-motto" aria-label="站点标语">
-			<p>WHERE DEAD SOULS STILL GLOW</p>
-			<p>逝魂未灭，幽光犹存</p>
+			<p>{siteConfig.home.englishMotto}</p>
+			<p>{siteConfig.home.chineseMotto}</p>
 		</div>
 	</section>
 </Layout>
@@ -367,16 +368,17 @@ const stars = buildStars();
 	.cover-kicker {
 		margin: 0;
 		font-family: var(--font-meta);
-		font-size: clamp(0.78rem, 1.2vw, 0.95rem);
-		font-weight: 700;
-		letter-spacing: 0.34em;
+		font-size: clamp(0.7rem, 1vw, 0.82rem);
+		font-weight: 400;
+		line-height: 1.6;
+		letter-spacing: 0.24em;
 		text-transform: uppercase;
-		color: rgba(125, 211, 252, 0.9);
+		color: var(--accent-soft);
 	}
 
 	.cover-title {
 		max-width: min(1200px, 100%);
-		margin: 26px auto 0;
+		margin: clamp(20px, 2.2vw, 30px) auto 0;
 		font-size: var(--title-size);
 		font-family: var(--font-brand);
 		font-weight: 400;
@@ -388,23 +390,24 @@ const stars = buildStars();
 	}
 
 	.cover-subtitle {
-		max-width: 900px;
-		margin: clamp(24px, 3.8vw, 38px) auto 0;
-		font-size: clamp(1.35rem, 2.65vw, 2.55rem);
-		font-family: var(--font-reading);
+		max-width: 30em;
+		margin: clamp(28px, 3vw, 40px) auto 0;
+		font-size: clamp(1.35rem, 2.3vw, 2.1rem);
+		font-family: var(--font-display);
 		font-weight: 500;
-		line-height: 1.08;
-		letter-spacing: -0.045em;
+		line-height: 1.45;
+		letter-spacing: -0.025em;
 		color: #edf2ff;
 		text-wrap: balance;
 	}
 
 	.cover-description {
 		max-width: 680px;
-		margin: 20px auto 0;
-		font-size: clamp(0.95rem, 1.2vw, 1.05rem);
+		margin: 14px auto 0;
+		font-family: var(--font-ui);
+		font-size: clamp(0.86rem, 1.2vw, 1rem);
 		line-height: 1.75;
-		color: #9aa8c4;
+		color: var(--text-soft);
 		text-wrap: balance;
 	}
 
@@ -413,7 +416,7 @@ const stars = buildStars();
 		flex-wrap: wrap;
 		justify-content: center;
 		gap: 10px;
-		margin-top: 28px;
+		margin-top: 32px;
 	}
 
 	.cover-link {
@@ -508,45 +511,38 @@ const stars = buildStars();
 			padding: 34px clamp(22px, 5vw, 72px) 78px;
 		}
 
-		.cover-kicker {
-			font-size: 0.72rem;
-			letter-spacing: 0.28em;
-		}
-
 		.cover-title {
-			margin-top: 18px;
 			font-size: clamp(3.4rem, 8.6vw, 7.2rem);
-		}
-
-		.cover-subtitle {
-			margin-top: 22px;
-			font-size: clamp(1.15rem, 2.3vw, 2rem);
-		}
-
-		.cover-description {
-			margin-top: 14px;
-			font-size: 0.92rem;
-			line-height: 1.6;
-		}
-
-		.cover-nav {
-			margin-top: 20px;
 		}
 	}
 
-	@media (max-height: 600px) and (min-width: 821px) {
-		.cover-description {
-			display: none;
+	@media (max-height: 620px) and (min-width: 821px) {
+		.cover-frame {
+			height: auto;
+			grid-template-rows: 1fr auto;
+			padding-block: 32px;
+			row-gap: 38px;
+		}
+
+		.cover-content {
+			transform: none;
+		}
+
+		.cover-motto {
+			position: static;
 		}
 	}
 
 	@media (max-width: 820px) {
 		.cover-frame {
-			--content-y: -2.4vh;
 			--starfield-opacity: 0.72;
 			height: auto;
 			padding: 42px 18px 96px;
 			overflow: visible;
+		}
+
+		.cover-content {
+			transform: none;
 		}
 
 		.cover-motto {
@@ -558,26 +554,20 @@ const stars = buildStars();
 			display: none;
 		}
 
-		.cover-kicker {
-			letter-spacing: 0.26em;
-		}
-
 		.cover-title {
-			margin-top: 24px;
 			font-size: clamp(3.25rem, 15.4vw, 5.6rem);
 			line-height: 0.9;
 			letter-spacing: -0.075em;
 		}
 
 		.cover-subtitle {
-			margin-top: 26px;
-			font-size: clamp(1.24rem, 6.2vw, 2.05rem);
+			max-width: 19em;
+			font-size: clamp(1.2rem, 4.2vw, 1.75rem);
 		}
 
 		.cover-description {
-			margin-top: 18px;
-			font-size: 0.98rem;
-			line-height: 1.7;
+			max-width: 23em;
+			font-size: 0.85rem;
 		}
 	}
 

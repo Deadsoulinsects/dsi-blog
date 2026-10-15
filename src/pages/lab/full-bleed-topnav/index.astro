@@ -92,7 +92,7 @@ const standalonePosts = posts.filter((post) => post.data.topic.trim() === '');
 						<a class="fb-row-link" href={withBase(import.meta.env.BASE_URL, `/blog/${post.id}/`)}>
 							<div class="fb-inner">
 								<div class="fb-row-grid fb-article-row">
-									<time class="fb-row-date" datetime={formatDateTime(post.data.pubDate)}>{formatDate(post.data.pubDate)}</time>
+									<time class="fb-row-date" datetime={formatDateTime(post.data.completion_date)}>{formatDate(post.data.completion_date)}</time>
 									<div class="fb-row-copy">
 										<h3 class="fb-row-title">{post.data.title}</h3>
 										<p class="fb-row-description">{post.data.description}</p>

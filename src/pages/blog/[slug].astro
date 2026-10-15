@@ -1,9 +1,10 @@
 ---
 import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import ArticleMedia from '../../components/ArticleMedia.astro';
 import { render } from 'astro:content';
 import { formatDate, formatDateTime, getSortedPosts } from '../../utils/content';
-import { toParamSlug, withBase } from '../../utils/paths';
-import { normalizeTopic } from '../../utils/topics';
+import { withBase } from '../../utils/paths';
+import { getTopicPath, getTopicSlug } from '../../utils/topics';
 
 export async function getStaticPaths() {
 	const posts = await getSortedPosts();
@@ -18,11 +19,12 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content, headings } = await render(post);
-const dateLabel = formatDate(post.data.pubDate);
-const dateTime = formatDateTime(post.data.pubDate);
+const dateLabel = formatDate(post.data.completion_date);
+const dateTime = formatDateTime(post.data.completion_date);
 const base = import.meta.env.BASE_URL;
-const topic = normalizeTopic(post.data.topic);
-const backHref = topic ? withBase(base, `/blog/topics/${toParamSlug(topic)}/`) : withBase(base, '/blog');
+const topicPath = getTopicPath(post.data);
+const topic = topicPath.at(-1);
+const backHref = topic ? withBase(base, `/blog/topics/${getTopicSlug(topicPath)}/`) : withBase(base, '/blog');
 const backLabel = topic ? `返回${topic}专题` : '返回博客列表';
 ---
 
@@ -34,9 +36,38 @@ const backLabel = topic ? `返回${topic}专题` : '返回博客列表';
 	backLabel={backLabel}
 	dateLabel={dateLabel}
 	dateTime={dateTime}
+	dateKind="完成日期"
+	startDate={post.data.start_date ? formatDateTime(post.data.start_date) : undefined}
+	endDate={post.data.end_date ? formatDateTime(post.data.end_date) : undefined}
 	headings={headings}
 	canonicalPath={`/blog/${post.id}/`}
-	publishedTime={post.data.pubDate.toISOString()}
+	publishedTime={post.data.completion_date.toISOString()}
 >
+	{topicPath.length > 0 && (
+		<nav slot="topic-navigation" class="article-topic-path" aria-label="文章专题路径">
+			{topicPath.map((name, index) => (
+				<>
+					{index > 0 && <span aria-hidden="true">/</span>}
+					<a href={withBase(base, `/blog/topics/${getTopicSlug(topicPath.slice(0, index + 1))}/`)}>{name}</a>
+				</>
+			))}
+		</nav>
+	)}
+	{post.data.mediaId && <ArticleMedia />}
 	<Content />
 </ArticleLayout>
+
+<style>
+	.article-topic-path {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-2) var(--space-3);
+		margin-bottom: var(--space-4);
+		color: var(--text-soft);
+		font-size: var(--text-small);
+	}
+	.article-topic-path a {
+		color: var(--accent-soft);
+		overflow-wrap: anywhere;
+	}
+</style>

@@ -15,7 +15,8 @@ export const formatDate = (date: Date) =>
 export const formatDateTime = (date: Date) =>
 	`${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;
 
-export const getSortedPosts = async () => sortByPubDateDesc(await getCollection('blog'));
+export const getSortedPosts = async () =>
+	(await getCollection('blog')).sort((a, b) => b.data.completion_date.getTime() - a.data.completion_date.getTime());
 
 export const getSortedDocs = async () => sortByPubDateDesc(await getCollection('docs'));
 
@@ -47,7 +48,7 @@ export const getArchiveGroups = async () => {
 	const groups = new Map<string, typeof posts>();
 
 	for (const post of posts) {
-		const year = String(post.data.pubDate.getUTCFullYear());
+		const year = String(post.data.completion_date.getUTCFullYear());
 		const current = groups.get(year) ?? [];
 
 		current.push(post);

@@ -77,7 +77,7 @@ export function usesPlatformGlyph(char) {
 
 /** @param {string} text @param {string[]} families */
 export function missingFontCharacters(text, families) {
-	return [...new Set([...text])].filter((char) => !usesPlatformGlyph(char)
+	return [...new Set(text)].filter((char) => !usesPlatformGlyph(char)
 		&& !families.some((family) => hasFontCharacter(family, char.codePointAt(0))));
 }
 

@@ -30,7 +30,7 @@ const topics = getTopicGroups(posts).slice(0, 3).map((topic) => ({
 const postPreviews = posts.slice(0, 6).map((post) => ({
 	title: post.data.title,
 	description: post.data.description,
-	dateLabel: formatDate(post.data.pubDate),
+	dateLabel: formatDate(post.data.completion_date),
 	topic: post.data.topic.trim() || undefined,
 	href: `/blog/${post.id}/`,
 }));
@@ -45,7 +45,7 @@ const archiveGroups = (await getArchiveGroups()).slice(0, 3).map((group) => ({
 	year: group.year,
 	items: group.items.slice(0, 3).map((item) => ({
 		title: item.data.title,
-		dateLabel: formatDate(item.data.pubDate),
+		dateLabel: formatDate(item.data.completion_date),
 		href: `/blog/${item.id}/`,
 	})),
 }));

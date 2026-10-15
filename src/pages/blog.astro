@@ -1,19 +1,16 @@
 ---
-import { featuredTopics } from '../data/topics';
 import Layout from '../layouts/Layout.astro';
 import { formatDateTime, getSortedPosts } from '../utils/content';
 import { withBase } from '../utils/paths';
-import { getTopicGroups } from '../utils/topics';
+import { getFeaturedTopicGroups, getTopicGroups, getTopicPath } from '../utils/topics';
 
 const posts = await getSortedPosts();
-const topicGroups = getTopicGroups(posts);
-const featuredTopicGroups = featuredTopics
-	.map((topicName) => topicGroups.find((topicGroup) => topicGroup.name === topicName))
-	.filter((topicGroup): topicGroup is (typeof topicGroups)[number] => topicGroup !== undefined);
-const latestArchiveYear = posts.at(0)?.data.pubDate.getUTCFullYear();
+const topicGroups = getTopicGroups(posts).filter((group) => group.path.length === 1);
+const featuredTopicGroups = getFeaturedTopicGroups(topicGroups);
+const latestArchiveYear = posts.at(0)?.data.completion_date.getUTCFullYear();
 const archivePreviewPosts = latestArchiveYear === undefined
 	? []
-	: posts.filter((post) => post.data.pubDate.getUTCFullYear() === latestArchiveYear);
+	: posts.filter((post) => post.data.completion_date.getUTCFullYear() === latestArchiveYear);
 const base = import.meta.env.BASE_URL;
 ---
 
@@ -75,20 +72,22 @@ const base = import.meta.env.BASE_URL;
 
 			<div class="rule-list">
 				{posts.map((post) => {
-					const dateTime = formatDateTime(post.data.pubDate);
-					const topic = post.data.topic.trim();
+					const dateTime = formatDateTime(post.data.completion_date);
+					const topic = getTopicPath(post.data)[0];
 
 					return (
-						<a class="rule-row post-row text-link" href={withBase(base, `/blog/${post.id}/`)}>
+						<div class="rule-row post-row">
 							<div class="post-meta">
 								<time datetime={dateTime}>{dateTime.replaceAll('-', '.')}</time>
 								{topic && <span class="post-topic">{topic}</span>}
 							</div>
-							<article>
-								<h3 class="row-title">{post.data.title}</h3>
-								<p class="post-description">{post.data.description}</p>
-							</article>
-						</a>
+							<a class="text-link" href={withBase(base, `/blog/${post.id}/`)}>
+								<article>
+									<h3 class="row-title">{post.data.title}</h3>
+									<p class="post-description">{post.data.description}</p>
+								</article>
+							</a>
+						</div>
 					);
 				})}
 			</div>
@@ -109,7 +108,7 @@ const base = import.meta.env.BASE_URL;
 					<div class="archive-preview-list">
 						<ul class="archive-list">
 							{archivePreviewPosts.map((post) => {
-								const dateTime = formatDateTime(post.data.pubDate);
+								const dateTime = formatDateTime(post.data.completion_date);
 
 								return (
 									<li>
@@ -129,8 +128,7 @@ const base = import.meta.env.BASE_URL;
 
 <style>
 	.blog-page {
-		--blog-rule: color-mix(in srgb, var(--accent-soft) 16%, transparent);
-		--blog-rule-muted: color-mix(in srgb, var(--text) 8%, transparent);
+		--blog-topic-count-width: 5rem;
 	}
 
 	.blog-page .intro {
@@ -197,7 +195,7 @@ const base = import.meta.env.BASE_URL;
 	}
 
 	.blog-topic-list {
-		border-bottom: var(--rule-thin) solid var(--blog-rule);
+		border-bottom: var(--rule-thin) solid var(--line-accent);
 	}
 
 	.blog-topic-list .topic-row:last-child {
@@ -209,13 +207,6 @@ const base = import.meta.env.BASE_URL;
 		align-items: center;
 		gap: var(--space-4);
 		margin-bottom: var(--space-5);
-	}
-
-	.blog-page .blog-section-heading::after {
-		content: '';
-		flex: 1 1 auto;
-		block-size: var(--rule-thin);
-		background: var(--blog-rule);
 	}
 
 	.blog-page .blog-section-heading h2 {
@@ -230,17 +221,17 @@ const base = import.meta.env.BASE_URL;
 	.blog-page .rule-list,
 	.blog-page .blog-topic-list,
 	.blog-page .intro-index {
-		border-color: var(--blog-rule);
+		border-color: var(--line-accent);
 	}
 
 	.blog-page .rule-row,
 	.blog-page .archive-list li {
-		border-color: var(--blog-rule-muted);
+		border-color: var(--line-muted);
 	}
 
 	.topic-row {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) var(--column-contact-action);
+		grid-template-columns: minmax(0, 1fr) var(--blog-topic-count-width);
 		gap: var(--space-2) var(--space-5);
 	}
 
@@ -279,6 +270,7 @@ const base = import.meta.env.BASE_URL;
 		padding-block: var(--space-6);
 	}
 
+	.post-row > .text-link,
 	.post-row article {
 		min-width: 0;
 	}
@@ -305,7 +297,7 @@ const base = import.meta.env.BASE_URL;
 
 	.blog-page .post-row .row-title {
 		color: var(--text);
-		font-family: var(--font-reading);
+		font-family: var(--font-display);
 		font-size: var(--text-editorial-row);
 		font-weight: 500;
 		text-wrap: pretty;
@@ -357,7 +349,7 @@ const base = import.meta.env.BASE_URL;
 		position: relative;
 		padding: 0;
 		list-style: none;
-		border-top: var(--rule-thin) solid var(--blog-rule);
+		border-top: var(--rule-thin) solid var(--line-accent);
 	}
 
 	.blog-page .archive-list::before {
@@ -367,7 +359,7 @@ const base = import.meta.env.BASE_URL;
 		right: 100%;
 		width: calc(var(--column-archive-year) + var(--space-6));
 		height: var(--rule-thin);
-		background: var(--blog-rule);
+		background: var(--line-accent);
 	}
 
 	.archive-list li {
@@ -392,7 +384,7 @@ const base = import.meta.env.BASE_URL;
 
 	.blog-page .archive-link {
 		color: color-mix(in srgb, var(--text) 88%, var(--text-soft));
-		font-family: var(--font-reading);
+		font-family: var(--font-display);
 		font-size: var(--text-body);
 		line-height: 1.45;
 		text-decoration: none;

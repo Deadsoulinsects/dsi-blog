@@ -210,6 +210,8 @@ const activeNavIndex = navItems.findIndex((item) =>
 		--panel: rgba(18, 23, 37, 0.78);
 		--panel-strong: rgba(24, 31, 51, 0.92);
 		--line: rgba(153, 176, 255, 0.16);
+		--line-accent: color-mix(in srgb, var(--accent-soft) 16%, transparent);
+		--line-muted: color-mix(in srgb, var(--text) 8%, transparent);
 		--text: #edf2ff;
 		--text-soft: #a4b0d3;
 		--accent: #9d8cff;
@@ -221,7 +223,7 @@ const activeNavIndex = navItems.findIndex((item) =>
 		--reading-measure: 44rem;
 		--intro-measure: 38rem;
 		--font-brand: 'Newsreader', Georgia, 'Times New Roman', serif;
-		--font-reading: 'Newsreader', 'Noto Serif SC', 'Iowan Old Style', 'Songti SC', STSong, serif;
+		--font-display: 'Newsreader', 'Noto Serif SC', 'Iowan Old Style', 'Songti SC', STSong, serif;
 		--font-ui: 'Noto Sans SC', 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
 		--font-meta: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', 'SFMono-Regular', Consolas, 'Noto Sans SC', 'Microsoft YaHei', monospace;
 		--article-reading-measure: 40rem;
@@ -590,7 +592,7 @@ const activeNavIndex = navItems.findIndex((item) =>
 
 	.editorial-page .intro h1 {
 		max-width: 13ch;
-		font-family: var(--font-reading);
+		font-family: var(--font-display);
 		font-size: var(--text-display);
 		font-weight: 500;
 		line-height: 1.06;
@@ -646,7 +648,7 @@ const activeNavIndex = navItems.findIndex((item) =>
 	.editorial-page .intro-stat strong {
 		display: block;
 		margin-top: var(--space-1);
-		font-family: var(--font-reading);
+		font-family: var(--font-display);
 		font-size: 1.85rem;
 		font-weight: 500;
 		font-variant-numeric: lining-nums tabular-nums;
@@ -681,7 +683,7 @@ const activeNavIndex = navItems.findIndex((item) =>
 	}
 
 	.editorial-page .section-copy h2 {
-		font-family: var(--font-reading);
+		font-family: var(--font-display);
 		font-size: var(--text-section);
 		font-weight: 500;
 		line-height: 1.06;
@@ -706,7 +708,7 @@ const activeNavIndex = navItems.findIndex((item) =>
 	}
 
 	.editorial-page .row-title {
-		font-family: var(--font-reading);
+		font-family: var(--font-display);
 		font-size: var(--text-row);
 		font-weight: 500;
 		line-height: 1.18;
@@ -753,7 +755,7 @@ const activeNavIndex = navItems.findIndex((item) =>
 	}
 
 	.editorial-page .editorial-row h3 {
-		font-family: var(--font-reading);
+		font-family: var(--font-display);
 		font-size: var(--text-editorial-row);
 		font-weight: 500;
 	}
@@ -789,7 +791,7 @@ const activeNavIndex = navItems.findIndex((item) =>
 	}
 
 	.editorial-page .aftertone h2 {
-		font-family: var(--font-reading);
+		font-family: var(--font-display);
 		font-size: clamp(1.8rem, 3vw, 2.5rem);
 		font-weight: 500;
 	}

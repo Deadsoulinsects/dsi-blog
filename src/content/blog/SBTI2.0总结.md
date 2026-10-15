@@ -1,15 +1,14 @@
 ---
-title: "SBTI2.0总结"
-description: "简要描述SBTI2.0项目的过程和所用工具"
+title: SBTI2.0总结
+description: 简要描述SBTI2.0项目的过程和所用工具
 completion_date: 2026-05-06
 tags:
-  - SBTI2.0
   - AI项目
   - 分享
-topic: "SBTI"
+topic: SBTI 2.0
 mediaId: article-270a2bac4a2632b4
 topicPath:
-  - SBTI
+  - SBTI 2.0
 ---
 相关链接：[SBTI2.0的设计思路](/blog/sbti20的设计思路/)
 
