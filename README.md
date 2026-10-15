@@ -12,6 +12,16 @@ Dead Soul Insects 是一个基于 Astro 的个人静态博客仓库，用来整�
 - npm
 - GitHub Pages
 
+## DSI Admin 桌面产品
+
+仓库还包含 DSI Admin：面向本博客的 Windows 桌面文章管理程序，连接本地 Astro 工程与 Obsidian 笔记库，自动保存草稿、准备网页媒体，在明确确认后提交或发布。
+
+- [安装、使用与开发 README](./desktop/README.md)
+- [产品介绍与适用范围](./desktop/产品介绍.md)
+- [版本更新记录](./desktop/CHANGELOG.md)
+
+安装版自带运行工具，不需要用户手动启动 `astro dev`。博客网站仍采用静态架构；桌面程序的本地能力不会开放到正式网站。
+
 ## 规则与设计入口
 
 - [`AGENTS.md`](./AGENTS.md)：工程实现、修改权限、验证和协作规则
@@ -44,7 +54,7 @@ npm run dev                # 启动本地开发服务器
 npm run lint               # 只读 Oxlint 代码静态检查
 npm run lint:fix           # 用 Oxlint 修复可自动处理的问题，会写入文件
 npm run links:check        # 检查 Markdown 链接
-npm run sync:blog:dry      # 预览博客同步，不写入
+npm run sync:blog -- --file "<原笔记路径>" --dry-run # 手动预览单篇博客同步，不写入
 npm run sync:origin:dry    # 预览起源同步，不写入
 npm run content:prepare:dry # 预览完整内容准备流程，不写入
 npm run content:prepare    # 执行内容准备流程（会写入文件）
@@ -57,7 +67,7 @@ npm run preview            # 预览构建结果
 
 - `npm run lint` 是只读的代码静态检查。`npm run lint:fix` 会写入文件，执行后应审阅 diff，并重新运行 `npm run lint`；两者都不替代 `npm run build:astro` 对 Astro 构建与模板的验证。
 - `npm run build:astro` 是**纯 Astro 构建检查**，如果你只是想确认站点能否构建，优先用它。
-- `npm run build` **不是普通 build 检查**。它会先跑 `prebuild`，其中包含 Obsidian 内容同步、frontmatter 补全和 Markdown 链接转换，因此**可能改动仓库里的 Markdown 文件**。
+- `npm run build` **不是普通 build 检查**。它会先跑 `prebuild`，其中保留起源同步、frontmatter 补全和 Markdown 链接转换，因此**可能改动仓库里的 Markdown 文件**；博客同步不再进入这条链路。
 - `npm run content:prepare` 也会写入文件；如果只是想先看结果，优先使用带 `:dry` 的命令。
 - `npm run publish` 默认不要随意运行。它可能触发构建、提交并推送代码，不适合当作日常检查命令。
 - `scripts/` 中的 Obsidian 本地 Windows 路径属于当前用户工作流；其他环境里如果源目录不存在而出现 warning，通常不代表源码本身出错。
@@ -90,3 +100,13 @@ npm run preview            # 预览构建结果
 - 根目录 `docs/`：维护者 / AI 使用的内部说明文档
 
 Markdown 内容应保持合法 frontmatter，日期使用 `YYYY-MM-DD`；保留现有中文文件名、中文路径和中文内容，不擅自改成英文或拼音。
+
+博客以 `completion_date` 表示完成日期，用于文章展示、排序、归档和 RSS；`start_date`、`end_date` 为可选过程日期。旧博客的 `pubDate` 仅在缺少 `completion_date` 字段时迁移，新文章不自动使用当天或文件修改时间。公开 Docs 继续使用 `pubDate`。
+
+原始 Obsidian 笔记留在自然目录中，在 Admin 里选择要公开的笔记，不再复制到“博客发布”目录。默认目录与待确认扫描排除“博客发布”和 `picture`；已有绑定仍继续使用，只有作者明确重新绑定才迁移到原笔记。迁移保留站点文件名、URL、`mediaId` 和其他技术字段，不删除私人副本。原笔记与旧副本可能各有修改，应先比较内容，再由作者选择原笔记版本，迁移过程不代替作者覆盖正文。
+
+Admin 按规范化后的文件名或标题提示原笔记候选，忽略大小写、Unicode 表示与空白差异，排除历史“博客发布”副本；即使只有一个候选，也不自动绑定或替换现有路径。可能与已有文章重名或同标题的新导入会被拒绝，应改用显式绑定。来源目录与网站专题可以不同。
+
+同步更新源笔记中明确提供的标题、描述、标签和日期，保留站点的 `mediaId` 等技术字段；网站专题可在 Admin 独立维护。插件 `article-header-sync` 写入的受管头部只用于笔记阅读，导入博客时移除完整的 `article-header:start/end` 区块，再由站点渲染文章头部；源笔记不被修改。缺少有效完成日期或头部标记异常时，需要修正后再准备内容。
+
+手动兜底使用 `npm run sync:blog -- --file "<原笔记路径>"`，加 `--dry-run` 可先预览。不传 `--file` 时仅说明用法，不扫描旧发布目录，也不写入文件。本轮是源码更新，现有安装包不因此升级；使用新流程的安装版需要后续重新打包。
