@@ -76,7 +76,7 @@ const base = import.meta.env.BASE_URL;
 	.back-link {
 		display: inline-block;
 		margin-bottom: var(--space-6);
-		color: var(--text-soft);
+		color: var(--accent-soft);
 		font-family: var(--font-ui);
 		font-size: var(--text-small);
 		text-decoration-color: var(--line);
@@ -88,7 +88,7 @@ const base = import.meta.env.BASE_URL;
 	}
 
 	.back-link:is(:hover, :focus-visible) {
-		color: var(--accent-soft);
+		color: var(--accent-hover);
 		text-decoration-color: currentColor;
 	}
 
@@ -160,7 +160,7 @@ const base = import.meta.env.BASE_URL;
 	}
 
 	.workflow-row:is(:hover, :focus-visible) .record-copy strong {
-		color: var(--accent-soft);
+		color: var(--accent-hover);
 	}
 
 	@media (max-width: 760px) {

@@ -225,7 +225,7 @@ const contacts = siteConfig.about.contact.items;
 		inline-size: 100%;
 		aspect-ratio: 1;
 		border-radius: 50%;
-		background: color-mix(in srgb, var(--accent-soft) 8%, transparent);
+		background: color-mix(in srgb, var(--accent-hover) 8%, transparent);
 		pointer-events: none;
 		transform: translate(-50%, -50%) scale(0);
 		transition: transform calc(var(--duration-slider) * 2.5) ease-in-out;
@@ -236,9 +236,9 @@ const contacts = siteConfig.about.contact.items;
 	}
 
 	.copy-btn:is(:hover, :focus-visible) {
-		border-color: color-mix(in srgb, var(--accent-soft) 28%, var(--line));
-		background: color-mix(in srgb, var(--accent-soft) 8%, transparent);
-		color: var(--text);
+		border-color: color-mix(in srgb, var(--accent-hover) 28%, var(--line));
+		background: color-mix(in srgb, var(--accent-hover) 8%, transparent);
+		color: var(--accent-hover);
 	}
 
 	.copy-btn:disabled {

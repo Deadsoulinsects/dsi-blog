@@ -68,7 +68,7 @@ const base = import.meta.env.BASE_URL;
 
 <Layout
 	title="项目 | Dead Soul Insects"
-	description="Dead Soul Insects 的真实项目入口页，按类型整理站点项目、自动化脚本与 AI 实践。"
+	description="收录我做过的网页项目，以及维护这个博客用到的工具和流程。"
 	canonicalPath="/projects/"
 >
 	<div class="editorial-page projects-page">
@@ -183,7 +183,7 @@ const base = import.meta.env.BASE_URL;
 
 	.type-index a:is(:hover, :focus-visible) {
 		background: color-mix(in srgb, var(--panel) 72%, transparent);
-		color: var(--accent-soft);
+		color: var(--accent-hover);
 	}
 
 	.project-group-head,
@@ -293,6 +293,7 @@ const base = import.meta.env.BASE_URL;
 	}
 
 	.project-links a:is(:hover, :focus-visible) {
+		color: var(--accent-hover);
 		text-decoration-color: currentColor;
 	}
 

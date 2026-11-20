@@ -16,7 +16,7 @@ const base = import.meta.env.BASE_URL;
 >
 	<div class="editorial-page topics-page">
 		<section class="intro intro--single topics-index" aria-labelledby="topics-title">
-			<a class="back-link" href={withBase(base, '/blog/')}>返回博客</a>
+			<a class="back-link" href={withBase(base, '/blog/')}>返回文章列表</a>
 			<h1 id="topics-title">专题</h1>
 			<div class="rule-list">
 				{topicGroups.map((topicGroup) => {
@@ -45,7 +45,7 @@ const base = import.meta.env.BASE_URL;
 	.back-link {
 		display: inline-block;
 		margin-bottom: var(--space-5);
-		color: var(--text-soft);
+		color: var(--accent-soft);
 		font-family: var(--font-ui);
 		font-size: var(--text-small);
 		text-decoration-color: var(--line);
@@ -57,7 +57,7 @@ const base = import.meta.env.BASE_URL;
 	}
 
 	.back-link:is(:hover, :focus-visible) {
-		color: var(--accent-soft);
+		color: var(--accent-hover);
 		text-decoration-color: currentColor;
 	}
 

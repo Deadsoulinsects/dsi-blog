@@ -1,7 +1,7 @@
 ---
 import ArticleLayout from '../../layouts/ArticleLayout.astro';
 import { render } from 'astro:content';
-import { formatDate, formatDateTime, getSortedDocs } from '../../utils/content';
+import { formatDateTime, getSortedDocs } from '../../utils/content';
 import { withBase } from '../../utils/paths';
 
 export async function getStaticPaths() {
@@ -17,7 +17,6 @@ export async function getStaticPaths() {
 
 const { doc } = Astro.props;
 const { Content, headings } = await render(doc);
-const dateLabel = formatDate(doc.data.pubDate);
 const dateTime = formatDateTime(doc.data.pubDate);
 const base = import.meta.env.BASE_URL;
 ---
@@ -28,11 +27,12 @@ const base = import.meta.env.BASE_URL;
 	sectionLabel="文档"
 	backHref={withBase(base, '/docs')}
 	backLabel="返回文档列表"
-	dateLabel={dateLabel}
+	dateLabel={dateTime}
 	dateTime={dateTime}
 	headings={headings}
 	canonicalPath={`/docs/${doc.id}/`}
 	publishedTime={doc.data.pubDate.toISOString()}
+	tags={doc.data.tags}
 >
 	<Content />
 </ArticleLayout>

@@ -14,7 +14,7 @@
 			"about": "关于"
 		},
 		"home": {
-			"blog": "博客",
+			"blog": "文章",
 			"projects": "项目",
 			"docs": "文档",
 			"origin": "起源",
@@ -23,10 +23,10 @@
 	},
 	"home": {
 		"metaDescription": "冷色残光中的技术记录、项目与文档整理",
-		"kicker": "A PERSONAL JOURNAL",
+		"kicker": "A Personal Journal",
 		"subtitle": "一个在冷色残光里，缓慢展开的个人站点",
 		"description": "技术札记 · 实践项目 · 长期整理",
-		"englishMotto": "WHERE DEAD SOULS STILL GLOW",
+		"englishMotto": "Where Dead Souls Still Glow",
 		"chineseMotto": "逝魂未灭，幽光犹存"
 	},
 	"about": {

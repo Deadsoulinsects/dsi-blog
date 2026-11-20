@@ -14,7 +14,7 @@ const archivePreviewPosts = latestArchiveYear === undefined
 const base = import.meta.env.BASE_URL;
 ---
 
-<Layout title="博客 | Dead Soul Insects" description="Dead Soul Insects 的博客列表页。" canonicalPath="/blog/">
+<Layout title="文章 | Dead Soul Insects" description="浏览我写的技术札记、项目记录和随想，也可以按专题或归档查找。" canonicalPath="/blog/">
 	<div class="editorial-page blog-page">
 		<section class="intro blog-hero" aria-labelledby="blog-title">
 			<div class="intro-grid blog-hero-grid">
@@ -28,7 +28,7 @@ const base = import.meta.env.BASE_URL;
 						打发时间、娱乐自己
 					</p>
 
-					<div class="intro-index blog-stats" aria-label="博客概览">
+					<div class="intro-index blog-stats" aria-label="文章栏目概览">
 						<div class="intro-stat">
 							<span>文章</span>
 							<strong>{posts.length}</strong>
@@ -190,6 +190,7 @@ const base = import.meta.env.BASE_URL;
 	}
 
 	.blog-topic-all:is(:hover, :focus-visible) {
+		color: var(--accent-hover);
 		text-decoration: underline;
 		text-underline-offset: var(--space-1);
 	}
@@ -287,6 +288,7 @@ const base = import.meta.env.BASE_URL;
 	}
 
 	.post-meta time {
+		color: var(--accent-gold);
 		letter-spacing: var(--tracking-date);
 		font-variant-numeric: tabular-nums lining-nums;
 	}
@@ -301,6 +303,10 @@ const base = import.meta.env.BASE_URL;
 		font-size: var(--text-editorial-row);
 		font-weight: 500;
 		text-wrap: pretty;
+	}
+
+	.blog-page .post-row .text-link:is(:hover, :focus-visible) .row-title {
+		color: var(--accent-hover);
 	}
 
 	.row-copy,
@@ -375,7 +381,7 @@ const base = import.meta.env.BASE_URL;
 	}
 
 	.archive-date {
-		color: var(--text-soft);
+		color: var(--accent-gold);
 		font-family: var(--font-meta);
 		font-size: var(--text-kicker);
 		letter-spacing: var(--tracking-meta);
@@ -391,8 +397,8 @@ const base = import.meta.env.BASE_URL;
 		transition: color var(--duration-fast) ease;
 	}
 
-	.archive-link:is(:hover, :focus-visible) {
-		color: var(--accent-soft);
+	.blog-page .archive-link:is(:hover, :focus-visible) {
+		color: var(--accent-hover);
 	}
 
 	.archive-more {

@@ -152,6 +152,11 @@ const pageDescription = topicGroup.description ?? `查看 ${topicGroup.name} 专
 		text-underline-offset: var(--space-1);
 	}
 
+	.topic-path a:is(:hover, :focus-visible),
+	.child-links a:is(:hover, :focus-visible) {
+		color: var(--accent-hover);
+	}
+
 	.topic-heading,
 	.list-toolbar {
 		display: flex;
@@ -176,6 +181,10 @@ const pageDescription = topicGroup.description ?? `查看 ${topicGroup.name} 专
 		font-size: var(--text-small);
 		font-variant-numeric: tabular-nums lining-nums;
 		white-space: nowrap;
+	}
+
+	.post-date {
+		color: var(--accent-gold);
 	}
 
 	.topic-description {
@@ -228,6 +237,10 @@ const pageDescription = topicGroup.description ?? `查看 ${topicGroup.name} 专
 	[data-scope][aria-pressed='true'] {
 		background: var(--panel);
 		color: var(--text);
+	}
+
+	.list-control:is(:hover, :focus-visible) {
+		color: var(--accent-hover);
 	}
 
 	.list-control:focus-visible,

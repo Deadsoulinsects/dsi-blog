@@ -2,7 +2,7 @@
 import ArticleLayout from '../../layouts/ArticleLayout.astro';
 import ArticleMedia from '../../components/ArticleMedia.astro';
 import { render } from 'astro:content';
-import { formatDate, formatDateTime, getSortedPosts } from '../../utils/content';
+import { formatDateTime, getSortedPosts } from '../../utils/content';
 import { withBase } from '../../utils/paths';
 import { getTopicPath, getTopicSlug } from '../../utils/topics';
 
@@ -19,13 +19,12 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content, headings } = await render(post);
-const dateLabel = formatDate(post.data.completion_date);
 const dateTime = formatDateTime(post.data.completion_date);
 const base = import.meta.env.BASE_URL;
 const topicPath = getTopicPath(post.data);
 const topic = topicPath.at(-1);
 const backHref = topic ? withBase(base, `/blog/topics/${getTopicSlug(topicPath)}/`) : withBase(base, '/blog');
-const backLabel = topic ? `返回${topic}专题` : '返回博客列表';
+const backLabel = topic ? `返回${topic}专题` : '返回文章列表';
 ---
 
 <ArticleLayout
@@ -34,7 +33,7 @@ const backLabel = topic ? `返回${topic}专题` : '返回博客列表';
 	sectionLabel="文章"
 	backHref={backHref}
 	backLabel={backLabel}
-	dateLabel={dateLabel}
+	dateLabel={dateTime}
 	dateTime={dateTime}
 	dateKind="完成日期"
 	startDate={post.data.start_date ? formatDateTime(post.data.start_date) : undefined}
@@ -42,6 +41,7 @@ const backLabel = topic ? `返回${topic}专题` : '返回博客列表';
 	headings={headings}
 	canonicalPath={`/blog/${post.id}/`}
 	publishedTime={post.data.completion_date.toISOString()}
+	tags={post.data.tags}
 >
 	{topicPath.length > 0 && (
 		<nav slot="topic-navigation" class="article-topic-path" aria-label="文章专题路径">
@@ -69,5 +69,8 @@ const backLabel = topic ? `返回${topic}专题` : '返回博客列表';
 	.article-topic-path a {
 		color: var(--accent-soft);
 		overflow-wrap: anywhere;
+	}
+	.article-topic-path a:is(:hover, :focus-visible) {
+		color: var(--accent-hover);
 	}
 </style>

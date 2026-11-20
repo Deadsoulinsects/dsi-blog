@@ -46,7 +46,7 @@ const base = import.meta.env.BASE_URL;
 	}
 
 	.origin-back:is(:hover, :focus-visible) {
-		color: var(--accent-soft);
+		color: var(--accent-hover);
 	}
 
 	.origin-detail-heading {
@@ -56,9 +56,10 @@ const base = import.meta.env.BASE_URL;
 	.origin-detail-heading h1 {
 		margin: var(--space-5) 0 0;
 		font-family: var(--font-display);
-		font-size: clamp(2rem, 4vw, 3rem);
-		font-weight: 500;
-		line-height: 1.3;
+		font-size: clamp(2.5rem, 4.5vw, 3.5rem);
+		font-weight: 600;
+		line-height: 1.4;
+		letter-spacing: var(--tracking-heading);
 		text-wrap: balance;
 	}
 
@@ -93,6 +94,16 @@ const base = import.meta.env.BASE_URL;
 		font-size: var(--text-row);
 	}
 
+	.origin-detail-body :global(h2::before) {
+		display: block;
+		inline-size: var(--space-6);
+		block-size: 3px;
+		margin-block-end: var(--space-4);
+		background: var(--toc-accent);
+		content: '';
+		pointer-events: none;
+	}
+
 	.origin-detail-body :global(h3) {
 		font-family: var(--font-ui);
 		font-weight: 600;
@@ -118,12 +129,30 @@ const base = import.meta.env.BASE_URL;
 	}
 
 	.origin-detail-body :global(a:is(:hover, :focus-visible)) {
-		color: var(--text);
+		color: var(--accent-hover);
+	}
+
+	.origin-detail-body :global(ol > li::marker) {
+		color: var(--accent-gold);
+	}
+
+	.origin-detail-body :global(hr) {
+		inline-size: var(--space-9);
+		block-size: var(--rule-thin);
+		margin: var(--space-7) auto;
+		border: 0;
+		background: linear-gradient(90deg, var(--accent), var(--accent-gold));
 	}
 
 	@media (max-width: 760px) {
 		.origin-detail-heading {
 			margin-block-end: var(--space-6);
+		}
+	}
+
+	@media (max-width: 600px) {
+		.origin-detail-heading h1 {
+			font-size: clamp(2rem, 7vw, 2.5rem);
 		}
 	}
 </style>

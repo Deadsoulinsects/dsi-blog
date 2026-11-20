@@ -70,7 +70,7 @@ const activeNavIndex = navItems.findIndex((item) =>
 ---
 
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-content-theme={activeNavIndex >= 0 ? 'editorial' : undefined}>
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -234,6 +234,9 @@ const activeNavIndex = navItems.findIndex((item) =>
 		--text-soft: #a4b0d3;
 		--accent: #9d8cff;
 		--accent-soft: #6ec3ff;
+		--accent-hover: var(--accent-soft);
+		--accent-gold: var(--text-soft);
+		--toc-accent: var(--accent-soft);
 		--page-width: 72rem;
 		--header-width-scrolled: 68rem;
 		--list-measure: 50rem;
@@ -304,6 +307,32 @@ const activeNavIndex = navItems.findIndex((item) =>
 		--duration-slider: 200ms;
 		--ease-standard: cubic-bezier(0.2, 0.7, 0.2, 1);
 		--ease-slider: cubic-bezier(0.34, 0.96, 0.6, 0.99);
+	}
+
+	html[data-content-theme='editorial'] {
+		--bg: #0b0d14;
+		--bg-top: var(--bg);
+		--bg-bottom: var(--bg);
+		--ambient-left: transparent;
+		--ambient-right: transparent;
+		--bg-soft: #1a202d;
+		--panel: #1a202d;
+		--panel-strong: #1a202d;
+		--text: #f0e7ed;
+		--text-soft: #c1b3c0;
+		--line: #514452;
+		--line-accent: var(--line);
+		--line-muted: color-mix(in srgb, var(--line) 65%, transparent);
+		--accent: #eab0c6;
+		--accent-soft: #bbb1f0;
+		--accent-hover: var(--accent);
+		--accent-gold: #ddc59b;
+		--toc-accent: #ff98bd;
+		--focus-ring: 2px solid var(--accent-soft);
+		--hover-border: color-mix(in srgb, var(--accent) 34%, transparent);
+		--tag-border: color-mix(in srgb, var(--accent-soft) 24%, transparent);
+		--tag-bg: color-mix(in srgb, var(--accent-soft) 7%, transparent);
+		background: var(--bg);
 	}
 
 	* {
@@ -750,7 +779,7 @@ const activeNavIndex = navItems.findIndex((item) =>
 	}
 
 	.editorial-page .text-link:is(:hover, :focus-visible) :is(.row-title, .doc-title) {
-		color: var(--accent-soft);
+		color: var(--accent-hover);
 	}
 
 	.editorial-page .editorial-stack {
@@ -801,6 +830,10 @@ const activeNavIndex = navItems.findIndex((item) =>
 
 	.editorial-page .arrow-link:is(:hover, :focus-visible) span {
 		transform: translateX(var(--space-1));
+	}
+
+	.editorial-page .arrow-link:is(:hover, :focus-visible) {
+		color: var(--accent-hover);
 	}
 
 	.editorial-page .aftertone {
