@@ -105,7 +105,19 @@ const buildStars = (): Star[] => {
 const stars = buildStars();
 ---
 
-<Layout title={siteConfig.site.name} description={siteConfig.home.metaDescription} hideChrome={true} fullBleed={true}>
+<Layout
+	title={siteConfig.site.name}
+	description={siteConfig.home.metaDescription}
+	canonicalPath={withBase('/')}
+	shareImage={{
+		path: '/share/home-cover-v1.jpg',
+		alt: `${siteConfig.site.name}：${siteConfig.home.subtitle}。深色背景上有稀疏星点。`,
+		width: 1200,
+		height: 630,
+	}}
+	hideChrome={true}
+	fullBleed={true}
+>
 	<section class="cover-frame" aria-labelledby="cover-title">
 		<div class="cover-ambient" aria-hidden="true"></div>
 
