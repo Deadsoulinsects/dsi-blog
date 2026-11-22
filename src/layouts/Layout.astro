@@ -4,6 +4,7 @@ interface Props {
 	readonly description?: string;
 	readonly hideChrome?: boolean;
 	readonly fullBleed?: boolean;
+	readonly deferFonts?: boolean;
 	readonly canonicalPath?: string;
 	readonly noindex?: boolean;
 	readonly mainId?: string;
@@ -28,6 +29,7 @@ const {
 	description = siteConfig.site.defaultDescription,
 	hideChrome = false,
 	fullBleed = false,
+	deferFonts = false,
 	canonicalPath,
 	noindex = false,
 	mainId,
@@ -47,6 +49,7 @@ const navItems = [
 ] as const;
 
 const base = import.meta.env.BASE_URL;
+const fontStylesheet = fontStylesheetHref('a1', base);
 const site = Astro.site;
 const canonicalUrl = canonicalPath && site ? new URL(canonicalPath, site).toString() : undefined;
 const shareImageUrl = shareImage && site ? new URL(withBase(base, shareImage.path), site).href : undefined;
@@ -98,7 +101,14 @@ const activeNavIndex = navItems.findIndex((item) =>
 		<meta name="twitter:title" content={twitterTitle} />
 		<meta name="twitter:description" content={twitterDescription} />
 		<title>{title}</title>
-		<link rel="stylesheet" href={fontStylesheetHref('a1', base)} />
+		{deferFonts ? (
+			<>
+				<link rel="stylesheet" href={fontStylesheet} media="print" onload="this.removeAttribute('onload');this.setAttribute('media','all')" />
+				<noscript><link rel="stylesheet" href={fontStylesheet} /></noscript>
+			</>
+		) : (
+			<link rel="stylesheet" href={fontStylesheet} />
+		)}
 	</head>
 	<body>
 		{mainId && skipLinkLabel && <a class="site-skip-link" href={`#${mainId}`}>{skipLinkLabel}</a>}
